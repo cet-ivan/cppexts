@@ -1,0 +1,14 @@
+CONFIGURATION := gcc-debug-64
+CXX := g++
+
+CXXFLAGS := -Wall \
+            -std=c++11 \
+            -m64 \
+            -Wno-sign-compare \
+            -Wno-switch \
+            -isystem ../overrides/gcc \
+            -ffloat-store \
+            -fwrapv \
+            -g3
+
+include common.mk

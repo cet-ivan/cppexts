@@ -1,0 +1,16 @@
+CONFIGURATION := gcc-release-32
+CXX := g++
+
+CXXFLAGS := -O3 \
+            -Wall \
+            -std=c++11 \
+            -m32 \
+            -Wno-sign-compare \
+            -Wno-switch \
+            -isystem ../overrides/gcc \
+            -ffloat-store \
+            -fwrapv \
+            -g0 \
+            -DNDEBUG
+
+include common.mk

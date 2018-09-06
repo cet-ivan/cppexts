@@ -1,0 +1,23 @@
+CONFIGURATION := clang-debug-32
+CXX := clang
+
+CXXFLAGS := -Weverything \
+            -std=c++11 \
+            -m32 \
+            -Wno-c++98-compat-pedantic \
+            -Wno-covered-switch-default \
+            -Wno-exit-time-destructors \
+            -Wno-global-constructors \
+            -Wno-padded \
+            -Wno-reserved-id-macro \
+            -Wno-shift-count-overflow \
+            -Wno-shift-sign-overflow \
+            -Wno-sign-compare \
+            -Wno-sign-conversion \
+            -Wno-switch-enum \
+            -stdlib=libc++ \
+            -isystem ../overrides/clang \
+            -fwrapv \
+            -g3
+
+include common.mk
