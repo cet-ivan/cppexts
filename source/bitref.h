@@ -16,6 +16,7 @@
 #include "iterator.h"
 #include "utility.h"
 #include "cstdint.h"
+#include "algorithm.h"
 
 #include "numbase.h"
 
@@ -169,6 +170,12 @@ bool operator < ( const const_reverse_bit_iterator < Word > & a,
 //
 
 template < class BitIterator >
+bool valid_bit_iterator_range ( BitIterator first, BitIterator last ) ;
+
+
+//
+
+template < class BitIterator >
 BitIterator find_bit_1 ( BitIterator iter, size_t n ) ;
 
 template < class BitIterator >
@@ -180,8 +187,18 @@ ReverseBitIterator reverse_find_bit_1 ( ReverseBitIterator iter, size_t n ) ;
 template < class ReverseBitIterator >
 ReverseBitIterator reverse_find_bit_0 ( ReverseBitIterator iter, size_t n ) ;
 
-template < class BitIterator >
-bool valid_bit_iterator_range ( BitIterator first, BitIterator last ) ;
+
+//
+
+template < class SourceBitIterator, class DestBitIterator >
+DestBitIterator copy_n_bits ( SourceBitIterator source,
+                              size_t n,
+                              DestBitIterator dest ) ;
+
+template < class SourceReverseBitIterator, class DestReverseBitIterator >
+DestReverseBitIterator reverse_copy_n_bits ( SourceReverseBitIterator source,
+                                             size_t n,
+                                             DestReverseBitIterator dest ) ;
 
 
 
@@ -369,14 +386,22 @@ private:
   friend class reverse_bit_iterator < Word > ;
   friend class const_reverse_bit_iterator < Word > ;
 
+  friend bool valid_bit_iterator_range < > ( bit_iterator first,
+                                             bit_iterator last ) ;
+
   friend bit_iterator find_bit_1 < > ( bit_iterator iter,
                                        size_t n ) ;
 
   friend bit_iterator find_bit_0 < > ( bit_iterator iter,
                                        size_t n ) ;
 
-  friend bool valid_bit_iterator_range < > ( bit_iterator first,
-                                             bit_iterator last ) ;
+  friend bit_iterator copy_n_bits < > ( bit_iterator source,
+                                        size_t n,
+                                        bit_iterator dest ) ;
+
+  friend bit_iterator copy_n_bits < > ( const_bit_iterator < Word > source,
+                                        size_t n,
+                                        bit_iterator dest ) ;
 
   typedef Word word_type ;
 
@@ -401,8 +426,8 @@ public:
   typedef bit_reference < Word > reference ;
   typedef random_access_iterator_tag iterator_category ;
 
-  explicit bit_iterator ( Word * i_word_position = nullptr ) noexcept :
-    word_position ( i_word_position ),
+  bit_iterator ( ) noexcept :
+    word_position ( nullptr ),
     bit_position ( 0 )
     { }
 
@@ -517,15 +542,18 @@ private:
 
   friend class const_reverse_bit_iterator < Word > ;
 
+  friend bool valid_bit_iterator_range < > ( const_bit_iterator first,
+                                             const_bit_iterator last ) ;
+
   friend const_bit_iterator find_bit_1 < > ( const_bit_iterator iter,
                                              size_t n ) ;
 
   friend const_bit_iterator find_bit_0 < > ( const_bit_iterator iter,
                                              size_t n ) ;
 
-  friend bool valid_bit_iterator_range < > ( const_bit_iterator first,
-                                             const_bit_iterator last ) ;
-
+  friend bit_iterator < Word > copy_n_bits < > ( const_bit_iterator source,
+                                                 size_t n,
+                                                 bit_iterator < Word > dest ) ;
 
   typedef Word word_type ;
 
@@ -550,9 +578,8 @@ public:
   typedef const_bit_reference < Word > reference ;
   typedef random_access_iterator_tag iterator_category ;
 
-  explicit const_bit_iterator
-             ( const Word * i_word_position = nullptr ) noexcept :
-    word_position ( i_word_position ),
+  const_bit_iterator ( ) noexcept :
+    word_position ( nullptr ),
     bit_position ( 0 )
     { }
 
@@ -681,6 +708,9 @@ private:
   friend class const_bit_iterator < Word > ;
   friend class const_reverse_bit_iterator < Word > ;
 
+  friend bool valid_bit_iterator_range < > ( reverse_bit_iterator first,
+                                             reverse_bit_iterator last ) ;
+
   friend reverse_bit_iterator
            reverse_find_bit_1 < > ( reverse_bit_iterator iter,
                                     size_t n ) ;
@@ -689,8 +719,15 @@ private:
            reverse_find_bit_0 < > ( reverse_bit_iterator iter,
                                     size_t n ) ;
 
-  friend bool valid_bit_iterator_range < > ( reverse_bit_iterator first,
-                                             reverse_bit_iterator last ) ;
+  friend reverse_bit_iterator
+           reverse_copy_n_bits < > ( reverse_bit_iterator source,
+                                     size_t n,
+                                     reverse_bit_iterator dest ) ;
+
+  friend reverse_bit_iterator
+           reverse_copy_n_bits < > ( const_reverse_bit_iterator < Word > source,
+                                     size_t n,
+                                     reverse_bit_iterator dest ) ;
 
   typedef Word word_type ;
 
@@ -715,16 +752,15 @@ public:
   typedef bit_reference < Word > reference ;
   typedef random_access_iterator_tag iterator_category ;
 
-  explicit reverse_bit_iterator ( Word * i_word_position = nullptr ) noexcept :
-    word_position ( i_word_position - 1 ),
-    bit_position ( word_bit_size_1 )
+  reverse_bit_iterator ( ) noexcept :
+    word_position ( nullptr ),
+    bit_position ( 0 )
     { }
 
   reverse_bit_iterator ( Word * i_word_position,
                          ptrdiff_t bit_offset ) noexcept :
-    word_position (   i_word_position
-                    + ( ( bit_offset - 1 ) >> log2_word_bit_size ) ),
-    bit_position ( ( bit_offset - 1 ) & word_bit_size_1 )
+    word_position ( i_word_position + ( bit_offset >> log2_word_bit_size ) ),
+    bit_position ( bit_offset & word_bit_size_1 )
     { }
 
   explicit reverse_bit_iterator ( const bit_iterator < Word > & x ) noexcept :
@@ -739,8 +775,8 @@ public:
     { assert ( bit_size <= word_bit_size ) ;
       Word w = * word_position << ( word_bit_size_1 - bit_position ) ;
       if ( bit_position + 1 < bit_size )
-        w |= unsigned_shift_right
-               ( * ( word_position - 1 ), bit_position + 1 ) ;
+        w |= unsigned_shift_right ( * ( word_position - 1 ),
+                                    bit_position + 1 ) ;
       w = reverse ( w ) ;
       if ( bit_size < word_bit_size )
         w &= ( Word ( 1 ) << bit_size ) - 1 ;
@@ -837,6 +873,9 @@ private:
 
   friend class const_bit_iterator < Word > ;
 
+  friend bool valid_bit_iterator_range < > ( const_reverse_bit_iterator first,
+                                             const_reverse_bit_iterator last ) ;
+
   friend const_reverse_bit_iterator
            reverse_find_bit_1 < > ( const_reverse_bit_iterator iter,
                                     size_t n ) ;
@@ -845,8 +884,10 @@ private:
            reverse_find_bit_0 < > ( const_reverse_bit_iterator iter,
                                     size_t n ) ;
 
-  friend bool valid_bit_iterator_range < > ( const_reverse_bit_iterator first,
-                                             const_reverse_bit_iterator last ) ;
+  friend reverse_bit_iterator < Word >
+           reverse_copy_n_bits < > ( const_reverse_bit_iterator source,
+                                     size_t n,
+                                     reverse_bit_iterator < Word > dest ) ;
 
   typedef Word word_type ;
 
@@ -871,17 +912,15 @@ public:
   typedef const_bit_reference < Word > reference ;
   typedef random_access_iterator_tag iterator_category ;
 
-  explicit const_reverse_bit_iterator
-             ( const Word * i_word_position = nullptr ) noexcept :
-    word_position ( i_word_position - 1 ),
-    bit_position ( word_bit_size_1 )
+  const_reverse_bit_iterator ( ) noexcept :
+    word_position ( nullptr ),
+    bit_position ( 0 )
     { }
 
   const_reverse_bit_iterator ( const Word * i_word_position,
                                ptrdiff_t bit_offset ) noexcept :
-    word_position (   i_word_position
-                    + ( ( bit_offset - 1 ) >> log2_word_bit_size ) ),
-    bit_position ( ( bit_offset - 1 ) & word_bit_size_1 )
+    word_position ( i_word_position + ( bit_offset >> log2_word_bit_size ) ),
+    bit_position ( bit_offset & word_bit_size_1 )
     { }
 
   const_reverse_bit_iterator
@@ -909,8 +948,8 @@ public:
     { assert ( bit_size <= word_bit_size ) ;
       Word w = * word_position << ( word_bit_size_1 - bit_position ) ;
       if ( bit_position + 1 < bit_size )
-        w |= unsigned_shift_right
-               ( * ( word_position - 1 ), bit_position + 1 ) ;
+        w |= unsigned_shift_right ( * ( word_position - 1 ),
+                                    bit_position + 1 ) ;
       w = reverse ( w ) ;
       if ( bit_size < word_bit_size )
         w &= ( Word ( 1 ) << bit_size ) - 1 ;
@@ -1041,7 +1080,27 @@ return const_bit_iterator < Word > ( x ) ;
 
 
 
-// *** GLOBALS ***
+// *** VALID_BIT_ITERATOR_RANGE ***
+
+
+//
+
+template < class BitIterator >
+inline bool valid_bit_iterator_range ( BitIterator first, BitIterator last )
+
+{
+constexpr size_t word_bit_size_1 = BitIterator :: word_bit_size_1 ;
+
+return        (   reinterpret_cast < uintptr_t > ( first.word_position )
+                & ( word_bit_size_1 >> 3 ) )
+           == (   reinterpret_cast < uintptr_t > ( last.word_position )
+                & ( word_bit_size_1 >> 3 ) )
+       &&  first <= last ;
+}
+
+
+
+// *** FIND ***
 
 
 // pre: w != 0
@@ -1067,7 +1126,7 @@ return w == 0 ? numeric_traits < Word > :: bit_size
 }
 
 
-// pre w != -1
+// pre: w != -1
 
 template < class Word >
 inline size_t raw_find_bit_0 ( Word w )
@@ -1090,7 +1149,7 @@ return w == -1 ? numeric_traits < Word > :: bit_size
 }
 
 
-// pre w != 0
+// pre: w != 0
 
 template < class Word >
 inline size_t raw_find_last_bit_1 ( Word w )
@@ -1108,12 +1167,12 @@ template < class Word >
 inline size_t find_last_bit_1 ( Word w )
 
 {
-return w == -1 ? -1
-               : raw_find_last_bit_1 ( w ) ;
+return w == 0 ? -1
+              : raw_find_last_bit_1 ( w ) ;
 }
 
 
-// pre w != 0
+// pre: w != 0
 
 template < class Word >
 inline size_t raw_reverse_find_bit_1 ( Word w )
@@ -1134,7 +1193,7 @@ return w == 0 ? numeric_traits < Word > :: bit_size
 }
 
 
-// pre w != -1
+// pre: w != -1
 
 template < class Word >
 inline size_t raw_find_last_bit_0 ( Word w )
@@ -1157,7 +1216,7 @@ return w == -1 ? -1
 }
 
 
-// pre w != -1
+// pre: w != -1
 
 template < class Word >
 inline size_t raw_reverse_find_bit_0 ( Word w )
@@ -1186,13 +1245,14 @@ BitIterator find_bit_1 ( BitIterator iter, size_t n )
 {
 typedef typename BitIterator :: word_type word_type ;
 
+constexpr size_t word_bit_size = BitIterator :: word_bit_size ;
+
 if ( n == 0 )
   return iter ;
 
 if ( iter.bit_position > 0 )
   {
-  size_t relevant_bits =
-           min ( BitIterator :: word_bit_size - iter.bit_position, n ) ;
+  size_t relevant_bits = min ( word_bit_size - iter.bit_position, n ) ;
 
   word_type w =   ( * iter.word_position >> iter.bit_position )
                 & ( ( word_type ( 1 ) << relevant_bits ) - 1 ) ;
@@ -1203,20 +1263,20 @@ if ( iter.bit_position > 0 )
   if ( n == relevant_bits )
     return iter + n ;
 
-  n -= relevant_bits ;
-
   ++ iter.word_position ;
+
+  n -= relevant_bits ;
   }
 
-while ( n >= BitIterator :: word_bit_size )
+while ( n >= word_bit_size )
   {
   if ( * iter.word_position )
     return BitIterator ( iter.word_position,
                          raw_find_bit_1 ( * iter.word_position ) ) ;
 
-  n -= BitIterator :: word_bit_size ;
-
   ++ iter.word_position ;
+
+  n -= word_bit_size ;
   }
 
 if ( n > 0 )
@@ -1239,13 +1299,14 @@ BitIterator find_bit_0 ( BitIterator iter, size_t n )
 {
 typedef typename BitIterator :: word_type word_type ;
 
+constexpr size_t word_bit_size = BitIterator :: word_bit_size ;
+
 if ( n == 0 )
   return iter ;
 
 if ( iter.bit_position > 0 )
   {
-  size_t relevant_bits =
-           min ( BitIterator :: word_bit_size - iter.bit_position, n ) ;
+  size_t relevant_bits = min ( word_bit_size - iter.bit_position, n ) ;
 
   word_type w =   ( * iter.word_position >> iter.bit_position )
                 | ( word_type ( -1 ) << relevant_bits ) ;
@@ -1256,20 +1317,20 @@ if ( iter.bit_position > 0 )
   if ( n == relevant_bits )
     return iter + n ;
 
-  n -= relevant_bits ;
-
   ++ iter.word_position ;
+
+  n -= relevant_bits ;
   }
 
-while ( n >= BitIterator :: word_bit_size )
+while ( n >= word_bit_size )
   {
   if ( * iter.word_position != -1 )
     return BitIterator ( iter.word_position,
                          raw_find_bit_0 ( * iter.word_position ) ) ;
 
-  n -= BitIterator :: word_bit_size ;
-
   ++ iter.word_position ;
+
+  n -= word_bit_size ;
   }
 
 if ( n > 0 )
@@ -1292,18 +1353,19 @@ ReverseBitIterator reverse_find_bit_1 ( ReverseBitIterator iter, size_t n )
 {
 typedef typename ReverseBitIterator :: word_type word_type ;
 
+constexpr size_t word_bit_size = ReverseBitIterator :: word_bit_size,
+                 word_bit_size_1 = ReverseBitIterator :: word_bit_size_1 ;
+
 if ( n == 0 )
   return iter ;
 
-if ( iter.bit_position < ReverseBitIterator :: word_bit_size_1 )
+if ( iter.bit_position < word_bit_size_1 )
   {
   size_t relevant_bits = min ( iter.bit_position + 1, n ) ;
 
   word_type
-    w =   (    * iter.word_position
-            << ( ReverseBitIterator :: word_bit_size_1 - iter.bit_position ) )
-        & (    word_type ( -1 )
-            << ( ReverseBitIterator :: word_bit_size - relevant_bits ) ) ;
+    w =   ( * iter.word_position << ( word_bit_size_1 - iter.bit_position ) )
+        & ( word_type ( -1 ) << ( word_bit_size - relevant_bits ) ) ;
 
   if ( w )
     return iter + raw_reverse_find_bit_1 ( w ) ;
@@ -1311,34 +1373,33 @@ if ( iter.bit_position < ReverseBitIterator :: word_bit_size_1 )
   if ( n == relevant_bits )
     return iter + n ;
 
-  n -= relevant_bits ;
-
   -- iter.word_position ;
+
+  n -= relevant_bits ;
   }
 
-while ( n >= ReverseBitIterator :: word_bit_size )
+while ( n >= word_bit_size )
   {
   if ( * iter.word_position )
     return ReverseBitIterator ( iter.word_position,
                                 raw_find_last_bit_1 ( * iter.word_position ) ) ;
 
-  n -= ReverseBitIterator :: word_bit_size ;
-
   -- iter.word_position ;
+
+  n -= word_bit_size ;
   }
 
 if ( n > 0 )
   {
-  word_type
-    w =   * iter.word_position
-        & ( word_type ( -1 ) << ( ReverseBitIterator :: word_bit_size - n ) ) ;
+  word_type w =   * iter.word_position
+                & ( word_type ( -1 ) << ( word_bit_size - n ) ) ;
 
   if ( w )
     return ReverseBitIterator ( iter.word_position,
                                 raw_find_last_bit_1 ( w ) ) ;
   }
 
-return ReverseBitIterator ( iter.word_position, n ) ;
+return ReverseBitIterator ( iter.word_position, word_bit_size_1 - n ) ;
 }
 
 
@@ -1350,19 +1411,19 @@ ReverseBitIterator reverse_find_bit_0 ( ReverseBitIterator iter, size_t n )
 {
 typedef typename ReverseBitIterator :: word_type word_type ;
 
+constexpr size_t word_bit_size = ReverseBitIterator :: word_bit_size,
+                 word_bit_size_1 = ReverseBitIterator :: word_bit_size_1 ;
+
 if ( n == 0 )
   return iter ;
 
-if ( iter.bit_position < ReverseBitIterator :: word_bit_size_1 )
+if ( iter.bit_position < word_bit_size_1 )
   {
   size_t relevant_bits = min ( iter.bit_position + 1, n ) ;
 
   word_type
-    w =   (    * iter.word_position
-            << ( ReverseBitIterator :: word_bit_size_1 - iter.bit_position ) )
-        | (   (    word_type ( 1 )
-                << ( ReverseBitIterator :: word_bit_size - relevant_bits ) )
-            - 1 ) ;
+    w =   ( * iter.word_position << ( word_bit_size_1 - iter.bit_position ) )
+        | ( ( word_type ( 1 ) << ( word_bit_size - relevant_bits ) ) - 1 ) ;
 
   if ( w != -1 )
     return iter + raw_reverse_find_bit_0 ( w ) ;
@@ -1370,48 +1431,33 @@ if ( iter.bit_position < ReverseBitIterator :: word_bit_size_1 )
   if ( n == relevant_bits )
     return iter + n ;
 
-  n -= relevant_bits ;
-
   -- iter.word_position ;
+
+  n -= relevant_bits ;
   }
 
-while ( n >= ReverseBitIterator :: word_bit_size )
+while ( n >= word_bit_size )
   {
   if ( * iter.word_position != -1 )
     return ReverseBitIterator ( iter.word_position,
-                                raw_find_last_bit_1 ( * iter.word_position ) ) ;
-
-  n -= ReverseBitIterator :: word_bit_size ;
+                                raw_find_last_bit_0 ( * iter.word_position ) ) ;
 
   -- iter.word_position ;
+
+  n -= word_bit_size ;
   }
 
 if ( n > 0 )
   {
   word_type w =   * iter.word_position
-                | ( (    word_type ( 1 )
-                      << ( ReverseBitIterator :: word_bit_size - n ) ) - 1 ) ;
+                | ( ( word_type ( 1 ) << ( word_bit_size - n ) ) - 1 ) ;
 
   if ( w != -1 )
     return ReverseBitIterator ( iter.word_position,
                                 raw_find_last_bit_0 ( w ) ) ;
   }
 
-return ReverseBitIterator ( iter.word_position, n ) ;
-}
-
-
-//
-
-template < class BitIterator >
-inline bool valid_bit_iterator_range ( BitIterator first, BitIterator last )
-
-{
-return        (   reinterpret_cast < uintptr_t > ( first.word_position )
-                & ( BitIterator :: word_bit_size_1 >> 3 ) )
-           == (   reinterpret_cast < uintptr_t > ( last.word_position )
-                & ( BitIterator :: word_bit_size_1 >> 3 ) )
-       &&  first <= last ;
+return ReverseBitIterator ( iter.word_position, word_bit_size_1 - n ) ;
 }
 
 
@@ -1426,6 +1472,20 @@ inline BitIterator find_bit ( const BitIterator & first,
 assert ( valid_bit_iterator_range ( first, last ) ) ;
 ptrdiff_t n = last - first ;
 return b ? find_bit_1 ( first, n ) : find_bit_0 ( first, n ) ;
+}
+
+
+//
+
+template < class ReverseBitIterator >
+inline ReverseBitIterator reverse_find_bit ( const ReverseBitIterator & first,
+                                             const ReverseBitIterator & last,
+                                             bool b )
+
+{
+assert ( valid_bit_iterator_range ( first, last ) ) ;
+ptrdiff_t n = last - first ;
+return b ? reverse_find_bit_1 ( first, n ) : reverse_find_bit_0 ( first, n ) ;
 }
 
 
@@ -1457,20 +1517,6 @@ return find_bit ( first, last, b ) ;
 
 //
 
-template < class ReverseBitIterator >
-inline ReverseBitIterator reverse_find_bit ( const ReverseBitIterator & first,
-                                             const ReverseBitIterator & last,
-                                             bool b )
-
-{
-assert ( valid_bit_iterator_range ( first, last ) ) ;
-ptrdiff_t n = last - first ;
-return b ? reverse_find_bit_1 ( first, n ) : reverse_find_bit_0 ( first, n ) ;
-}
-
-
-//
-
 template < class Word, class T >
 inline reverse_bit_iterator < Word >
          find ( const reverse_bit_iterator < Word > & first,
@@ -1492,6 +1538,483 @@ inline const_reverse_bit_iterator < Word >
 
 {
 return reverse_find_bit ( first, last, b ) ;
+}
+
+
+
+// *** COPY ***
+
+
+//
+
+template < class Word >
+inline void copy_selected_bits ( Word source, Word selected_bits, Word & dest )
+
+{
+atomic_fetch_or ( dest, source & selected_bits ) ;
+atomic_fetch_and ( dest, source | ~ selected_bits ) ;
+}
+
+
+// pre: SourceBitIterator :: word_type == DestBitIterator :: word_type
+
+template < class SourceBitIterator, class DestBitIterator >
+DestBitIterator copy_n_bits ( SourceBitIterator source,
+                              size_t n,
+                              DestBitIterator dest )
+
+{
+typedef typename DestBitIterator :: word_type word_type ;
+
+constexpr size_t word_bit_size = DestBitIterator :: word_bit_size ;
+
+if ( n == 0 )
+  return dest ;
+
+if ( dest.bit_position == source.bit_position )
+  {
+  if ( dest.bit_position > 0 )
+    {
+    size_t relevant_bits = min ( word_bit_size - dest.bit_position, n ) ;
+
+    copy_selected_bits ( * source.word_position,
+                            ( ( word_type ( 1 ) << relevant_bits ) - 1 )
+                         << dest.bit_position,
+                         * dest.word_position ) ;
+
+    if ( n == relevant_bits )
+      return dest + n ;
+
+    ++ source.word_position ;
+    ++ dest.word_position ;
+
+    n -= relevant_bits ;
+    }
+
+  while ( n >= word_bit_size )
+    {
+    * dest.word_position = * source.word_position ;
+    ++ source.word_position ;
+    ++ dest.word_position ;
+
+    n -= word_bit_size ;
+    }
+
+  if ( n > 0 )
+    copy_selected_bits ( * source.word_position,
+                         ( word_type ( 1 ) << n ) - 1,
+                         * dest.word_position ) ;
+  }
+else
+  {
+  size_t source_shift_right,
+         source_shift_left ;
+
+  if ( dest.bit_position < source.bit_position )
+    {
+    source_shift_right = source.bit_position - dest.bit_position ;
+    source_shift_left = word_bit_size - source_shift_right ;
+    }
+  else
+    {
+    source_shift_left = dest.bit_position - source.bit_position ;
+    source_shift_right = word_bit_size - source_shift_left ;
+    }
+
+  if ( dest.bit_position > 0 )
+    {
+    size_t relevant_bits = min ( word_bit_size - dest.bit_position, n ) ;
+
+    word_type source_word ;
+
+    if ( dest.bit_position < source.bit_position )
+      {
+      source_word = unsigned_shift_right ( * source.word_position,
+                                           source_shift_right ) ;
+
+      if ( relevant_bits > word_bit_size - source.bit_position )
+        {
+        ++ source.word_position ;
+        source_word |= * source.word_position << source_shift_left ;
+        }
+      }
+    else
+      source_word = * source.word_position << source_shift_left ;
+
+    copy_selected_bits ( source_word,
+                            ( ( word_type ( 1 ) << relevant_bits ) - 1 )
+                         << dest.bit_position,
+                         * dest.word_position ) ;
+
+    if ( n == relevant_bits )
+      return dest + n ;
+
+    ++ dest.word_position ;
+
+    n -= relevant_bits ;
+    }
+
+  while ( n >= word_bit_size )
+    {
+    word_type source_word = unsigned_shift_right ( * source.word_position,
+                                                   source_shift_right ) ;
+    ++ source.word_position ;
+    source_word |= * source.word_position << source_shift_left ;
+
+    * dest.word_position = source_word ;
+    ++ dest.word_position ;
+
+    n -= word_bit_size ;
+    }
+
+  if ( n > 0 )
+    {
+    word_type source_word = unsigned_shift_right ( * source.word_position,
+                                                   source_shift_right ) ;
+
+    if ( n > source_shift_left )
+      {
+      ++ source.word_position ;
+      source_word |= * source.word_position << source_shift_left ;
+      }
+
+    copy_selected_bits ( source_word,
+                         ( word_type ( 1 ) << n ) - 1,
+                         * dest.word_position ) ;
+    }
+  }
+
+return DestBitIterator ( dest.word_position, n ) ;
+}
+
+
+// pre:    SourceReverseBitIterator:: word_type
+//      == DestReverseBitIterator :: word_type
+
+template < class SourceReverseBitIterator, class DestReverseBitIterator >
+DestReverseBitIterator reverse_copy_n_bits ( SourceReverseBitIterator source,
+                                             size_t n,
+                                             DestReverseBitIterator dest )
+
+{
+typedef typename DestReverseBitIterator :: word_type word_type ;
+
+constexpr size_t word_bit_size = DestReverseBitIterator :: word_bit_size,
+                 word_bit_size_1 = DestReverseBitIterator :: word_bit_size_1 ;
+
+if ( n == 0 )
+  return dest ;
+
+if ( dest.bit_position == source.bit_position )
+  {
+  if ( dest.bit_position < word_bit_size_1 )
+    {
+    size_t relevant_bits = min ( dest.bit_position + 1, n ) ;
+
+    copy_selected_bits ( * source.word_position,
+                            ( ( word_type ( 1 ) << relevant_bits ) - 1 )
+                         << ( dest.bit_position + 1 - relevant_bits ),
+                         * dest.word_position ) ;
+
+    if ( n == relevant_bits )
+      return dest + n ;
+
+    -- source.word_position ;
+    -- dest.word_position ;
+
+    n -= relevant_bits ;
+    }
+
+  while ( n >= word_bit_size )
+    {
+    * dest.word_position = * source.word_position ;
+    -- source.word_position ;
+    -- dest.word_position ;
+
+    n -= word_bit_size ;
+    }
+
+  if ( n > 0 )
+    copy_selected_bits ( * source.word_position,
+                         word_type ( -1 ) << ( word_bit_size - n ),
+                         * dest.word_position ) ;
+  }
+else
+  {
+  size_t source_shift_right,
+         source_shift_left ;
+
+  if ( dest.bit_position < source.bit_position )
+    {
+    source_shift_right = source.bit_position - dest.bit_position ;
+    source_shift_left = word_bit_size - source_shift_right ;
+    }
+  else
+    {
+    source_shift_left = dest.bit_position - source.bit_position ;
+    source_shift_right = word_bit_size - source_shift_left ;
+    }
+
+  if ( dest.bit_position < word_bit_size_1 )
+    {
+    size_t relevant_bits = min ( dest.bit_position + 1, n ) ;
+
+    word_type source_word ;
+
+    if ( dest.bit_position < source.bit_position )
+      source_word = unsigned_shift_right ( * source.word_position,
+                                           source_shift_right ) ;
+    else
+      {
+      source_word = * source.word_position << source_shift_left ;
+
+      if ( relevant_bits > source.bit_position + 1 )
+        {
+        -- source.word_position ;
+        source_word |= unsigned_shift_right ( * source.word_position,
+                                              source_shift_right ) ;
+        }
+      }
+
+    copy_selected_bits ( source_word,
+                            ( ( word_type ( 1 ) << relevant_bits ) - 1 )
+                         << ( dest.bit_position + 1 - relevant_bits ),
+                         * dest.word_position ) ;
+
+    if ( n == relevant_bits )
+      return dest + n ;
+
+    -- dest.word_position ;
+
+    n -= relevant_bits ;
+    }
+
+  while ( n >= word_bit_size )
+    {
+    word_type source_word = * source.word_position << source_shift_left ;
+    -- source.word_position ;
+    source_word |= unsigned_shift_right ( * source.word_position,
+                                          source_shift_right ) ;
+
+    * dest.word_position = source_word ;
+    -- dest.word_position ;
+
+    n -= word_bit_size ;
+    }
+
+  if ( n > 0 )
+    {
+    word_type source_word = * source.word_position << source_shift_left ;
+
+    if ( n > source_shift_right )
+      {
+      -- source.word_position ;
+      source_word |= unsigned_shift_right ( * source.word_position,
+                                            source_shift_right ) ;
+      }
+
+    copy_selected_bits ( source_word,
+                         word_type ( -1 ) << ( word_bit_size - n ),
+                         * dest.word_position ) ;
+    }
+  }
+
+return DestReverseBitIterator ( dest.word_position, word_bit_size_1 - n ) ;
+}
+
+
+//
+
+template < class SourceBitIterator, class DestBitIterator >
+inline DestBitIterator copy_bits ( SourceBitIterator first,
+                                   SourceBitIterator last,
+                                   DestBitIterator result )
+
+{
+assert ( valid_bit_iterator_range ( first, last ) ) ;
+return copy_n_bits ( first, last - first, result ) ;
+}
+
+
+//
+
+template < class SourceReverseBitIterator, class DestReverseBitIterator >
+inline DestReverseBitIterator
+         reverse_copy_bits ( SourceReverseBitIterator first,
+                             SourceReverseBitIterator last,
+                             DestReverseBitIterator result )
+
+{
+assert ( valid_bit_iterator_range ( first, last ) ) ;
+return reverse_copy_n_bits ( first, last - first, result ) ;
+}
+
+
+//
+
+template < class Word >
+inline bit_iterator < Word >
+         copy ( const bit_iterator < Word > & first,
+                const bit_iterator < Word > & last,
+                const bit_iterator < Word > & result )
+
+{
+return copy_bits ( first, last, result ) ;
+}
+
+
+//
+
+template < class Word >
+inline bit_iterator < Word >
+         copy ( const const_bit_iterator < Word > & first,
+                const const_bit_iterator < Word > & last,
+                const bit_iterator < Word > & result )
+
+{
+return copy_bits ( first, last, result ) ;
+}
+
+
+//
+
+template < class Word >
+inline reverse_bit_iterator < Word >
+         copy ( const reverse_bit_iterator < Word > & first,
+                const reverse_bit_iterator < Word > & last,
+                const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_copy_bits ( first, last, result ) ;
+}
+
+
+//
+
+template < class Word >
+inline reverse_bit_iterator < Word >
+         copy ( const const_reverse_bit_iterator < Word > & first,
+                const const_reverse_bit_iterator < Word > & last,
+                const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_copy_bits ( first, last, result ) ;
+}
+
+
+//
+
+template < class Word, class Size >
+inline bit_iterator < Word >
+         copy_n ( const bit_iterator < Word > & first,
+                  Size n,
+                  const bit_iterator < Word > & result )
+
+{
+return copy_n_bits ( first, n, result ) ;
+}
+
+
+//
+
+template < class Word, class Size >
+inline bit_iterator < Word >
+         copy_n ( const const_bit_iterator < Word > & first,
+                  Size n,
+                  const bit_iterator < Word > & result )
+
+{
+return copy_n_bits ( first, n, result ) ;
+}
+
+
+//
+
+template < class Word, class Size >
+inline reverse_bit_iterator < Word >
+         copy_n ( const reverse_bit_iterator < Word > & first,
+                  Size n,
+                  const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_copy_n_bits ( first, n, result ) ;
+}
+
+
+//
+
+template < class Word, class Size >
+inline reverse_bit_iterator < Word >
+         copy_n ( const const_reverse_bit_iterator < Word > & first,
+                  Size n,
+                  const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_copy_n_bits ( first, n, result ) ;
+}
+
+
+//
+
+template < class Word >
+inline bit_iterator < Word >
+         copy_backward ( const bit_iterator < Word > & first,
+                         const bit_iterator < Word > & last,
+                         const bit_iterator < Word > & result )
+
+{
+return bit_iterator < Word >
+         ( reverse_copy_bits ( reverse_bit_iterator < Word > ( last ),
+                               reverse_bit_iterator < Word > ( first ),
+                               reverse_bit_iterator < Word > ( result ) ) ) ;
+}
+
+
+//
+
+template < class Word >
+inline bit_iterator < Word >
+         copy_backward ( const const_bit_iterator < Word > & first,
+                         const const_bit_iterator < Word > & last,
+                         const bit_iterator < Word > & result )
+
+{
+return bit_iterator < Word >
+         ( reverse_copy_bits ( const_reverse_bit_iterator < Word > ( last ),
+                               const_reverse_bit_iterator < Word > ( first ),
+                               reverse_bit_iterator < Word > ( result ) ) ) ;
+}
+
+
+//
+
+template < class Word >
+inline reverse_bit_iterator < Word >
+         copy_backward ( const reverse_bit_iterator < Word > & first,
+                         const reverse_bit_iterator < Word > & last,
+                         const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_bit_iterator < Word >
+         ( copy_bits ( bit_iterator < Word > ( last ),
+                       bit_iterator < Word > ( first ),
+                       bit_iterator < Word > ( result ) ) ) ;
+}
+
+
+//
+
+template < class Word >
+inline reverse_bit_iterator < Word >
+         copy_backward ( const const_reverse_bit_iterator < Word > & first,
+                         const const_reverse_bit_iterator < Word > & last,
+                         const reverse_bit_iterator < Word > & result )
+
+{
+return reverse_bit_iterator < Word >
+         ( copy_bits ( const_bit_iterator < Word > ( last ),
+                       const_bit_iterator < Word > ( first ),
+                       bit_iterator < Word > ( result ) ) ) ;
 }
 
 

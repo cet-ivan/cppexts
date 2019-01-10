@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2014.
+// Copyright Ivan Stanojevic 2018.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -384,6 +384,16 @@ inline complex < T > polar ( const T & rho, const T & theta )
 
 {
 return complex < T > ( rho * cos ( theta ), rho * sin ( theta ) ) ;
+}
+
+
+//
+
+template < class T >
+inline complex < T > unit_polar ( const T & theta )
+
+{
+return complex < T > ( cos ( theta ), sin ( theta ) ) ;
 }
 
 

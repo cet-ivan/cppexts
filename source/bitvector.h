@@ -212,10 +212,10 @@ public:
     { return data_.get_allocator ( ) ; }
 
   iterator begin ( ) noexcept
-    { return iterator ( data_.data ( ) ) ; }
+    { return iterator ( data_.data ( ), 0 ) ; }
 
   const_iterator begin ( ) const noexcept
-    { return const_iterator ( data_.data ( ) ) ; }
+    { return const_iterator ( data_.data ( ), 0 ) ; }
 
   iterator end ( ) noexcept
     { return iterator ( data_.data ( ), size_ ) ; }
@@ -224,16 +224,16 @@ public:
     { return const_iterator ( data_.data ( ), size_ ) ; }
 
   reverse_iterator rbegin ( ) noexcept
-    { return reverse_iterator ( data_.data ( ), size_ ) ; }
+    { return reverse_iterator ( data_.data ( ), size_ - 1 ) ; }
 
   const_reverse_iterator rbegin ( ) const noexcept
-    { return const_reverse_iterator ( data_.data ( ), size_ ) ; }
+    { return const_reverse_iterator ( data_.data ( ), size_ - 1 ) ; }
 
   reverse_iterator rend ( ) noexcept
-    { return reverse_iterator ( data_.data ( ) ) ; }
+    { return reverse_iterator ( data_.data ( ), -1 ) ; }
 
   const_reverse_iterator rend ( ) const noexcept
-    { return const_reverse_iterator ( data_.data ( ) ) ; }
+    { return const_reverse_iterator ( data_.data ( ), -1 ) ; }
 
   const_iterator cbegin ( ) const noexcept
     { return begin ( ) ; }
@@ -323,6 +323,11 @@ public:
     { push_back ( b ) ; }
 
   void append ( Word word, size_t bit_size ) ;
+
+  void append ( const basic_bit_vector & b )
+    { size_t old_size = size_ ;
+      resize ( size_ + b.size_ ) ;
+      copy ( b.begin ( ), b.end ( ), begin ( ) + old_size ) ; }
 
   void pop_back ( )
     { assert ( size_ > 0 ) ;
@@ -518,7 +523,7 @@ else
   size_t back_size_mod_c = word_bit_size - back_size_mod ;
 
   if ( bit_size > back_size_mod_c )
-    data_.push_back ( word >> back_size_mod_c ) ;
+    data_.push_back ( unsigned_shift_right ( word, back_size_mod_c ) ) ;
   }
 
 size_ += bit_size ;
@@ -562,7 +567,7 @@ else
   bp = & a ;
   }
 
-size_t result ( 0 ) ;
+size_t result = 0 ;
 
 for_each_pair
   ( ap -> data_.begin ( ), ap -> data_.end ( ),
@@ -693,7 +698,7 @@ else
   bp = & a ;
   }
 
-size_t w ( 0 ) ;
+size_t w = 0 ;
 
 for_each_pair ( ap -> data_.begin ( ), ap -> data_.end ( ),
                 bp -> data_.begin ( ),
