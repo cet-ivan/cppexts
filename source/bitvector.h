@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -186,6 +186,22 @@ public:
     data_ ( a ),
     size_ ( 0 )
     { fill_from_range ( first, last ) ; }
+
+  basic_bit_vector ( const_iterator first,
+                     const_iterator last,
+                     const Allocator & a = Allocator ( ) ) :
+    data_ ( a ),
+    size_ ( 0 )
+    { resize ( last - first ) ;
+      copy ( first, last, begin ( ) ) ; }
+
+  basic_bit_vector ( iterator first,
+                     iterator last,
+                     const Allocator & a = Allocator ( ) ) :
+    data_ ( a ),
+    size_ ( 0 )
+    { resize ( last - first ) ;
+      copy ( first, last, begin ( ) ) ; }
 
   basic_bit_vector ( initializer_list < bool > l,
                      const Allocator & a = Allocator ( ) ) :
