@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -24,7 +24,7 @@
 // *** PLATFORM SPECIFIC ***
 
 
-#ifdef __unix__
+#if defined(__unix__)
 
 
 #include "ios.h"
@@ -70,6 +70,90 @@ for ( sint b = 0 ;
   result = ldexp ( result + random_device.get ( ), -8 ) ;
 
 return result ;
+}
+
+
+#elif defined(_WIN32) || defined(_WIN64)
+
+
+#include "windows.h"
+
+
+//
+
+template < class Integer >
+Integer platform_integer_seed ( )
+
+{
+HCRYPTPROV csp ;
+
+BOOL cac_status = CryptAcquireContext ( & csp,
+                                        nullptr,
+                                        nullptr,
+                                        PROV_RSA_FULL,
+                                        CRYPT_VERIFYCONTEXT ) ;
+
+if ( cac_status )
+  {
+  constexpr size_t result_byte_size = numeric_traits < Integer > :: byte_size ;
+
+  BYTE result_bytes [ result_byte_size ] ;
+  BOOL cgr_status = CryptGenRandom ( csp, result_byte_size, result_bytes ) ;
+
+  CryptReleaseContext ( csp, 0 ) ;
+
+  if ( cgr_status )
+    {
+    Integer result ( 0 ) ;
+
+    for ( BYTE b : result_bytes )
+      result = ( result << 8 ) + b ;
+
+    return result ;
+    }
+  }
+
+return 0 ;
+}
+
+
+//
+
+template < class FloatingPoint >
+FloatingPoint platform_floating_point_seed ( )
+
+{
+HCRYPTPROV csp ;
+
+BOOL cac_status = CryptAcquireContext ( & csp,
+                                        nullptr,
+                                        nullptr,
+                                        PROV_RSA_FULL,
+                                        CRYPT_VERIFYCONTEXT ) ;
+
+if ( cac_status )
+  {
+  constexpr size_t
+    result_byte_size =
+      ( numeric_traits < FloatingPoint > :: mantissa_bit_size + 7 ) >> 3 ;
+
+  BYTE result_bytes [ result_byte_size ] ;
+  BOOL cgr_status = CryptGenRandom ( csp, result_byte_size, result_bytes ) ;
+
+  CryptReleaseContext ( csp, 0 ) ;
+
+  if ( cgr_status )
+    {
+    FloatingPoint result ( 0 ) ;
+
+    for ( BYTE b : result_bytes )
+      result = ldexp ( result + b, -8 ) ;
+
+    return result ;
+    }
+  }
+
+return 0 ;
 }
 
 
@@ -196,10 +280,10 @@ FloatingPoint
   floating_point_rnd_static_generator < FloatingPoint > :: operate ( )
 
 {
-lock_guard < spinlock > lck ( sl ) ;
-
 FloatingPoint &
   v = b.data [ system_rnd_static_generator :: operate ( ) & buffer_size_mask ] ;
+
+lock_guard < spinlock > lck ( sl ) ;
 
 v += generate ( ) ;
 v -= floor ( v ) ;
