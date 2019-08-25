@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <iterator>
 
 #include "cstddef.h"
+#include "type_traits.h"
 
 
 
@@ -64,24 +65,81 @@ using std :: end ;
 
 
 
+// *** HAS_ITERATOR_CATEGORY_MEMBER_TYPE ***
+
+
+template < class T >
+class has_iterator_category_member_type
+
+{
+private:
+
+  typedef const char ( & s1 ) [ 1 ] ;
+  typedef const char ( & s2 ) [ 2 ] ;
+
+  template < class U >
+  static s1 test ( const typename U :: iterator_category * ) ;
+
+  template < class >
+  static s2 test ( ... ) ;
+
+public:
+
+   static const bool value = sizeof ( test < T > ( nullptr ) ) == 1 ;
+
+} ;
+
+
+
+// *** __ITERATOR_TRAITS_BASE ***
+
+
+//
+
+template < class T, bool IteratorCategoryExists >
+class __iterator_traits_base ;
+
+
+//
+
+template < class T >
+class __iterator_traits_base < T, true >
+
+{
+public:
+
+  typedef typename T :: iterator_category iterator_category ;
+  typedef typename T :: value_type value_type ;
+  typedef typename T :: difference_type difference_type ;
+  typedef typename T :: pointer pointer ;
+  typedef typename T :: reference reference ;
+  typedef typename T :: value_type assignment_type ;
+
+} ;
+
+
+//
+
+template < class T >
+class __iterator_traits_base < T, false >
+
+{
+} ;
+
+
+
 // *** ITERATOR_TRAITS ***
 
 
 //
 
 template < class Iterator >
-class iterator_traits
+class iterator_traits :
+  public __iterator_traits_base
+           < Iterator,
+             has_iterator_category_member_type < Iterator > :: value >
 
 {
-public:
-
-  typedef typename Iterator :: iterator_category iterator_category ;
-  typedef typename Iterator :: value_type value_type ;
-  typedef typename Iterator :: difference_type difference_type ;
-  typedef typename Iterator :: pointer pointer ;
-  typedef typename Iterator :: reference reference ;
-  typedef typename Iterator :: value_type assignment_type ;
-
 } ;
 
 
@@ -208,6 +266,55 @@ public:
   typedef void reference ;
   typedef CharT assignment_type ;
 
+} ;
+
+
+
+// *** __IS_INPUT_ITERATOR_BASE ***
+
+
+//
+
+template < class T, bool IteratorCategoryExists >
+class __is_input_iterator_base ;
+
+
+//
+
+template < class T >
+class __is_input_iterator_base < T, true > :
+  public integral_constant
+           < bool,
+             is_convertible
+               < typename iterator_traits < T > :: iterator_category,
+                 input_iterator_tag >
+               :: value >
+
+{
+} ;
+
+
+//
+
+template < class T >
+class __is_input_iterator_base < T, false > : public false_type
+
+{
+} ;
+
+
+
+// *** IS_INPUT_ITERATOR ***
+
+
+template < class T >
+class is_input_iterator :
+  public __is_input_iterator_base
+           < T,
+             has_iterator_category_member_type < iterator_traits < T > >
+               :: value >
+
+{
 } ;
 
 
