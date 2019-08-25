@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -37,16 +37,32 @@ typedef long double long_double ;
 
 
 
+// *** FOR_BUILTIN_SIGNED_CHAR_TYPES ***
+
+
+#define FOR_BUILTIN_SIGNED_CHAR_TYPES(Macro) \
+Macro(char)                                  \
+Macro(signed_char)
+
+
+
+// *** FOR_BUILTIN_SIGNED_NONCHAR_INTEGRAL_TYPES ***
+
+
+#define FOR_BUILTIN_SIGNED_NONCHAR_INTEGRAL_TYPES(Macro) \
+Macro(short)                                             \
+Macro(int)                                               \
+Macro(long)                                              \
+Macro(long_long)
+
+
+
 // *** FOR_BUILTIN_SIGNED_INTEGRAL_TYPES ***
 
 
 #define FOR_BUILTIN_SIGNED_INTEGRAL_TYPES(Macro) \
-Macro(char)                                      \
-Macro(signed_char)                               \
-Macro(short)                                     \
-Macro(int)                                       \
-Macro(long)                                      \
-Macro(long_long)
+FOR_BUILTIN_SIGNED_CHAR_TYPES(Macro)             \
+FOR_BUILTIN_SIGNED_NONCHAR_INTEGRAL_TYPES(Macro)
 
 
 
@@ -63,15 +79,31 @@ Macro(long_long,Arg)
 
 
 
+// *** FOR_BUILTIN_UNSIGNED_CHAR_TYPES ***
+
+
+#define FOR_BUILTIN_UNSIGNED_CHAR_TYPES(Macro) \
+Macro(unsigned_char)
+
+
+
+// *** FOR_BUILTIN_UNSIGNED_NONCHAR_INTEGRAL_TYPES ***
+
+
+#define FOR_BUILTIN_UNSIGNED_NONCHAR_INTEGRAL_TYPES(Macro) \
+Macro(unsigned_short)                                      \
+Macro(unsigned)                                            \
+Macro(unsigned_long)                                       \
+Macro(unsigned_long_long)
+
+
+
 // *** FOR_BUILTIN_UNSIGNED_INTEGRAL_TYPES ***
 
 
 #define FOR_BUILTIN_UNSIGNED_INTEGRAL_TYPES(Macro) \
-Macro(unsigned_char)                               \
-Macro(unsigned_short)                              \
-Macro(unsigned)                                    \
-Macro(unsigned_long)                               \
-Macro(unsigned_long_long)
+FOR_BUILTIN_UNSIGNED_CHAR_TYPES(Macro)             \
+FOR_BUILTIN_UNSIGNED_NONCHAR_INTEGRAL_TYPES(Macro)
 
 
 
@@ -84,6 +116,24 @@ Macro(unsigned_short,Arg)                                \
 Macro(unsigned,Arg)                                      \
 Macro(unsigned_long,Arg)                                 \
 Macro(unsigned_long_long,Arg)
+
+
+
+// *** FOR_BUILTIN_CHAR_TYPES ***
+
+
+#define FOR_BUILTIN_CHAR_TYPES(Macro) \
+FOR_BUILTIN_SIGNED_CHAR_TYPES(Macro)      \
+FOR_BUILTIN_UNSIGNED_CHAR_TYPES(Macro)
+
+
+
+// *** FOR_BUILTIN_NONCHAR_INTEGRAL_TYPES ***
+
+
+#define FOR_BUILTIN_NONCHAR_INTEGRAL_TYPES(Macro)  \
+FOR_BUILTIN_SIGNED_NONCHAR_INTEGRAL_TYPES(Macro)   \
+FOR_BUILTIN_UNSIGNED_NONCHAR_INTEGRAL_TYPES(Macro)
 
 
 
