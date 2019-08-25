@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -647,6 +647,21 @@ extern const unsigned char __char_reversed [ ] ;
 
 //
 
+#define __DEFINE_REVERSE(Type)          \
+                                        \
+inline Type reverse ( Type x )          \
+                                        \
+{                                       \
+return __char_reversed [ uint ( x ) ] ; \
+}
+
+FOR_BUILTIN_CHAR_TYPES(__DEFINE_REVERSE)
+
+#undef __DEFINE_REVERSE
+
+
+//
+
 #define __DEFINE_REVERSE(Type)                  \
                                                 \
 inline Type reverse ( Type x )                  \
@@ -664,7 +679,7 @@ for ( sint i = 1 ; i < sizeof ( Type ) ; ++ i ) \
 return result ;                                 \
 }
 
-FOR_BUILTIN_INTEGRAL_TYPES(__DEFINE_REVERSE)
+FOR_BUILTIN_NONCHAR_INTEGRAL_TYPES(__DEFINE_REVERSE)
 
 #undef __DEFINE_REVERSE
 
