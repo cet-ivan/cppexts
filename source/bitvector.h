@@ -89,9 +89,24 @@ class basic_bit_vector
 public:
 
   typedef Word word_type ;
-  typedef Allocator allocator_type ;
+
+  typedef bool value_type ;
   typedef size_t size_type ;
   typedef ptrdiff_t difference_type ;
+
+  typedef Allocator allocator_type ;
+
+  typedef bit_iterator < Word > iterator ;
+  typedef const_bit_iterator < Word > const_iterator ;
+
+  typedef reverse_bit_iterator < Word > reverse_iterator ;
+  typedef const_reverse_bit_iterator < Word > const_reverse_iterator ;
+
+  typedef bit_reference < Word > reference ;
+  typedef const_bit_reference < Word > const_reference ;
+
+  typedef iterator pointer ;
+  typedef const_iterator const_pointer ;
 
   static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
 
@@ -119,29 +134,72 @@ private:
         data_.back ( ) |= Word ( -1 ) << back_size_mod ; }
 
   template < class InputIterator >
-  void fill_from_range ( InputIterator first,
+  void copy_from_range ( InputIterator first,
                          InputIterator last,
                          input_iterator_tag )
-    { for ( ; first != last ; ++ first )
+    { clear ( ) ;
+      for ( ; first != last ; ++ first )
         push_back ( * first ) ; }
 
   template < class ForwardIterator >
-  void fill_from_range ( ForwardIterator first,
+  void copy_from_range ( ForwardIterator first,
                          ForwardIterator last,
                          forward_iterator_tag )
-    { data_.reserve (    ( distance ( first, last ) + word_bit_size_1 )
-                      >> log2_word_bit_size ) ;
-      fill_from_range ( first, last, input_iterator_tag ( ) ) ; }
+    { resize ( distance ( first, last ) ) ;
+      copy ( first, last, begin ( ) ) ; }
 
   template < class InputIterator >
-  void fill_from_range ( InputIterator first, InputIterator last )
-    { fill_from_range ( first,
+  void copy_from_range ( InputIterator first, InputIterator last )
+    { copy_from_range ( first,
                         last,
-                        typename iterator_traits < InputIterator > ::
-                                   iterator_category ( ) ) ; }
+                        typename    iterator_traits < InputIterator >
+                                 :: iterator_category ( ) ) ; }
 
-  void fill_from_list ( initializer_list < bool > l )
-    { fill_from_range ( l.begin ( ), l.end ( ) ) ; }
+  void copy_from_list ( initializer_list < bool > l )
+    { copy_from_range ( l.begin ( ), l.end ( ) ) ; }
+
+  template < class InputIterator >
+  iterator insert_from_range ( const_iterator position,
+                               InputIterator first,
+                               InputIterator last,
+                               input_iterator_tag )
+    { assert ( position >= cbegin ( )  &&  position <= cend ( ) ) ;
+      basic_bit_vector v ( first, last ) ;
+      size_t index = position - cbegin ( ) ;
+      resize ( size_ + v.size_ ) ;
+      iterator new_position = begin ( ) + index ;
+      copy_backward ( new_position, end ( ) - v.size_, end ( ) ) ;
+      copy ( v.begin ( ), v.end ( ), new_position ) ;
+      return new_position ; }
+
+  template < class ForwardIterator >
+  iterator insert_from_range ( const_iterator position,
+                               ForwardIterator first,
+                               ForwardIterator last,
+                               forward_iterator_tag )
+    { assert ( position >= cbegin ( )  &&  position <= cend ( ) ) ;
+      size_t index = position - cbegin ( ) ;
+      size_t n = distance ( first, last ) ;
+      resize ( size_ + n ) ;
+      iterator new_position = begin ( ) + index ;
+      copy_backward ( new_position, end ( ) - n, end ( ) ) ;
+      copy ( first, last, new_position ) ;
+      return new_position ; }
+
+  template < class InputIterator >
+  iterator insert_from_range ( const_iterator position,
+                               InputIterator first,
+                               InputIterator last )
+    { return insert_from_range
+               ( position,
+                 first,
+                 last,
+                 typename    iterator_traits < InputIterator >
+                          :: iterator_category ( ) ) ; }
+
+  iterator insert_from_list ( const_iterator position,
+                              initializer_list < bool > l )
+    { return insert_from_range ( position, l.begin ( ), l.end ( ) ) ; }
 
   template < class CharT, class CharTraits >
   basic_ostream < CharT, CharTraits > &
@@ -152,18 +210,6 @@ private:
     input_from ( basic_istream < CharT, CharTraits > & i ) ;
 
 public:
-
-  typedef bool value_type ;
-
-  typedef bit_iterator < Word > iterator ;
-  typedef const_bit_iterator < Word > const_iterator ;
-
-  typedef reverse_bit_iterator < Word > reverse_iterator ;
-  typedef const_reverse_bit_iterator < Word > const_reverse_iterator ;
-
-  typedef bit_reference < Word > reference ;
-  typedef const_bit_reference < Word > const_reference ;
-
 
   explicit basic_bit_vector ( const Allocator & a = Allocator ( ) ) :
     data_ ( a ),
@@ -181,33 +227,20 @@ public:
 
   template < class InputIterator >
   basic_bit_vector ( InputIterator first,
-                     InputIterator last,
+                     typename enable_if
+                                < is_input_iterator < InputIterator > :: value,
+                                  InputIterator > :: type
+                       last,
                      const Allocator & a = Allocator ( ) ) :
     data_ ( a ),
     size_ ( 0 )
-    { fill_from_range ( first, last ) ; }
-
-  basic_bit_vector ( const_iterator first,
-                     const_iterator last,
-                     const Allocator & a = Allocator ( ) ) :
-    data_ ( a ),
-    size_ ( 0 )
-    { resize ( last - first ) ;
-      copy ( first, last, begin ( ) ) ; }
-
-  basic_bit_vector ( iterator first,
-                     iterator last,
-                     const Allocator & a = Allocator ( ) ) :
-    data_ ( a ),
-    size_ ( 0 )
-    { resize ( last - first ) ;
-      copy ( first, last, begin ( ) ) ; }
+    { copy_from_range ( first, last ) ; }
 
   basic_bit_vector ( initializer_list < bool > l,
                      const Allocator & a = Allocator ( ) ) :
     data_ ( a ),
     size_ ( 0 )
-    { fill_from_list ( l ) ; }
+    { copy_from_list ( l ) ; }
 
   void assign ( size_t n, bool b )
     { data_.assign ( ( n + word_bit_size_1 ) >> log2_word_bit_size,
@@ -216,13 +249,15 @@ public:
       reset_trail ( ) ; }
 
   template < class InputIterator >
-  void assign ( InputIterator first, InputIterator last )
-    { clear ( ) ;
-      fill_from_range ( first, last ) ; }
+  void assign ( InputIterator first,
+                typename enable_if
+                           < is_input_iterator < InputIterator > :: value,
+                             InputIterator > :: type
+                  last )
+    { copy_from_range ( first, last ) ; }
 
   void assign ( initializer_list < bool > l )
-    { clear ( ) ;
-      fill_from_list ( l ) ; }
+    { copy_from_list ( l ) ; }
 
   Allocator get_allocator ( ) const
     { return data_.get_allocator ( ) ; }
@@ -351,6 +386,57 @@ public:
       data_.resize ( ( size_ + word_bit_size_1 ) >> log2_word_bit_size,
                      Word ( 0 ) ) ;
       reset_trail ( ) ; }
+
+  iterator insert ( const_iterator position, bool b )
+    { assert ( position >= cbegin ( )  &&  position <= cend ( ) ) ;
+      size_t index = position - cbegin ( ) ;
+      resize ( size_ + 1 ) ;
+      iterator new_position = begin ( ) + index ;
+      copy_backward ( new_position, end ( ) - 1, end ( ) ) ;
+      * new_position = b ;
+      return new_position ; }
+
+  iterator insert ( const_iterator position, size_t n, bool b )
+    { assert ( position >= cbegin ( )  &&  position <= cend ( ) ) ;
+      size_t index = position - cbegin ( ) ;
+      resize ( size_ + n ) ;
+      iterator new_position = begin ( ) + index ;
+      copy_backward ( new_position, end ( ) - n, end ( ) ) ;
+      fill ( new_position, new_position + n, b ) ;
+      return new_position ; }
+
+  template < class InputIterator >
+  iterator insert ( const_iterator position,
+                    InputIterator first,
+                    typename enable_if
+                               < is_input_iterator < InputIterator > :: value,
+                                 InputIterator > :: type
+                      last )
+    { return insert_from_range ( position, first, last ) ; }
+
+  iterator insert ( const_iterator position, initializer_list < bool > l )
+    { return insert_from_list ( position, l ) ; }
+
+  iterator emplace ( const_iterator position, bool b )
+    { return insert ( position, b ) ; }
+
+  iterator erase ( const_iterator position )
+    { assert ( position >= cbegin ( )  &&  position < cend ( ) ) ;
+      size_t index = position - cbegin ( ) ;
+      iterator new_position ( position ) ;
+      copy ( new_position + 1, end ( ), new_position ) ;
+      pop_back ( ) ;
+      return begin ( ) + index ; }
+
+  iterator erase ( const_iterator first, const_iterator last )
+    { assert ( cbegin ( ) <= first  &&  first <= last  &&  last <= cend ( ) ) ;
+      size_t index = first - cbegin ( ) ;
+      if ( first < last )
+        {
+        copy ( last, cend ( ), iterator ( first ) ) ;
+        resize ( size_ - ( last - first ) ) ;
+        }
+      return begin ( ) + index ; }
 
   basic_bit_vector & reset ( )
     { fill ( data_.begin ( ), data_.end ( ), Word ( 0 ) ) ;
