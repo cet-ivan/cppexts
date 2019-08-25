@@ -4,13 +4,13 @@ CXX := clang
 CXXFLAGS := -Weverything \
             -std=c++11 \
             -m32 \
+            -Wno-atomic-implicit-seq-cst \
             -Wno-c++98-compat-pedantic \
             -Wno-covered-switch-default \
             -Wno-exit-time-destructors \
             -Wno-global-constructors \
             -Wno-padded \
             -Wno-reserved-id-macro \
-            -Wno-shift-count-overflow \
             -Wno-shift-sign-overflow \
             -Wno-sign-compare \
             -Wno-sign-conversion \
