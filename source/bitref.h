@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2019.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -418,6 +418,11 @@ private:
   Word * word_position ;
   size_t bit_position ;
 
+  explicit bit_iterator ( const const_bit_iterator < Word > & x ) noexcept :
+    word_position ( const_cast < Word * > ( x.word_position ) ),
+    bit_position ( x.bit_position )
+    { }
+
 public:
 
   typedef ptrdiff_t difference_type ;
@@ -540,6 +545,7 @@ private:
   template < class Word2, class Allocator >
   friend class basic_bit_vector ;
 
+  friend class bit_iterator < Word > ;
   friend class const_reverse_bit_iterator < Word > ;
 
   friend bool valid_bit_iterator_range < > ( const_bit_iterator first,
@@ -744,6 +750,12 @@ private:
   Word * word_position ;
   size_t bit_position ;
 
+  explicit reverse_bit_iterator
+             ( const const_reverse_bit_iterator < Word > & x ) noexcept :
+    word_position ( const_cast < Word * > ( x.word_position ) ),
+    bit_position ( x.bit_position )
+    { }
+
 public:
 
   typedef ptrdiff_t difference_type ;
@@ -872,6 +884,7 @@ private:
   friend class basic_bit_vector ;
 
   friend class const_bit_iterator < Word > ;
+  friend class reverse_bit_iterator < Word > ;
 
   friend bool valid_bit_iterator_range < > ( const_reverse_bit_iterator first,
                                              const_reverse_bit_iterator last ) ;
