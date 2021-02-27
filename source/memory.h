@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -57,7 +57,7 @@ using std :: default_delete ;
 using std :: unique_ptr ;
 using std :: shared_ptr ;
 using std :: weak_ptr ;
-using std :: auto_ptr ;
+// using std :: auto_ptr ;
 
 using std :: bad_weak_ptr ;
 
