@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -124,163 +124,176 @@ public:
 
   typedef T value_type ;
 
-  T real,
-    imag ;
+  T re, im ;
 
   complex ( ) :
-    real ( 0 ),
-    imag ( 0 )
+    re ( 0 ),
+    im ( 0 )
     { }
 
-  complex ( const T & i_real ) :
-    real ( i_real ),
-    imag ( 0 )
+  complex ( const T & i_re ) :
+    re ( i_re ),
+    im ( 0 )
     { }
 
-  complex ( const T & i_real, const T & i_imag ) :
-    real ( i_real ),
-    imag ( i_imag )
-    { }
-
-  template < class X >
-  complex ( const complex < X > & z ) :
-    real ( z.real ),
-    imag ( z.imag )
+  complex ( const T & i_re, const T & i_im ) :
+    re ( i_re ),
+    im ( i_im )
     { }
 
   template < class S >
   complex ( const S & x,
             typename implicit_conversion_test < S, T > :: result =
               implicit_conversion_allowed ) :
-    real ( x ),
-    imag ( 0 )
+    re ( x ),
+    im ( 0 )
     { }
+
+  template < class S >
+  complex ( const complex < S > & z,
+            typename implicit_conversion_test < S, T > :: result =
+              implicit_conversion_allowed ) :
+    re ( z.re ),
+    im ( z.im )
+    { }
+
+  T real ( ) const
+    { return re ; }
+
+  void real ( const T & x )
+    { re = x ; }
+
+  T imag ( ) const
+    { return im ; }
+
+  void imag ( const T & x )
+    { im = x ; }
 
   const complex & operator + ( ) const
     { return * this ; }
 
   complex operator - ( ) const
-    { return complex ( - real, - imag ) ; }
+    { return complex ( - re, - im ) ; }
 
   friend complex operator + ( const __complex_base < T > & a,
                               const __complex_base < T > & b )
     { const complex & ar = static_cast < const complex & > ( a ),
                     & br = static_cast < const complex & > ( b ) ;
-      return complex ( ar.real + br.real, ar.imag + br.imag ) ; }
+      return complex ( ar.re + br.re, ar.im + br.im ) ; }
 
   friend complex operator + ( const complex & a, const T & b )
-    { return complex ( a.real + b, a.imag ) ; }
+    { return complex ( a.re + b, a.im ) ; }
 
   friend complex operator + ( const T & a, const complex & b )
-    { return complex ( a + b.real, b.imag ) ; }
+    { return complex ( a + b.re, b.im ) ; }
 
   friend complex operator - ( const __complex_base < T > & a,
                               const __complex_base < T > & b )
     { const complex & ar = static_cast < const complex & > ( a ),
                     & br = static_cast < const complex & > ( b ) ;
-      return complex ( ar.real - br.real, ar.imag - br.imag ) ; }
+      return complex ( ar.re - br.re, ar.im - br.im ) ; }
 
   friend complex operator - ( const complex & a, const T & b )
-    { return complex ( a.real - b, a.imag ) ; }
+    { return complex ( a.re - b, a.im ) ; }
 
   friend complex operator - ( const T & a, const complex & b )
-    { return complex ( a - b.real, - b.imag ) ; }
+    { return complex ( a - b.re, - b.im ) ; }
 
   friend complex operator * ( const __complex_base < T > & a,
                               const __complex_base < T > & b )
     { const complex & ar = static_cast < const complex & > ( a ),
                     & br = static_cast < const complex & > ( b ) ;
-      return complex ( ar.real * br.real - ar.imag * br.imag,
-                       ar.imag * br.real + ar.real * br.imag ) ; }
+      return complex ( ar.re * br.re - ar.im * br.im,
+                       ar.im * br.re + ar.re * br.im ) ; }
 
   friend complex operator * ( const complex & a, const T & b )
-    { return complex ( a.real * b, a.imag * b ) ; }
+    { return complex ( a.re * b, a.im * b ) ; }
 
   friend complex operator * ( const T & a, const complex & b )
-    { return complex ( a * b.real, a * b.imag ) ; }
+    { return complex ( a * b.re, a * b.im ) ; }
 
   friend complex operator / ( const __complex_base < T > & a,
                               const __complex_base < T > & b )
     { const complex & ar = static_cast < const complex & > ( a ),
                     & br = static_cast < const complex & > ( b ) ;
       T n ( norm ( br ) ) ;
-      return complex ( ( ar.real * br.real + ar.imag * br.imag ) / n,
-                       ( ar.imag * br.real - ar.real * br.imag ) / n ) ; }
+      return complex ( ( ar.re * br.re + ar.im * br.im ) / n,
+                       ( ar.im * br.re - ar.re * br.im ) / n ) ; }
 
   friend complex operator / ( const complex & a, const T & b )
-    { return complex ( a.real / b, a.imag / b ) ; }
+    { return complex ( a.re / b, a.im / b ) ; }
 
   friend complex operator / ( const T & a, const complex & b )
     { T n ( norm ( b ) ) ;
-      return complex ( a * b.real / n, - a * b.imag / n ) ; }
+      return complex ( a * b.re / n, - a * b.im / n ) ; }
 
   complex & operator = ( const T & x )
-    { real = x ;
-      imag = 0 ;
+    { re = x ;
+      im = 0 ;
       return * this ; }
 
   complex & operator += ( const T & x )
-    { real += x ;
+    { re += x ;
       return * this ; }
 
   complex & operator -= ( const T & x )
-    { real -= x ;
+    { re -= x ;
       return * this ; }
 
   complex & operator *= ( const T & x )
-    { real *= x ;
-      imag *= x ;
+    { re *= x ;
+      im *= x ;
       return * this ; }
 
   complex & operator /= ( const T & x )
-    { real /= x ;
-      imag /= x ;
+    { re /= x ;
+      im /= x ;
       return * this ; }
 
   template < class X >
   complex & operator = ( const complex < X > & z )
-    { real = z.real ;
-      imag = z.imag ;
+    { re = z.re ;
+      im = z.im ;
       return * this ; }
 
   template < class X >
   complex & operator += ( const complex < X > & z )
-    { real += z.real ;
-      imag += z.imag ;
+    { re += z.re ;
+      im += z.im ;
       return * this ; }
 
   template < class X >
   complex & operator -= ( const complex < X > & z )
-    { real -= z.real ;
-      imag -= z.imag ;
+    { re -= z.re ;
+      im -= z.im ;
       return * this ; }
 
   template < class X >
   complex & operator *= ( const complex < X > & z )
-    { T new_imag = imag * z.real + real * z.imag ;
-      real = real * z.real - imag * z.imag ;
-      imag = new_imag ;
+    { T new_im = im * z.re + re * z.im ;
+      re = re * z.re - im * z.im ;
+      im = new_im ;
       return * this ; }
 
   template < class X >
   complex & operator /= ( const complex < X > & z )
     { T n = norm ( z ),
-        new_imag = ( imag * z.real - real * z.imag ) / n ;
-      real = ( real * z.real + imag * z.imag ) / n ;
-      imag = new_imag ;
+        new_im = ( im * z.re - re * z.im ) / n ;
+      re = ( re * z.re + im * z.im ) / n ;
+      im = new_im ;
       return * this ; }
 
   friend bool operator == ( const __complex_base < T > & a,
                             const __complex_base < T > & b )
     { const complex & ar = static_cast < const complex & > ( a ),
                     & br = static_cast < const complex & > ( b ) ;
-      return ar.real == br.real  &&  ar.imag == br.imag ; }
+      return ar.re == br.re  &&  ar.im == br.im ; }
 
   friend bool operator == ( const complex & a, const T & b )
-    { return a.real == b  &&  a.imag == T ( 0 ) ; }
+    { return a.re == b  &&  a.im == T ( 0 ) ; }
 
   friend bool operator == ( const T & a, const complex & b )
-    { return a == b.real  &&  T ( 0 ) == b.imag ; }
+    { return a == b.re  &&  T ( 0 ) == b.im ; }
 
   friend complex pow ( const __complex_base < T > & z,
                        const __complex_base < T > & e )
@@ -306,13 +319,13 @@ public:
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
                   const complex & z )
-    { return output_pair ( o, z.real, z.imag ) ; }
+    { return output_pair ( o, z.re, z.im ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_istream < CharT, CharTraits > &
     operator >> ( basic_istream < CharT, CharTraits > & i,
                   complex & z )
-    { return input_pair ( i, z.real, z.imag ) ; }
+    { return input_pair ( i, z.re, z.im ) ; }
 
 } ;
 
@@ -323,7 +336,7 @@ template < class T >
 inline const T & real ( const complex < T > & z )
 
 {
-return z.real ;
+return z.re ;
 }
 
 
@@ -333,7 +346,7 @@ template < class T >
 inline const T & imag ( const complex < T > & z )
 
 {
-return z.imag ;
+return z.im ;
 }
 
 
@@ -343,7 +356,7 @@ template < class T >
 inline T norm ( const complex < T > & z )
 
 {
-return sqr ( z.real ) + sqr ( z.imag ) ;
+return sqr ( z.re ) + sqr ( z.im ) ;
 }
 
 
@@ -363,7 +376,7 @@ template < class T >
 inline T arg ( const complex < T > & z )
 
 {
-return atan2 ( z.imag, z.real ) ;
+return atan2 ( z.im, z.re ) ;
 }
 
 
@@ -373,7 +386,7 @@ template < class T >
 inline complex < T > conj ( const complex < T > & z )
 
 {
-return complex < T > ( z.real, - z.imag ) ;
+return complex < T > ( z.re, - z.im ) ;
 }
 
 
@@ -405,11 +418,11 @@ inline complex < T > sqrt ( const complex < T > & z )
 {
 T m ( abs ( z ) ) ;
 
-complex < T > result ( sqrt ( ( m + z.real ) / 2 ),
-                       sqrt ( ( m - z.real ) / 2 ) ) ;
+complex < T > result ( sqrt ( ( m + z.re ) / 2 ),
+                       sqrt ( ( m - z.re ) / 2 ) ) ;
 
-if ( ( z.imag ) < T ( 0 ) )
-  result.imag = - result.imag ;
+if ( z.im < T ( 0 ) )
+  result.im = - result.im ;
 
 return result ;
 }
@@ -421,7 +434,7 @@ template < class T >
 inline complex < T > exp ( const complex < T > & z )
 
 {
-return polar ( exp ( z.real ), z.imag ) ;
+return polar ( exp ( z.re ), z.im ) ;
 }
 
 
@@ -500,8 +513,8 @@ template < class T >
 inline complex < T > sin ( const complex < T > & z )
 
 {
-complex < T > t ( sinh ( complex < T > ( - z.imag, z.real ) ) ) ;
-return complex < T > ( t.imag, - t.real ) ;
+complex < T > t ( sinh ( complex < T > ( - z.im, z.re ) ) ) ;
+return complex < T > ( t.im, - t.re ) ;
 }
 
 
@@ -511,7 +524,7 @@ template < class T >
 inline complex < T > cos ( const complex < T > & z )
 
 {
-return cosh ( complex < T > ( - z.imag, z.real ) ) ;
+return cosh ( complex < T > ( - z.im, z.re ) ) ;
 }
 
 
@@ -521,8 +534,8 @@ template < class T >
 inline complex < T > tan ( const complex < T > & z )
 
 {
-complex < T > t ( tanh ( complex < T > ( - z.imag, z.real ) ) ) ;
-return complex < T > ( t.imag, - t.real ) ;
+complex < T > t ( tanh ( complex < T > ( - z.im, z.re ) ) ) ;
+return complex < T > ( t.im, - t.re ) ;
 }
 
 
@@ -590,9 +603,9 @@ class implicit_conversion_test < T, complex < T > > :
 
 //
 
-template < class X, class T >
-class implicit_conversion_test < complex < X >, complex < T > > :
-  public implicit_conversion_test_ok
+template < class S, class T >
+class implicit_conversion_test < S, complex < T > > :
+  public implicit_conversion_test < S, T >
 
 {
 } ;
@@ -601,7 +614,7 @@ class implicit_conversion_test < complex < X >, complex < T > > :
 //
 
 template < class S, class T >
-class implicit_conversion_test < S, complex < T > > :
+class implicit_conversion_test < complex < S >, complex < T > > :
   public implicit_conversion_test < S, T >
 
 {
