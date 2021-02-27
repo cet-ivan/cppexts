@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -78,7 +78,7 @@ using std :: reverse_copy ;
 using std :: rotate ;
 using std :: rotate_copy ;
 
-using std :: random_shuffle ;
+// using std :: random_shuffle ;
 using std :: shuffle ;
 
 using std :: is_partitioned ;
