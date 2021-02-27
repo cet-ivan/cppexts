@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2020.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -85,10 +85,32 @@ public:
 template < class CharT, class CharTraits, class T1, class T2 >
 inline basic_ostream < CharT, CharTraits > &
   output_pair ( basic_ostream < CharT, CharTraits > & o,
-                const T1 & a, const T2 & b )
+                const T1 & v1, const T2 & v2 )
 
 {
-return o << CharT ( '(' ) << a << CharT ( ',' ) << b << CharT ( ')' ) ;
+return o << CharT ( '(' )
+         << v1
+         << CharT ( ',' )
+         << v2
+         << CharT ( ')' ) ;
+}
+
+
+//
+
+template < class CharT, class CharTraits, class T1, class T2, class T3 >
+inline basic_ostream < CharT, CharTraits > &
+  output_triple ( basic_ostream < CharT, CharTraits > & o,
+                  const T1 & v1, const T2 & v2, const T3 & v3 )
+
+{
+return o << CharT ( '(' )
+         << v1
+         << CharT ( ',' )
+         << v2
+         << CharT ( ',' )
+         << v3
+         << CharT ( ')' ) ;
 }
 
 
@@ -269,11 +291,11 @@ public:
 template < class CharT, class CharTraits, class T1, class T2 >
 basic_istream < CharT, CharTraits > &
   input_pair ( basic_istream < CharT, CharTraits > & i,
-               T1 & a, T2 & b )
+               T1 & v1, T2 & v2 )
 
 {
-T1 ta ;
-T2 tb ;
+T1 t1 ;
+T2 t2 ;
 
 CharT c ;
 
@@ -281,7 +303,7 @@ i >> c ;
 if ( ! i.good ( )  ||  c != CharT ( '(' ) )
   goto error_end ;
 
-i >> ta ;
+i >> t1 ;
 if ( ! i.good ( ) )
   goto error_end ;
 
@@ -289,7 +311,7 @@ i >> c ;
 if ( ! i.good ( )  ||  c != CharT ( ',' ) )
   goto error_end ;
 
-i >> tb ;
+i >> t2 ;
 if ( ! i.good ( ) )
   goto error_end ;
 
@@ -297,8 +319,66 @@ i >> c ;
 if ( ! i.good ( )  ||  c != CharT ( ')' ) )
   goto error_end ;
 
-a = move ( ta ) ;
-b = move ( tb ) ;
+v1 = move ( t1 ) ;
+v2 = move ( t2 ) ;
+
+goto end ;
+
+error_end:
+
+i.setstate ( ios_base :: failbit ) ;
+
+end:
+
+return i ;
+}
+
+
+//
+
+template < class CharT, class CharTraits, class T1, class T2, class T3 >
+basic_istream < CharT, CharTraits > &
+  input_triple ( basic_istream < CharT, CharTraits > & i,
+                 T1 & v1, T2 & v2, T3 & v3 )
+
+{
+T1 t1 ;
+T2 t2 ;
+T3 t3 ;
+
+CharT c ;
+
+i >> c ;
+if ( ! i.good ( )  ||  c != CharT ( '(' ) )
+  goto error_end ;
+
+i >> t1 ;
+if ( ! i.good ( ) )
+  goto error_end ;
+
+i >> c ;
+if ( ! i.good ( )  ||  c != CharT ( ',' ) )
+  goto error_end ;
+
+i >> t2 ;
+if ( ! i.good ( ) )
+  goto error_end ;
+
+i >> c ;
+if ( ! i.good ( )  ||  c != CharT ( ',' ) )
+  goto error_end ;
+
+i >> t3 ;
+if ( ! i.good ( ) )
+  goto error_end ;
+
+i >> c ;
+if ( ! i.good ( )  ||  c != CharT ( ')' ) )
+  goto error_end ;
+
+v1 = move ( t1 ) ;
+v2 = move ( t2 ) ;
+v3 = move ( t3 ) ;
 
 goto end ;
 
@@ -609,7 +689,7 @@ public:
     begin ( s ),
     current ( s ),
     end ( s + CharTraits :: length ( s ) )
-    { assert ( s != 0 ) ; }
+    { assert ( s != nullptr ) ; }
 
 } ;
 
