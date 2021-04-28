@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -607,13 +607,13 @@ size_t zds ;
 if ( :: is_negative ( zde ) )
   zds = 0 ;
 else
- if ( zde <= numeric_traits < size_t > :: max ( ) )
-   {
-   zds = convert_to < size_t > ( zde ) ;
-   y = ldexp ( y, - digit_bit_size * zde ) ;
-   }
- else
-   throw bad_alloc ( ) ;
+  if ( zde <= numeric_traits < size_t > :: max ( ) )
+    {
+    zds = convert_to < size_t > ( zde ) ;
+    y = ldexp ( y, - digit_bit_size * zde ) ;
+    }
+  else
+    throw bad_alloc ( ) ;
 
 basic_exint result ( zds, 0, a ) ;
 
