@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -87,9 +87,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
       }
   }
 
-{
-size_t i = dimension ;
-while ( i != 0 )
+for ( size_t i = dimension ; i != 0 ; )
   {
   -- i ;
 
@@ -100,7 +98,6 @@ while ( i != 0 )
 
   x [ i ] = c / a [ i ] [ i ] ;
   }
-}
 
 if ( singular != nullptr )
   * singular = false ;
@@ -231,6 +228,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
   {
   assert ( indexing_size ( a [ i ] ) == dimension ) ;
 
+  {
   matrix_element c ( a [ i ] [ i ] ) ;
   size_t p = i,
          q = i ;
@@ -266,6 +264,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
 
     swap ( solution_index [ i ], solution_index [ q ] ) ;
     }
+  }
 
   if ( a [ i ] [ i ] == 0 )
     {
@@ -289,9 +288,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
       }
   }
 
-{
-size_t i = dimension ;
-while ( i != 0 )
+for ( size_t i = dimension ; i != 0 ; )
   {
   -- i ;
 
@@ -302,7 +299,6 @@ while ( i != 0 )
 
   x [ solution_index [ i ] ] = c / a [ i ] [ i ] ;
   }
-}
 
 if ( singular != nullptr )
   * singular = false ;
@@ -409,6 +405,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
   {
   assert ( indexing_size ( a [ i ] ) == dimension ) ;
 
+  {
   matrix_element c ( a [ i ] [ i ] ) ;
   size_t p = i,
          q = i ;
@@ -444,6 +441,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
 
     negate = ! negate ;
     }
+  }
 
   if ( a [ i ] [ i ] == 0 )
     return matrix_element ( 0 ) ;
