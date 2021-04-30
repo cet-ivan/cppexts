@@ -1,13 +1,13 @@
-// Copyright Ivan Stanojevic 2015.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
 
 
 
-#ifndef __FVM_H
+#ifndef __FSVM_H
 
-#define __FVM_H
+#define __FSVM_H
 
 
 
@@ -27,325 +27,331 @@
 // *** FORWARD_DECLARATIONS ***
 
 
-//
-
 template < class T, size_t N >
-class fixed_vector ;
+class fs_vector ;
 
 template < class T, size_t N1, size_t N2 >
-class fixed_matrix ;
+class fs_matrix ;
 
 template < class T, size_t N >
-class fixed_lower_triangular_matrix ;
+class fs_lower_triangular_matrix ;
 
 template < class T, size_t N >
-class fixed_upper_triangular_matrix ;
+class fs_upper_triangular_matrix ;
 
 
-//
+
+// *** FS_VECTOR FORWARD_DECLARATIONS ***
+
 
 template < class T, size_t N >
-fixed_vector < T, N > operator + ( const fixed_vector < T, N > & a,
-                                   const fixed_vector < T, N > & b ) ;
+fs_vector < T, N > operator + ( const fs_vector < T, N > & a,
+                                const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N > operator - ( const fixed_vector < T, N > & a,
-                                   const fixed_vector < T, N > & b ) ;
+fs_vector < T, N > operator - ( const fs_vector < T, N > & a,
+                                const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-T operator * ( const fixed_vector < T, N > & a,
-               const fixed_vector < T, N > & b ) ;
+T operator * ( const fs_vector < T, N > & a,
+               const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N > operator * ( const fixed_vector < T, N > & a,
-                                   const T & b ) ;
+fs_vector < T, N > operator * ( const fs_vector < T, N > & a,
+                                const T & b ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N > operator * ( const T & a,
-                                   const fixed_vector < T, N > & b ) ;
+fs_vector < T, N > operator * ( const T & a,
+                                const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N > operator / ( const fixed_vector < T, N > & a,
-                                   const T & b ) ;
+fs_vector < T, N > operator / ( const fs_vector < T, N > & a,
+                                const T & b ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N > operator % ( const fixed_vector < T, N > & a,
-                                   const T & b ) ;
+fs_vector < T, N > operator % ( const fs_vector < T, N > & a,
+                                const T & b ) ;
 
 template < class T, size_t N >
-bool operator == ( const fixed_vector < T, N > & a,
-                   const fixed_vector < T, N > & b ) ;
+bool operator == ( const fs_vector < T, N > & a,
+                   const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-bool operator < ( const fixed_vector < T, N > & a,
-                  const fixed_vector < T, N > & b ) ;
+bool operator < ( const fs_vector < T, N > & a,
+                  const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-void swap ( fixed_vector < T, N > & a, fixed_vector < T, N > & b ) ;
+void swap ( fs_vector < T, N > & a, fs_vector < T, N > & b ) ;
 
 template < class T, size_t N, class UnaryOperation >
-fixed_vector < T, N > componentwise ( const fixed_vector < T, N > & a,
-                                      UnaryOperation unary_operation ) ;
+fs_vector < T, N > componentwise ( const fs_vector < T, N > & a,
+                                   UnaryOperation unary_operation ) ;
 
 template < class T, size_t N, class BinaryOperation >
-fixed_vector < T, N > componentwise ( const fixed_vector < T, N > & a,
-                                      const fixed_vector < T, N > & b,
-                                      BinaryOperation binary_operation ) ;
+fs_vector < T, N > componentwise ( const fs_vector < T, N > & a,
+                                   const fs_vector < T, N > & b,
+                                   BinaryOperation binary_operation ) ;
 
 template < class T, size_t N >
-T inner_product ( const fixed_vector < T, N > & a,
-                  const fixed_vector < T, N > & b ) ;
+T inner_product ( const fs_vector < T, N > & a,
+                  const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-inline T norm ( const fixed_vector < T, N > & a ) ;
+inline T norm ( const fs_vector < T, N > & a ) ;
 
 
-//
+
+// *** FS_MATRIX FORWARD_DECLARATIONS ***
+
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator + ( const fixed_matrix < T, N1, N2 > & a,
-                                        const fixed_matrix < T, N1, N2 > & b ) ;
+fs_matrix < T, N1, N2 > operator + ( const fs_matrix < T, N1, N2 > & a,
+                                     const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator - ( const fixed_matrix < T, N1, N2 > & a,
-                                        const fixed_matrix < T, N1, N2 > & b ) ;
+fs_matrix < T, N1, N2 > operator - ( const fs_matrix < T, N1, N2 > & a,
+                                     const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator * ( const fixed_matrix < T, N1, N2 > & a,
-                                        const T & b ) ;
+fs_matrix < T, N1, N2 > operator * ( const fs_matrix < T, N1, N2 > & a,
+                                     const T & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator * ( const T & a,
-                                        const fixed_matrix < T, N1, N2 > & b ) ;
+fs_matrix < T, N1, N2 > operator * ( const T & a,
+                                     const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator / ( const fixed_matrix < T, N1, N2 > & a,
-                                        const T & b ) ;
+fs_matrix < T, N1, N2 > operator / ( const fs_matrix < T, N1, N2 > & a,
+                                     const T & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > operator % ( const fixed_matrix < T, N1, N2 > & a,
-                                        const T & b ) ;
+fs_matrix < T, N1, N2 > operator % ( const fs_matrix < T, N1, N2 > & a,
+                                     const T & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-bool operator == ( const fixed_matrix < T, N1, N2 > & a,
-                   const fixed_matrix < T, N1, N2 > & b ) ;
+bool operator == ( const fs_matrix < T, N1, N2 > & a,
+                   const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-bool operator < ( const fixed_matrix < T, N1, N2 > & a,
-                  const fixed_matrix < T, N1, N2 > & b ) ;
+bool operator < ( const fs_matrix < T, N1, N2 > & a,
+                  const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-void swap ( fixed_matrix < T, N1, N2 > & a, fixed_matrix < T, N1, N2 > & b ) ;
+void swap ( fs_matrix < T, N1, N2 > & a, fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2, class UnaryOperation >
-fixed_matrix < T, N1, N2 >
-  componentwise ( const fixed_matrix < T, N1, N2 > & a,
+fs_matrix < T, N1, N2 >
+  componentwise ( const fs_matrix < T, N1, N2 > & a,
                   UnaryOperation unary_operation ) ;
 
 template < class T, size_t N1, size_t N2, class BinaryOperation >
-fixed_matrix < T, N1, N2 >
-  componentwise ( const fixed_matrix < T, N1, N2 > & a,
-                  const fixed_matrix < T, N1, N2 > & b,
+fs_matrix < T, N1, N2 >
+  componentwise ( const fs_matrix < T, N1, N2 > & a,
+                  const fs_matrix < T, N1, N2 > & b,
                   BinaryOperation binary_operation ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 > outer_product ( const fixed_vector < T, N1 > & a,
-                                           const fixed_vector < T, N2 > & b ) ;
+fs_matrix < T, N1, N2 > outer_product ( const fs_vector < T, N1 > & a,
+                                        const fs_vector < T, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_vector < T, N1 > operator * ( const fixed_matrix < T, N1, N2 > & m,
-                                    const fixed_vector < T, N2 > & v ) ;
+fs_vector < T, N1 > operator * ( const fs_matrix < T, N1, N2 > & m,
+                                 const fs_vector < T, N2 > & v ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_vector < T, N2 > operator * ( const fixed_vector < T, N1 > & v,
-                                    const fixed_matrix < T, N1, N2 > & m ) ;
+fs_vector < T, N2 > operator * ( const fs_vector < T, N1 > & v,
+                                 const fs_matrix < T, N1, N2 > & m ) ;
 
 template < class T, size_t N1, size_t N2, size_t N3 >
-fixed_matrix < T, N1, N3 > operator * ( const fixed_matrix < T, N1, N2 > & a,
-                                        const fixed_matrix < T, N2, N3 > & b ) ;
+fs_matrix < T, N1, N3 > operator * ( const fs_matrix < T, N1, N2 > & a,
+                                     const fs_matrix < T, N2, N3 > & b ) ;
 
 
-//
+
+// *** FS_LOWER_TRIANGULAR_MATRIX FORWARD_DECLARATIONS ***
+
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator + ( const fixed_lower_triangular_matrix < T, N > & a,
-               const fixed_lower_triangular_matrix < T, N > & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator + ( const fs_lower_triangular_matrix < T, N > & a,
+               const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator - ( const fixed_lower_triangular_matrix < T, N > & a,
-               const fixed_lower_triangular_matrix < T, N > & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator - ( const fs_lower_triangular_matrix < T, N > & a,
+               const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator * ( const fixed_lower_triangular_matrix < T, N > & a, const T & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator * ( const fs_lower_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator * ( const T & a, const fixed_lower_triangular_matrix < T, N > & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator * ( const T & a, const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator / ( const fixed_lower_triangular_matrix < T, N > & a, const T & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator / ( const fs_lower_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator % ( const fixed_lower_triangular_matrix < T, N > & a, const T & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator % ( const fs_lower_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-bool operator == ( const fixed_lower_triangular_matrix < T, N > & a,
-                   const fixed_lower_triangular_matrix < T, N > & b ) ;
+bool operator == ( const fs_lower_triangular_matrix < T, N > & a,
+                   const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-bool operator < ( const fixed_lower_triangular_matrix < T, N > & a,
-                  const fixed_lower_triangular_matrix < T, N > & b ) ;
+bool operator < ( const fs_lower_triangular_matrix < T, N > & a,
+                  const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-void swap ( const fixed_lower_triangular_matrix < T, N > & a,
-            const fixed_lower_triangular_matrix < T, N > & b ) ;
+void swap ( const fs_lower_triangular_matrix < T, N > & a,
+            const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N, class UnaryOperation >
-fixed_lower_triangular_matrix < T, N >
-  componentwise ( const fixed_lower_triangular_matrix < T, N > & a,
+fs_lower_triangular_matrix < T, N >
+  componentwise ( const fs_lower_triangular_matrix < T, N > & a,
                   UnaryOperation unary_operation ) ;
 
 template < class T, size_t N, class BinaryOperation >
-fixed_lower_triangular_matrix < T, N >
-  componentwise ( const fixed_lower_triangular_matrix < T, N > & a,
-                  const fixed_lower_triangular_matrix < T, N > & b,
+fs_lower_triangular_matrix < T, N >
+  componentwise ( const fs_lower_triangular_matrix < T, N > & a,
+                  const fs_lower_triangular_matrix < T, N > & b,
                   BinaryOperation binary_operation ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N >
-  operator * ( const fixed_lower_triangular_matrix < T, N > & m,
-               const fixed_vector < T, N > & v ) ;
+fs_vector < T, N >
+  operator * ( const fs_lower_triangular_matrix < T, N > & m,
+               const fs_vector < T, N > & v ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N >
-  operator * ( const fixed_vector < T, N > & v,
-               const fixed_lower_triangular_matrix < T, N > & m ) ;
+fs_vector < T, N >
+  operator * ( const fs_vector < T, N > & v,
+               const fs_lower_triangular_matrix < T, N > & m ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 >
-  operator * ( const fixed_lower_triangular_matrix < T, N1 > & a,
-               const fixed_matrix < T, N1, N2 > & b ) ;
+fs_matrix < T, N1, N2 >
+  operator * ( const fs_lower_triangular_matrix < T, N1 > & a,
+               const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 >
-  operator * ( const fixed_matrix < T, N1, N2 > & a,
-               const fixed_lower_triangular_matrix < T, N2 > & b ) ;
+fs_matrix < T, N1, N2 >
+  operator * ( const fs_matrix < T, N1, N2 > & a,
+               const fs_lower_triangular_matrix < T, N2 > & b ) ;
 
 template < class T, size_t N >
-fixed_lower_triangular_matrix < T, N >
-  operator * ( const fixed_lower_triangular_matrix < T, N > & a,
-               const fixed_lower_triangular_matrix < T, N > & b ) ;
+fs_lower_triangular_matrix < T, N >
+  operator * ( const fs_lower_triangular_matrix < T, N > & a,
+               const fs_lower_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_matrix < T, N, N >
-  make_symmetric ( const fixed_lower_triangular_matrix < T, N > & m ) ;
+fs_matrix < T, N, N >
+  make_symmetric ( const fs_lower_triangular_matrix < T, N > & m ) ;
 
 template < class T, size_t N >
-fixed_matrix < T, N, N >
-  make_complete ( const fixed_lower_triangular_matrix < T, N > & m ) ;
+fs_matrix < T, N, N >
+  make_complete ( const fs_lower_triangular_matrix < T, N > & m ) ;
 
 
-//
+
+// *** FS_UPPER_TRIANGULAR_MATRIX FORWARD_DECLARATIONS ***
+
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator + ( const fixed_upper_triangular_matrix < T, N > & a,
-               const fixed_upper_triangular_matrix < T, N > & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator + ( const fs_upper_triangular_matrix < T, N > & a,
+               const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator - ( const fixed_upper_triangular_matrix < T, N > & a,
-               const fixed_upper_triangular_matrix < T, N > & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator - ( const fs_upper_triangular_matrix < T, N > & a,
+               const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator * ( const fixed_upper_triangular_matrix < T, N > & a, const T & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator * ( const fs_upper_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator * ( const T & a, const fixed_upper_triangular_matrix < T, N > & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator * ( const T & a, const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator / ( const fixed_upper_triangular_matrix < T, N > & a, const T & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator / ( const fs_upper_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator % ( const fixed_upper_triangular_matrix < T, N > & a, const T & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator % ( const fs_upper_triangular_matrix < T, N > & a, const T & b ) ;
 
 template < class T, size_t N >
-bool operator == ( const fixed_upper_triangular_matrix < T, N > & a,
-                   const fixed_upper_triangular_matrix < T, N > & b ) ;
+bool operator == ( const fs_upper_triangular_matrix < T, N > & a,
+                   const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-bool operator < ( const fixed_upper_triangular_matrix < T, N > & a,
-                  const fixed_upper_triangular_matrix < T, N > & b ) ;
+bool operator < ( const fs_upper_triangular_matrix < T, N > & a,
+                  const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-void swap ( const fixed_upper_triangular_matrix < T, N > & a,
-            const fixed_upper_triangular_matrix < T, N > & b ) ;
+void swap ( const fs_upper_triangular_matrix < T, N > & a,
+            const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N, class UnaryOperation >
-fixed_upper_triangular_matrix < T, N >
-  componentwise ( const fixed_upper_triangular_matrix < T, N > & a,
+fs_upper_triangular_matrix < T, N >
+  componentwise ( const fs_upper_triangular_matrix < T, N > & a,
                   UnaryOperation unary_operation ) ;
 
 template < class T, size_t N, class BinaryOperation >
-fixed_upper_triangular_matrix < T, N >
-  componentwise ( const fixed_upper_triangular_matrix < T, N > & a,
-                  const fixed_upper_triangular_matrix < T, N > & b,
+fs_upper_triangular_matrix < T, N >
+  componentwise ( const fs_upper_triangular_matrix < T, N > & a,
+                  const fs_upper_triangular_matrix < T, N > & b,
                   BinaryOperation binary_operation ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N >
-  operator * ( const fixed_upper_triangular_matrix < T, N > & m,
-               const fixed_vector < T, N > & v ) ;
+fs_vector < T, N >
+  operator * ( const fs_upper_triangular_matrix < T, N > & m,
+               const fs_vector < T, N > & v ) ;
 
 template < class T, size_t N >
-fixed_vector < T, N >
-  operator * ( const fixed_vector < T, N > & v,
-               const fixed_upper_triangular_matrix < T, N > & m ) ;
+fs_vector < T, N >
+  operator * ( const fs_vector < T, N > & v,
+               const fs_upper_triangular_matrix < T, N > & m ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 >
-  operator * ( const fixed_upper_triangular_matrix < T, N1 > & a,
-               const fixed_matrix < T, N1, N2 > & b ) ;
+fs_matrix < T, N1, N2 >
+  operator * ( const fs_upper_triangular_matrix < T, N1 > & a,
+               const fs_matrix < T, N1, N2 > & b ) ;
 
 template < class T, size_t N1, size_t N2 >
-fixed_matrix < T, N1, N2 >
-  operator * ( const fixed_matrix < T, N1, N2 > & a,
-               const fixed_upper_triangular_matrix < T, N2 > & b ) ;
+fs_matrix < T, N1, N2 >
+  operator * ( const fs_matrix < T, N1, N2 > & a,
+               const fs_upper_triangular_matrix < T, N2 > & b ) ;
 
 template < class T, size_t N >
-fixed_upper_triangular_matrix < T, N >
-  operator * ( const fixed_upper_triangular_matrix < T, N > & a,
-               const fixed_upper_triangular_matrix < T, N > & b ) ;
+fs_upper_triangular_matrix < T, N >
+  operator * ( const fs_upper_triangular_matrix < T, N > & a,
+               const fs_upper_triangular_matrix < T, N > & b ) ;
 
 template < class T, size_t N >
-fixed_matrix < T, N, N >
-  make_symmetric ( const fixed_upper_triangular_matrix < T, N > & m ) ;
+fs_matrix < T, N, N >
+  make_symmetric ( const fs_upper_triangular_matrix < T, N > & m ) ;
 
 template < class T, size_t N >
-fixed_matrix < T, N, N >
-  make_complete ( const fixed_upper_triangular_matrix < T, N > & m ) ;
+fs_matrix < T, N, N >
+  make_complete ( const fs_upper_triangular_matrix < T, N > & m ) ;
 
 
 
-// *** FIXED_VECTOR ***
+// *** FS_VECTOR ***
 
 
 template < class T, size_t N >
-class fixed_vector
+class fs_vector
 
 {
 public:
 
-  static_assert ( N > 0, "Size of fixed_vector == 0." ) ;
+  static_assert ( N > 0, "Size of fs_vector == 0." ) ;
 
   typedef T value_type ;
 
@@ -443,124 +449,124 @@ public:
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
-  void swap ( fixed_vector & b )
+  void swap ( fs_vector & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
 
-  const fixed_vector & operator + ( ) const
+  const fs_vector & operator + ( ) const
     { return * this ; }
 
-  fixed_vector operator - ( ) const
-    { fixed_vector result ;
+  fs_vector operator - ( ) const
+    { fs_vector result ;
       transform ( begin ( ), end ( ),
                   result.begin ( ),
                   :: negate < T > ( ) ) ;
       return result ; }
 
-  friend fixed_vector operator + ( const fixed_vector & a,
-                                   const fixed_vector & b )
-    { fixed_vector result ;
+  friend fs_vector operator + ( const fs_vector & a,
+                                   const fs_vector & b )
+    { fs_vector result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   plus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_vector operator - ( const fixed_vector & a,
-                                   const fixed_vector & b )
-    { fixed_vector result ;
+  friend fs_vector operator - ( const fs_vector & a,
+                                   const fs_vector & b )
+    { fs_vector result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   minus < T > ( ) ) ;
       return result ; }
 
-  friend T operator * ( const fixed_vector & a, const fixed_vector & b )
+  friend T operator * ( const fs_vector & a, const fs_vector & b )
     { return inner_product ( a.begin ( ), a.end ( ),
                              b.begin ( ),
                              T ( 0 ) ) ; }
 
-  friend fixed_vector operator * ( const fixed_vector & a, const T & b )
-    { fixed_vector result ;
+  friend fs_vector operator * ( const fs_vector & a, const T & b )
+    { fs_vector result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x * b ; } ) ;
       return result ; }
 
-  friend fixed_vector operator * ( const T & a, const fixed_vector & b )
-    { fixed_vector result ;
+  friend fs_vector operator * ( const T & a, const fs_vector & b )
+    { fs_vector result ;
       transform ( b.begin ( ), b.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return a * x ; } ) ;
       return result ; }
 
-  friend fixed_vector operator / ( const fixed_vector & a, const T & b )
-    { fixed_vector result ;
+  friend fs_vector operator / ( const fs_vector & a, const T & b )
+    { fs_vector result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x / b ; } ) ;
       return result ; }
 
-  friend fixed_vector operator % ( const fixed_vector & a, const T & b )
-    { fixed_vector result ;
+  friend fs_vector operator % ( const fs_vector & a, const T & b )
+    { fs_vector result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x % b ; } ) ;
       return result ; }
 
-  fixed_vector & negate ( )
+  fs_vector & negate ( )
     { for ( T & x : elements )
         x = - x ;
       return * this ; }
 
-  fixed_vector & operator += ( const fixed_vector & b )
+  fs_vector & operator += ( const fs_vector & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
-  fixed_vector & operator -= ( const fixed_vector & b )
+  fs_vector & operator -= ( const fs_vector & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
-  fixed_vector & operator *= ( const T & b )
+  fs_vector & operator *= ( const T & b )
     { for ( T & x : elements )
         x *= b ;
       return * this ; }
 
-  fixed_vector & operator /= ( const T & b )
+  fs_vector & operator /= ( const T & b )
     { for ( T & x : elements )
         x /= b ;
       return * this ; }
 
-  fixed_vector & operator %= ( const T & b )
+  fs_vector & operator %= ( const T & b )
     { for ( T & x : elements )
         x %= b ;
       return * this ; }
 
-  friend bool operator == ( const fixed_vector & a, const fixed_vector & b )
+  friend bool operator == ( const fs_vector & a, const fs_vector & b )
     { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
 
-  friend bool operator < ( const fixed_vector & a, const fixed_vector & b )
+  friend bool operator < ( const fs_vector & a, const fs_vector & b )
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fixed_vector & a, fixed_vector & b )
+  friend void swap ( fs_vector & a, fs_vector & b )
     { a.swap ( b ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
-                  const fixed_vector & x )
+                  const fs_vector & x )
     { return output_array ( o, x.elements ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_istream < CharT, CharTraits > &
     operator >> ( basic_istream < CharT, CharTraits > & i,
-                  fixed_vector & x )
-    { fixed_vector tx ;
+                  fs_vector & x )
+    { fs_vector tx ;
       input_array ( i, tx.elements ) ;
       if ( i.good ( ) )
         x = move ( tx ) ;
@@ -572,12 +578,12 @@ public:
 //
 
 template < class T, size_t N, class UnaryOperation >
-inline fixed_vector < T, N >
-         componentwise ( const fixed_vector < T, N > & a,
+inline fs_vector < T, N >
+         componentwise ( const fs_vector < T, N > & a,
                          UnaryOperation unary_operation )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             result.begin ( ),
@@ -590,13 +596,13 @@ return result ;
 //
 
 template < class T, size_t N, class BinaryOperation >
-inline fixed_vector < T, N >
-         componentwise ( const fixed_vector < T, N > & a,
-                         const fixed_vector < T, N > & b,
+inline fs_vector < T, N >
+         componentwise ( const fs_vector < T, N > & a,
+                         const fs_vector < T, N > & b,
                          BinaryOperation binary_operation )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             b.begin ( ),
@@ -610,8 +616,8 @@ return result ;
 //
 
 template < class T, size_t N >
-inline T inner_product ( const fixed_vector < T, N > & a,
-                         const fixed_vector < T, N > & b )
+inline T inner_product ( const fs_vector < T, N > & a,
+                         const fs_vector < T, N > & b )
 
 {
 return a * b ;
@@ -621,7 +627,7 @@ return a * b ;
 //
 
 template < class T, size_t N >
-inline T norm ( const fixed_vector < T, N > & a )
+inline T norm ( const fs_vector < T, N > & a )
 
 {
 return a * a ;
@@ -629,11 +635,11 @@ return a * a ;
 
 
 
-// *** FIXED_VECTOR INDEXING_TRAITS ***
+// *** FS_VECTOR INDEXING_TRAITS ***
 
 
 template < class T, size_t N >
-class indexing_traits < fixed_vector < T, N > >
+class indexing_traits < fs_vector < T, N > >
 
 {
 public:
@@ -641,24 +647,24 @@ public:
   typedef size_t index_type ;
   typedef T value_type ;
 
-  static constexpr size_t size ( const fixed_vector < T, N > & x )
+  static constexpr size_t size ( const fs_vector < T, N > & x )
     { return N ; }
 
 } ;
 
 
 
-// *** FIXED_MATRIX ***
+// *** FS_MATRIX ***
 
 
 template < class T, size_t N1, size_t N2 >
-class fixed_matrix
+class fs_matrix
 
 {
 public:
 
-  static_assert ( N1 > 0, "Size1 of fixed_matrix == 0." ) ;
-  static_assert ( N2 > 0, "Size2 of fixed_matrix == 0." ) ;
+  static_assert ( N1 > 0, "Size1 of fs_matrix == 0." ) ;
+  static_assert ( N2 > 0, "Size2 of fs_matrix == 0." ) ;
 
   typedef T value_type [ N2 ] ;
 
@@ -850,140 +856,140 @@ public:
   void fill ( const T & x )
     { :: fill ( element_begin ( ), element_end ( ), x ) ; }
 
-  void swap ( fixed_matrix & b )
+  void swap ( fs_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
     { swap_ranges ( element_begin ( ), element_end ( ),
                     b.element_begin ( ) ) ; }
 
-  const fixed_matrix & operator + ( ) const
+  const fs_matrix & operator + ( ) const
     { return * this ; }
 
-  fixed_matrix operator - ( ) const
-    { fixed_matrix result ;
+  fs_matrix operator - ( ) const
+    { fs_matrix result ;
       transform ( element_begin ( ), element_end ( ),
                   result.element_begin ( ),
                   :: negate < T > ( ) ) ;
       return result ; }
 
-  friend fixed_matrix operator + ( const fixed_matrix & a,
-                                   const fixed_matrix & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator + ( const fs_matrix & a,
+                                const fs_matrix & b )
+    { fs_matrix result ;
       transform ( a.element_begin ( ), a.element_end ( ),
                   b.element_begin ( ),
                   result.element_begin ( ),
                   plus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_matrix operator - ( const fixed_matrix & a,
-                                   const fixed_matrix & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator - ( const fs_matrix & a,
+                                const fs_matrix & b )
+    { fs_matrix result ;
       transform ( a.element_begin ( ), a.element_end ( ),
                   b.element_begin ( ),
                   result.element_begin ( ),
                   minus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_matrix operator * ( const fixed_matrix & a, const T & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator * ( const fs_matrix & a, const T & b )
+    { fs_matrix result ;
       transform ( a.element_begin ( ), a.element_end ( ),
                   result.element_begin ( ),
                   [ & ] ( const T & x ) { return x * b ; } ) ;
       return result ; }
 
-  friend fixed_matrix operator * ( const T & a, const fixed_matrix & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator * ( const T & a, const fs_matrix & b )
+    { fs_matrix result ;
       transform ( b.element_begin ( ), b.element_end ( ),
                   result.element_begin ( ),
                   [ & ] ( const T & x ) { return a * x ; } ) ;
       return result ; }
 
-  friend fixed_matrix operator / ( const fixed_matrix & a, const T & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator / ( const fs_matrix & a, const T & b )
+    { fs_matrix result ;
       transform ( a.element_begin ( ), a.element_end ( ),
                   result.element_begin ( ),
                   [ & ] ( const T & x ) { return x / b ; } ) ;
       return result ; }
 
-  friend fixed_matrix operator % ( const fixed_matrix & a, const T & b )
-    { fixed_matrix result ;
+  friend fs_matrix operator % ( const fs_matrix & a, const T & b )
+    { fs_matrix result ;
       transform ( a.element_begin ( ), a.element_end ( ),
                   result.element_begin ( ),
                   [ & ] ( const T & x ) { return x % b ; } ) ;
       return result ; }
 
-  fixed_matrix < T, N2, N1 > transposed ( ) const
-    { fixed_matrix < T, N2, N1 > result ;
+  fs_matrix < T, N2, N1 > transposed ( ) const
+    { fs_matrix < T, N2, N1 > result ;
       for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
         for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
           result.at ( n2, n1 ) = at ( n1, n2 ) ;
       return result ; }
 
-  fixed_matrix & negate ( )
+  fs_matrix & negate ( )
     { for_each ( element_begin ( ), element_end ( ),
                  [ ] ( T & x ) { x = - x ; } ) ;
       return * this ; }
 
-  fixed_matrix & operator += ( const fixed_matrix & b )
+  fs_matrix & operator += ( const fs_matrix & b )
     { for_each_pair ( element_begin ( ), element_end ( ),
                       b.element_begin ( ),
                       [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
-  fixed_matrix & operator -= ( const fixed_matrix & b )
+  fs_matrix & operator -= ( const fs_matrix & b )
     { for_each_pair ( element_begin ( ), element_end ( ),
                       b.element_begin ( ),
                       [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
-  fixed_matrix & operator *= ( const T & b )
+  fs_matrix & operator *= ( const T & b )
     { for_each ( element_begin ( ), element_end ( ),
                  [ & ] ( T & x ) { x *= b ; } ) ;
       return * this ; }
 
-  fixed_matrix & operator *= ( const fixed_matrix < T, N2, N2 > & b )
+  fs_matrix & operator *= ( const fs_matrix < T, N2, N2 > & b )
     { return * this = * this * b ; }
 
-  fixed_matrix & operator *=
-    ( const fixed_lower_triangular_matrix < T, N2 > & b )
+  fs_matrix & operator *=
+    ( const fs_lower_triangular_matrix < T, N2 > & b )
     { return * this = * this * b ; }
 
-  fixed_matrix & operator *=
-    ( const fixed_upper_triangular_matrix < T, N2 > & b )
+  fs_matrix & operator *=
+    ( const fs_upper_triangular_matrix < T, N2 > & b )
     { return * this = * this * b ; }
 
-  fixed_matrix & operator /= ( const T & b )
+  fs_matrix & operator /= ( const T & b )
     { for_each ( element_begin ( ), element_end ( ),
                  [ & ] ( T & x ) { x /= b ; } ) ;
       return * this ; }
 
-  fixed_matrix & operator %= ( const T & b )
+  fs_matrix & operator %= ( const T & b )
     { for_each ( element_begin ( ), element_end ( ),
                  [ & ] ( T & x ) { x %= b ; } ) ;
       return * this ; }
 
-  friend bool operator == ( const fixed_matrix & a, const fixed_matrix & b )
+  friend bool operator == ( const fs_matrix & a, const fs_matrix & b )
     { return equal ( a.element_begin ( ), a.element_end ( ),
                      b.element_begin ( ) ) ; }
 
-  friend bool operator < ( const fixed_matrix & a, const fixed_matrix & b )
+  friend bool operator < ( const fs_matrix & a, const fs_matrix & b )
     { return lexicographical_compare
                ( a.element_begin ( ), a.element_end ( ),
                  b.element_begin ( ), b.element_end ( ) ) ; }
 
-  friend void swap ( fixed_matrix & a, fixed_matrix & b )
+  friend void swap ( fs_matrix & a, fs_matrix & b )
     { a.swap ( b ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
-                  const fixed_matrix & x )
+                  const fs_matrix & x )
     { return output_array ( o, x.elements ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_istream < CharT, CharTraits > &
     operator >> ( basic_istream < CharT, CharTraits > & i,
-                  fixed_matrix & x )
-    { fixed_matrix tx ;
+                  fs_matrix & x )
+    { fs_matrix tx ;
       input_array ( i, tx.elements ) ;
       if ( i.good ( ) )
         x = move ( tx ) ;
@@ -995,12 +1001,12 @@ public:
 //
 
 template < class T, size_t N1, size_t N2, class UnaryOperation >
-inline fixed_matrix < T, N1, N2 >
-         componentwise ( const fixed_matrix < T, N1, N2 > & a,
+inline fs_matrix < T, N1, N2 >
+         componentwise ( const fs_matrix < T, N1, N2 > & a,
                          UnaryOperation unary_operation )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 transform ( a.element_begin ( ), a.element_end ( ),
             result.element_begin ( ),
@@ -1013,13 +1019,13 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2, class BinaryOperation >
-inline fixed_matrix < T, N1, N2 >
-         componentwise ( const fixed_matrix < T, N1, N2 > & a,
-                         const fixed_matrix < T, N1, N2 > & b,
+inline fs_matrix < T, N1, N2 >
+         componentwise ( const fs_matrix < T, N1, N2 > & a,
+                         const fs_matrix < T, N1, N2 > & b,
                          BinaryOperation binary_operation )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 transform ( a.element_begin ( ), a.element_end ( ),
             b.element_begin ( ),
@@ -1033,12 +1039,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         outer_product ( const fixed_vector < T, N1 > & a,
-                         const fixed_vector < T, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         outer_product ( const fs_vector < T, N1 > & a,
+                         const fs_vector < T, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -1051,12 +1057,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_vector < T, N1 >
-         operator * ( const fixed_matrix < T, N1, N2 > & m,
-                      const fixed_vector < T, N2 > & v )
+inline fs_vector < T, N1 >
+         operator * ( const fs_matrix < T, N1, N2 > & m,
+                      const fs_vector < T, N2 > & v )
 
 {
-fixed_vector < T, N1 > result ;
+fs_vector < T, N1 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   {
@@ -1075,12 +1081,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_vector < T, N2 >
-         operator * ( const fixed_vector < T, N1 > & v,
-                      const fixed_matrix < T, N1, N2 > & m )
+inline fs_vector < T, N2 >
+         operator * ( const fs_vector < T, N1 > & v,
+                      const fs_matrix < T, N1, N2 > & m )
 
 {
-fixed_vector < T, N2 > result ;
+fs_vector < T, N2 > result ;
 
 for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
   {
@@ -1099,12 +1105,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t L, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         operator * ( const fixed_matrix < T, N1, L > & a,
-                      const fixed_matrix < T, L, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         operator * ( const fs_matrix < T, N1, L > & a,
+                      const fs_matrix < T, L, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -1122,11 +1128,11 @@ return result ;
 
 
 
-// *** FIXED_MATRIX INDEXING_TRAITS ***
+// *** FS_MATRIX INDEXING_TRAITS ***
 
 
 template < class T, size_t N1, size_t N2 >
-class indexing_traits < fixed_matrix < T, N1, N2 > >
+class indexing_traits < fs_matrix < T, N1, N2 > >
 
 {
 public:
@@ -1134,23 +1140,23 @@ public:
   typedef size_t index_type ;
   typedef T value_type [ N2 ] ;
 
-  static constexpr size_t size ( const fixed_matrix < T, N1, N2 > & x )
+  static constexpr size_t size ( const fs_matrix < T, N1, N2 > & x )
     { return N1 ; }
 
 } ;
 
 
 
-// *** FIXED_LOWER_TRIANGULAR_MATRIX ***
+// *** FS_LOWER_TRIANGULAR_MATRIX ***
 
 
 template < class T, size_t N >
-class fixed_lower_triangular_matrix
+class fs_lower_triangular_matrix
 
 {
 public:
 
-  static_assert ( N > 0, "Size of fixed_lower_triangular_matrix == 0." ) ;
+  static_assert ( N > 0, "Size of fs_lower_triangular_matrix == 0." ) ;
 
   typedef T value_type ;
 
@@ -1262,134 +1268,134 @@ public:
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
-  void swap ( fixed_lower_triangular_matrix & b )
+  void swap ( fs_lower_triangular_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
 
-  const fixed_lower_triangular_matrix & operator + ( ) const
+  const fs_lower_triangular_matrix & operator + ( ) const
     { return * this ; }
 
-  fixed_lower_triangular_matrix operator - ( ) const
-    { fixed_lower_triangular_matrix result ;
+  fs_lower_triangular_matrix operator - ( ) const
+    { fs_lower_triangular_matrix result ;
       transform ( begin ( ), end ( ),
                   result.begin ( ),
                   :: negate < T > ( ) ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator + ( const fixed_lower_triangular_matrix & a,
-                        const fixed_lower_triangular_matrix & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator + ( const fs_lower_triangular_matrix & a,
+                        const fs_lower_triangular_matrix & b )
+    { fs_lower_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   plus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator - ( const fixed_lower_triangular_matrix & a,
-                        const fixed_lower_triangular_matrix & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator - ( const fs_lower_triangular_matrix & a,
+                        const fs_lower_triangular_matrix & b )
+    { fs_lower_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   minus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator * ( const fixed_lower_triangular_matrix & a, const T & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator * ( const fs_lower_triangular_matrix & a, const T & b )
+    { fs_lower_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x * b ; } ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator * ( const T & a, const fixed_lower_triangular_matrix & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator * ( const T & a, const fs_lower_triangular_matrix & b )
+    { fs_lower_triangular_matrix result ;
       transform ( b.begin ( ), b.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return a * x ; } ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator / ( const fixed_lower_triangular_matrix & a, const T & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator / ( const fs_lower_triangular_matrix & a, const T & b )
+    { fs_lower_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x / b ; } ) ;
       return result ; }
 
-  friend fixed_lower_triangular_matrix
-           operator % ( const fixed_lower_triangular_matrix & a, const T & b )
-    { fixed_lower_triangular_matrix result ;
+  friend fs_lower_triangular_matrix
+           operator % ( const fs_lower_triangular_matrix & a, const T & b )
+    { fs_lower_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x % b ; } ) ;
       return result ; }
 
-  fixed_lower_triangular_matrix & negate ( )
+  fs_lower_triangular_matrix & negate ( )
     { for ( T & x : elements )
         x = - x ;
       return * this ; }
 
-  fixed_lower_triangular_matrix &
-    operator += ( const fixed_lower_triangular_matrix & b )
+  fs_lower_triangular_matrix &
+    operator += ( const fs_lower_triangular_matrix & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
-  fixed_lower_triangular_matrix &
-    operator -= ( const fixed_lower_triangular_matrix & b )
+  fs_lower_triangular_matrix &
+    operator -= ( const fs_lower_triangular_matrix & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
-  fixed_lower_triangular_matrix & operator *= ( const T & b )
+  fs_lower_triangular_matrix & operator *= ( const T & b )
     { for ( T & x : elements )
         x *= b ;
       return * this ; }
 
-  fixed_lower_triangular_matrix & operator *=
-    ( const fixed_lower_triangular_matrix & b )
+  fs_lower_triangular_matrix & operator *=
+    ( const fs_lower_triangular_matrix & b )
     { return * this = * this * b ; }
 
-  fixed_lower_triangular_matrix & operator /= ( const T & b )
+  fs_lower_triangular_matrix & operator /= ( const T & b )
     { for ( T & x : elements )
         x /= b ;
       return * this ; }
 
-  fixed_lower_triangular_matrix & operator %= ( const T & b )
+  fs_lower_triangular_matrix & operator %= ( const T & b )
     { for ( T & x : elements )
         x %= b ;
       return * this ; }
 
-  friend bool operator == ( const fixed_lower_triangular_matrix & a,
-                            const fixed_lower_triangular_matrix & b )
+  friend bool operator == ( const fs_lower_triangular_matrix & a,
+                            const fs_lower_triangular_matrix & b )
     { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
 
-  friend bool operator < ( const fixed_lower_triangular_matrix & a,
-                           const fixed_lower_triangular_matrix & b )
+  friend bool operator < ( const fs_lower_triangular_matrix & a,
+                           const fs_lower_triangular_matrix & b )
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fixed_lower_triangular_matrix & a,
-                     fixed_lower_triangular_matrix & b )
+  friend void swap ( fs_lower_triangular_matrix & a,
+                     fs_lower_triangular_matrix & b )
     { a.swap ( b ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
-                  const fixed_lower_triangular_matrix & x )
+                  const fs_lower_triangular_matrix & x )
     { return output_array ( o, x.elements ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_istream < CharT, CharTraits > &
     operator >> ( basic_istream < CharT, CharTraits > & i,
-                  fixed_lower_triangular_matrix & x )
-    { fixed_lower_triangular_matrix tx ;
+                  fs_lower_triangular_matrix & x )
+    { fs_lower_triangular_matrix tx ;
       input_array ( i, tx.elements ) ;
       if ( i.good ( ) )
         x = move ( tx ) ;
@@ -1401,12 +1407,12 @@ public:
 //
 
 template < class T, size_t N, class UnaryOperation >
-inline fixed_lower_triangular_matrix < T, N >
-         componentwise ( const fixed_lower_triangular_matrix < T, N > & a,
+inline fs_lower_triangular_matrix < T, N >
+         componentwise ( const fs_lower_triangular_matrix < T, N > & a,
                          UnaryOperation unary_operation )
 
 {
-fixed_lower_triangular_matrix < T, N > result ;
+fs_lower_triangular_matrix < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             result.begin ( ),
@@ -1419,13 +1425,13 @@ return result ;
 //
 
 template < class T, size_t N, class BinaryOperation >
-inline fixed_lower_triangular_matrix < T, N >
-         componentwise ( const fixed_lower_triangular_matrix < T, N > & a,
-                         const fixed_lower_triangular_matrix < T, N > & b,
+inline fs_lower_triangular_matrix < T, N >
+         componentwise ( const fs_lower_triangular_matrix < T, N > & a,
+                         const fs_lower_triangular_matrix < T, N > & b,
                          BinaryOperation binary_operation )
 
 {
-fixed_lower_triangular_matrix < T, N > result ;
+fs_lower_triangular_matrix < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             b.begin ( ),
@@ -1439,12 +1445,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_vector < T, N >
-         operator * ( const fixed_lower_triangular_matrix < T, N > & m,
-                      const fixed_vector < T, N > & v )
+inline fs_vector < T, N >
+         operator * ( const fs_lower_triangular_matrix < T, N > & m,
+                      const fs_vector < T, N > & v )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   {
@@ -1463,12 +1469,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_vector < T, N >
-         operator * ( const fixed_vector < T, N > & v,
-                      const fixed_lower_triangular_matrix < T, N > & m )
+inline fs_vector < T, N >
+         operator * ( const fs_vector < T, N > & v,
+                      const fs_lower_triangular_matrix < T, N > & m )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
   {
@@ -1487,12 +1493,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         operator * ( const fixed_lower_triangular_matrix < T, N1 > & a,
-                      const fixed_matrix < T, N1, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         operator * ( const fs_lower_triangular_matrix < T, N1 > & a,
+                      const fs_matrix < T, N1, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -1512,12 +1518,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         operator * ( const fixed_matrix < T, N1, N2 > & a,
-                      const fixed_lower_triangular_matrix < T, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         operator * ( const fs_matrix < T, N1, N2 > & a,
+                      const fs_lower_triangular_matrix < T, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -1537,12 +1543,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_lower_triangular_matrix < T, N >
-         operator * ( const fixed_lower_triangular_matrix < T, N > & a,
-                      const fixed_lower_triangular_matrix < T, N > & b )
+inline fs_lower_triangular_matrix < T, N >
+         operator * ( const fs_lower_triangular_matrix < T, N > & a,
+                      const fs_lower_triangular_matrix < T, N > & b )
 
 {
-fixed_lower_triangular_matrix < T, N > result ;
+fs_lower_triangular_matrix < T, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 <= n1 ; ++ n2 )
@@ -1562,11 +1568,11 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_matrix < T, N, N >
-         make_symmetric ( const fixed_lower_triangular_matrix < T, N > & m )
+inline fs_matrix < T, N, N >
+         make_symmetric ( const fs_lower_triangular_matrix < T, N > & m )
 
 {
-fixed_matrix < T, N, N > result ;
+fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
@@ -1579,11 +1585,11 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_matrix < T, N, N >
-         make_complete ( const fixed_lower_triangular_matrix < T, N > & m )
+inline fs_matrix < T, N, N >
+         make_complete ( const fs_lower_triangular_matrix < T, N > & m )
 
 {
-fixed_matrix < T, N, N > result ;
+fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
@@ -1594,11 +1600,11 @@ return result ;
 
 
 
-// *** FIXED_LOWER_TRIANGULAR_MATRIX INDEXING_TRAITS ***
+// *** FS_LOWER_TRIANGULAR_MATRIX INDEXING_TRAITS ***
 
 
 template < class T, size_t N >
-class indexing_traits < fixed_lower_triangular_matrix < T, N > >
+class indexing_traits < fs_lower_triangular_matrix < T, N > >
 
 {
 public:
@@ -1607,23 +1613,23 @@ public:
   typedef T * value_type ;
 
   static constexpr
-    size_t size ( const fixed_lower_triangular_matrix < T, N > & x )
+    size_t size ( const fs_lower_triangular_matrix < T, N > & x )
     { return N ; }
 
 } ;
 
 
 
-// *** FIXED_UPPER_TRIANGULAR_MATRIX ***
+// *** FS_UPPER_TRIANGULAR_MATRIX ***
 
 
 template < class T, size_t N >
-class fixed_upper_triangular_matrix
+class fs_upper_triangular_matrix
 
 {
 public:
 
-  static_assert ( N > 0, "Size of fixed_upper_triangular_matrix == 0." ) ;
+  static_assert ( N > 0, "Size of fs_upper_triangular_matrix == 0." ) ;
 
   typedef T value_type ;
 
@@ -1737,134 +1743,134 @@ public:
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
-  void swap ( fixed_upper_triangular_matrix & b )
+  void swap ( fs_upper_triangular_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
 
-  const fixed_upper_triangular_matrix & operator + ( ) const
+  const fs_upper_triangular_matrix & operator + ( ) const
     { return * this ; }
 
-  fixed_upper_triangular_matrix operator - ( ) const
-    { fixed_upper_triangular_matrix result ;
+  fs_upper_triangular_matrix operator - ( ) const
+    { fs_upper_triangular_matrix result ;
       transform ( begin ( ), end ( ),
                   result.begin ( ),
                   :: negate < T > ( ) ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator + ( const fixed_upper_triangular_matrix & a,
-                        const fixed_upper_triangular_matrix & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator + ( const fs_upper_triangular_matrix & a,
+                        const fs_upper_triangular_matrix & b )
+    { fs_upper_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   plus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator - ( const fixed_upper_triangular_matrix & a,
-                        const fixed_upper_triangular_matrix & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator - ( const fs_upper_triangular_matrix & a,
+                        const fs_upper_triangular_matrix & b )
+    { fs_upper_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   b.begin ( ),
                   result.begin ( ),
                   minus < T > ( ) ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator * ( const fixed_upper_triangular_matrix & a, const T & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator * ( const fs_upper_triangular_matrix & a, const T & b )
+    { fs_upper_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x * b ; } ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator * ( const T & a, const fixed_upper_triangular_matrix & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator * ( const T & a, const fs_upper_triangular_matrix & b )
+    { fs_upper_triangular_matrix result ;
       transform ( b.begin ( ), b.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return a * x ; } ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator / ( const fixed_upper_triangular_matrix & a, const T & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator / ( const fs_upper_triangular_matrix & a, const T & b )
+    { fs_upper_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x / b ; } ) ;
       return result ; }
 
-  friend fixed_upper_triangular_matrix
-           operator % ( const fixed_upper_triangular_matrix & a, const T & b )
-    { fixed_upper_triangular_matrix result ;
+  friend fs_upper_triangular_matrix
+           operator % ( const fs_upper_triangular_matrix & a, const T & b )
+    { fs_upper_triangular_matrix result ;
       transform ( a.begin ( ), a.end ( ),
                   result.begin ( ),
                   [ & ] ( const T & x ) { return x % b ; } ) ;
       return result ; }
 
-  fixed_upper_triangular_matrix & negate ( )
+  fs_upper_triangular_matrix & negate ( )
     { for ( T & x : elements )
         x = - x ;
       return * this ; }
 
-  fixed_upper_triangular_matrix &
-    operator += ( const fixed_upper_triangular_matrix & b )
+  fs_upper_triangular_matrix &
+    operator += ( const fs_upper_triangular_matrix & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
-  fixed_upper_triangular_matrix &
-    operator -= ( const fixed_upper_triangular_matrix & b )
+  fs_upper_triangular_matrix &
+    operator -= ( const fs_upper_triangular_matrix & b )
     { for_each_pair ( begin ( ), end ( ),
                       b.begin ( ),
                       [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
-  fixed_upper_triangular_matrix & operator *= ( const T & b )
+  fs_upper_triangular_matrix & operator *= ( const T & b )
     { for ( T & x : elements )
         x *= b ;
       return * this ; }
 
-  fixed_upper_triangular_matrix & operator *=
-    ( const fixed_upper_triangular_matrix & b )
+  fs_upper_triangular_matrix & operator *=
+    ( const fs_upper_triangular_matrix & b )
     { return * this = * this * b ; }
 
-  fixed_upper_triangular_matrix & operator /= ( const T & b )
+  fs_upper_triangular_matrix & operator /= ( const T & b )
     { for ( T & x : elements )
         x /= b ;
       return * this ; }
 
-  fixed_upper_triangular_matrix & operator %= ( const T & b )
+  fs_upper_triangular_matrix & operator %= ( const T & b )
     { for ( T & x : elements )
         x %= b ;
       return * this ; }
 
-  friend bool operator == ( const fixed_upper_triangular_matrix & a,
-                            const fixed_upper_triangular_matrix & b )
+  friend bool operator == ( const fs_upper_triangular_matrix & a,
+                            const fs_upper_triangular_matrix & b )
     { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
 
-  friend bool operator < ( const fixed_upper_triangular_matrix & a,
-                           const fixed_upper_triangular_matrix & b )
+  friend bool operator < ( const fs_upper_triangular_matrix & a,
+                           const fs_upper_triangular_matrix & b )
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fixed_upper_triangular_matrix & a,
-                     fixed_upper_triangular_matrix & b )
+  friend void swap ( fs_upper_triangular_matrix & a,
+                     fs_upper_triangular_matrix & b )
     { a.swap ( b ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
-                  const fixed_upper_triangular_matrix & x )
+                  const fs_upper_triangular_matrix & x )
     { return output_array ( o, x.elements ) ; }
 
   template < class CharT, class CharTraits >
   friend basic_istream < CharT, CharTraits > &
     operator >> ( basic_istream < CharT, CharTraits > & i,
-                  fixed_upper_triangular_matrix & x )
-    { fixed_upper_triangular_matrix tx ;
+                  fs_upper_triangular_matrix & x )
+    { fs_upper_triangular_matrix tx ;
       input_array ( i, tx.elements ) ;
       if ( i.good ( ) )
         x = move ( tx ) ;
@@ -1876,12 +1882,12 @@ public:
 //
 
 template < class T, size_t N, class UnaryOperation >
-inline fixed_upper_triangular_matrix < T, N >
-         componentwise ( const fixed_upper_triangular_matrix < T, N > & a,
+inline fs_upper_triangular_matrix < T, N >
+         componentwise ( const fs_upper_triangular_matrix < T, N > & a,
                          UnaryOperation unary_operation )
 
 {
-fixed_upper_triangular_matrix < T, N > result ;
+fs_upper_triangular_matrix < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             result.begin ( ),
@@ -1894,13 +1900,13 @@ return result ;
 //
 
 template < class T, size_t N, class BinaryOperation >
-inline fixed_upper_triangular_matrix < T, N >
-         componentwise ( const fixed_upper_triangular_matrix < T, N > & a,
-                         const fixed_upper_triangular_matrix < T, N > & b,
+inline fs_upper_triangular_matrix < T, N >
+         componentwise ( const fs_upper_triangular_matrix < T, N > & a,
+                         const fs_upper_triangular_matrix < T, N > & b,
                          BinaryOperation binary_operation )
 
 {
-fixed_upper_triangular_matrix < T, N > result ;
+fs_upper_triangular_matrix < T, N > result ;
 
 transform ( a.begin ( ), a.end ( ),
             b.begin ( ),
@@ -1914,12 +1920,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_vector < T, N >
-         operator * ( const fixed_upper_triangular_matrix < T, N > & m,
-                      const fixed_vector < T, N > & v )
+inline fs_vector < T, N >
+         operator * ( const fs_upper_triangular_matrix < T, N > & m,
+                      const fs_vector < T, N > & v )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   {
@@ -1938,12 +1944,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_vector < T, N >
-         operator * ( const fixed_vector < T, N > & v,
-                      const fixed_upper_triangular_matrix < T, N > & m )
+inline fs_vector < T, N >
+         operator * ( const fs_vector < T, N > & v,
+                      const fs_upper_triangular_matrix < T, N > & m )
 
 {
-fixed_vector < T, N > result ;
+fs_vector < T, N > result ;
 
 for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
   {
@@ -1962,12 +1968,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         operator * ( const fixed_upper_triangular_matrix < T, N1 > & a,
-                      const fixed_matrix < T, N1, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         operator * ( const fs_upper_triangular_matrix < T, N1 > & a,
+                      const fs_matrix < T, N1, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -1987,12 +1993,12 @@ return result ;
 //
 
 template < class T, size_t N1, size_t N2 >
-inline fixed_matrix < T, N1, N2 >
-         operator * ( const fixed_matrix < T, N1, N2 > & a,
-                      const fixed_upper_triangular_matrix < T, N2 > & b )
+inline fs_matrix < T, N1, N2 >
+         operator * ( const fs_matrix < T, N1, N2 > & a,
+                      const fs_upper_triangular_matrix < T, N2 > & b )
 
 {
-fixed_matrix < T, N1, N2 > result ;
+fs_matrix < T, N1, N2 > result ;
 
 for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
@@ -2012,12 +2018,12 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_upper_triangular_matrix < T, N >
-         operator * ( const fixed_upper_triangular_matrix < T, N > & a,
-                      const fixed_upper_triangular_matrix < T, N > & b )
+inline fs_upper_triangular_matrix < T, N >
+         operator * ( const fs_upper_triangular_matrix < T, N > & a,
+                      const fs_upper_triangular_matrix < T, N > & b )
 
 {
-fixed_upper_triangular_matrix < T, N > result ;
+fs_upper_triangular_matrix < T, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 <= n1 ; ++ n2 )
@@ -2037,11 +2043,11 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_matrix < T, N, N >
-         make_symmetric ( const fixed_upper_triangular_matrix < T, N > & m )
+inline fs_matrix < T, N, N >
+         make_symmetric ( const fs_upper_triangular_matrix < T, N > & m )
 
 {
-fixed_matrix < T, N, N > result ;
+fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
@@ -2054,11 +2060,11 @@ return result ;
 //
 
 template < class T, size_t N >
-inline fixed_matrix < T, N, N >
-         make_complete ( const fixed_upper_triangular_matrix < T, N > & m )
+inline fs_matrix < T, N, N >
+         make_complete ( const fs_upper_triangular_matrix < T, N > & m )
 
 {
-fixed_matrix < T, N, N > result ;
+fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
@@ -2069,11 +2075,11 @@ return result ;
 
 
 
-// *** FIXED_UPPER_TRIANGULAR_MATRIX INDEXING_TRAITS ***
+// *** FS_UPPER_TRIANGULAR_MATRIX INDEXING_TRAITS ***
 
 
 template < class T, size_t N >
-class indexing_traits < fixed_upper_triangular_matrix < T, N > >
+class indexing_traits < fs_upper_triangular_matrix < T, N > >
 
 {
 public:
@@ -2082,7 +2088,7 @@ public:
   typedef T * value_type ;
 
   static constexpr
-    size_t size ( const fixed_upper_triangular_matrix < T, N > & x )
+    size_t size ( const fs_upper_triangular_matrix < T, N > & x )
     { return N ; }
 
 } ;
