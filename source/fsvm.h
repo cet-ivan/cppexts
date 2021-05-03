@@ -15,6 +15,7 @@
 #include "iterator.h"
 #include "utility.h"
 #include "cassert.h"
+#include "stdexcept.h"
 #include "algorithm.h"
 #include "functional.h"
 #include "numeric.h"
@@ -342,6 +343,50 @@ fs_matrix < T, N, N >
 
 
 
+// *** FIXED_SIZE_STRUCTURE_COMPONENTWISE ***
+
+
+//
+
+template < class FixedSizeStructure, class UnaryOperation >
+inline FixedSizeStructure
+         fixed_size_structure_componentwise
+           ( const FixedSizeStructure & a,
+             UnaryOperation unary_operation )
+
+{
+FixedSizeStructure result ;
+
+transform ( a.begin ( ), a.end ( ),
+            result.begin ( ),
+            unary_operation ) ;
+
+return result ;
+}
+
+
+//
+
+template < class FixedSizeStructure, class BinaryOperation >
+inline FixedSizeStructure
+         fixed_size_structure_componentwise
+           ( const FixedSizeStructure & a,
+             const FixedSizeStructure & b,
+             BinaryOperation binary_operation )
+
+{
+FixedSizeStructure result ;
+
+transform ( a.begin ( ), a.end ( ),
+            b.begin ( ),
+            result.begin ( ),
+            binary_operation ) ;
+
+return result ;
+}
+
+
+
 // *** FS_VECTOR ***
 
 
@@ -358,11 +403,11 @@ public:
   typedef size_t size_type ;
   typedef ptrdiff_t difference_type ;
 
-  typedef value_type * pointer ;
-  typedef const value_type * const_pointer ;
+  typedef T * pointer ;
+  typedef const T * const_pointer ;
 
-  typedef value_type & reference ;
-  typedef const value_type & const_reference ;
+  typedef T & reference ;
+  typedef const T & const_reference ;
 
   typedef pointer iterator ;
   typedef const_pointer const_iterator ;
@@ -414,72 +459,67 @@ public:
   const_reverse_iterator crend ( ) const noexcept
     { return rend ( ) ; }
 
-  constexpr size_t size ( ) noexcept
+  constexpr size_t size ( ) const noexcept
     { return N ; }
 
-  constexpr bool empty ( ) noexcept
+  constexpr bool empty ( ) const noexcept
     { return false ; }
 
-  reference at ( size_t n ) noexcept
+  reference access ( size_t n ) noexcept
     { assert ( n < N ) ;
       return elements [ n ] ; }
 
-  const_reference at ( size_t n ) const noexcept
+  const_reference access ( size_t n ) const noexcept
     { assert ( n < N ) ;
+      return elements [ n ] ; }
+
+  reference at ( size_t n )
+    { if ( n >= N )
+        throw out_of_range ( "fs_vector :: at, index out of range" ) ;
+      return elements [ n ] ; }
+
+  const_reference at ( size_t n ) const
+    { if ( n >= N )
+        throw out_of_range ( "fs_vector :: at, index out of range" ) ;
       return elements [ n ] ; }
 
   reference operator [ ] ( size_t n ) noexcept
-    { return at ( n ) ; }
+    { return access ( n ) ; }
 
   const_reference operator [ ] ( size_t n ) const noexcept
-    { return at ( n ) ; }
+    { return access ( n ) ; }
 
   reference front ( ) noexcept
-    { return at ( 0 ) ; }
+    { return elements [ 0 ] ; }
 
   const_reference front ( ) const noexcept
-    { return at ( 0 ) ; }
+    { return elements [ 0 ] ; }
 
   reference back ( ) noexcept
-    { return at ( N - 1 ) ; }
+    { return elements [ N - 1 ] ; }
 
   const_reference back ( ) const noexcept
-    { return at ( N - 1 ) ; }
+    { return elements [ N - 1 ] ; }
 
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_vector & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
-    { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
+    { swap_ranges ( begin ( ), end ( ),
+                    b.begin ( ) ) ; }
 
   const fs_vector & operator + ( ) const
     { return * this ; }
 
   fs_vector operator - ( ) const
-    { fs_vector result ;
-      transform ( begin ( ), end ( ),
-                  result.begin ( ),
-                  :: negate < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( * this, :: negate < T > ( ) ) ; }
 
-  friend fs_vector operator + ( const fs_vector & a,
-                                   const fs_vector & b )
-    { fs_vector result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  plus < T > ( ) ) ;
-      return result ; }
+  friend fs_vector operator + ( const fs_vector & a, const fs_vector & b )
+    { return componentwise ( a, b, plus < T > ( ) ) ; }
 
-  friend fs_vector operator - ( const fs_vector & a,
-                                   const fs_vector & b )
-    { fs_vector result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  minus < T > ( ) ) ;
-      return result ; }
+  friend fs_vector operator - ( const fs_vector & a, const fs_vector & b )
+    { return componentwise ( a, b, minus < T > ( ) ) ; }
 
   friend T operator * ( const fs_vector & a, const fs_vector & b )
     { return inner_product ( a.begin ( ), a.end ( ),
@@ -487,32 +527,16 @@ public:
                              T ( 0 ) ) ; }
 
   friend fs_vector operator * ( const fs_vector & a, const T & b )
-    { fs_vector result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x * b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x * b ; } ) ; }
 
   friend fs_vector operator * ( const T & a, const fs_vector & b )
-    { fs_vector result ;
-      transform ( b.begin ( ), b.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return a * x ; } ) ;
-      return result ; }
+    { return componentwise ( b, [ & ] ( const T & x ) { return a * x ; } ) ; }
 
   friend fs_vector operator / ( const fs_vector & a, const T & b )
-    { fs_vector result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x / b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x / b ; } ) ; }
 
   friend fs_vector operator % ( const fs_vector & a, const T & b )
-    { fs_vector result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x % b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x % b ; } ) ; }
 
   fs_vector & negate ( )
     { for ( T & x : elements )
@@ -547,7 +571,8 @@ public:
       return * this ; }
 
   friend bool operator == ( const fs_vector & a, const fs_vector & b )
-    { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
+    { return equal ( a.begin ( ), a.end ( ),
+                     b.begin ( ) ) ; }
 
   friend bool operator < ( const fs_vector & a, const fs_vector & b )
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
@@ -583,13 +608,7 @@ inline fs_vector < T, N >
                          UnaryOperation unary_operation )
 
 {
-fs_vector < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            result.begin ( ),
-            unary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, unary_operation ) ;
 }
 
 
@@ -602,14 +621,7 @@ inline fs_vector < T, N >
                          BinaryOperation binary_operation )
 
 {
-fs_vector < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            b.begin ( ),
-            result.begin ( ),
-            binary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
 }
 
 
@@ -647,7 +659,7 @@ public:
   typedef size_t index_type ;
   typedef T value_type ;
 
-  static constexpr size_t size ( const fs_vector < T, N > & x )
+  static constexpr size_t size ( const fs_vector < T, N > & )
     { return N ; }
 
 } ;
@@ -666,16 +678,16 @@ public:
   static_assert ( N1 > 0, "Size1 of fs_matrix == 0." ) ;
   static_assert ( N2 > 0, "Size2 of fs_matrix == 0." ) ;
 
-  typedef T value_type [ N2 ] ;
+  typedef T value_type ;
 
   typedef size_t size_type ;
   typedef ptrdiff_t difference_type ;
 
-  typedef value_type * pointer ;
-  typedef const value_type * const_pointer ;
+  typedef T * pointer ;
+  typedef const T * const_pointer ;
 
-  typedef value_type & reference ;
-  typedef const value_type & const_reference ;
+  typedef T & reference ;
+  typedef const T & const_reference ;
 
   typedef pointer iterator ;
   typedef const_pointer const_iterator ;
@@ -683,39 +695,28 @@ public:
   typedef :: reverse_iterator < iterator > reverse_iterator ;
   typedef :: reverse_iterator < const_iterator > const_reverse_iterator ;
 
-  typedef T * element_pointer ;
-  typedef const T * const_element_pointer ;
+  typedef T ( & row_reference ) [ N2 ] ;
+  typedef const T ( & const_row_reference ) [ N2 ] ;
 
-  typedef T & element_reference ;
-  typedef const T & const_element_reference ;
-
-  typedef element_pointer element_iterator ;
-  typedef const_element_pointer const_element_iterator ;
-
-  typedef :: reverse_iterator < element_iterator > reverse_element_iterator ;
-
-  typedef :: reverse_iterator < const_element_iterator >
-          const_reverse_element_iterator ;
-
-  value_type elements [ N1 ] ;
+  T elements [ N1 ] [ N2 ] ;
 
   pointer data ( ) noexcept
-    { return elements ; }
+    { return elements [ 0 ] ; }
 
   const_pointer data ( ) const noexcept
-    { return elements ; }
+    { return elements [ 0 ] ; }
 
   iterator begin ( ) noexcept
-    { return data ( ) ; }
+    { return elements [ 0 ] ; }
 
   const_iterator begin ( ) const noexcept
-    { return data ( ) ; }
+    { return elements [ 0 ] ; }
 
   iterator end ( ) noexcept
-    { return data ( ) + N1 ; }
+    { return elements [ N1 ] ; }
 
   const_iterator end ( ) const noexcept
-    { return data ( ) + N1 ; }
+    { return elements [ N1 ] ; }
 
   reverse_iterator rbegin ( ) noexcept
     { return reverse_iterator ( end ( ) ) ; }
@@ -741,240 +742,143 @@ public:
   const_reverse_iterator crend ( ) const noexcept
     { return rend ( ) ; }
 
-  constexpr size_t size ( ) noexcept
-    { return N1 ; }
-
-  constexpr bool empty ( ) noexcept
-    { return false ; }
-
-  reference at ( size_t n1 ) noexcept
-    { assert ( n1 < N1 ) ;
-      return data ( ) [ n1 ] ; }
-
-  const_reference at ( size_t n1 ) const noexcept
-    { assert ( n1 < N1 ) ;
-      return data ( ) [ n1 ] ; }
-
-  reference operator [ ] ( size_t n1 ) noexcept
-    { return at ( n1 ) ; }
-
-  const_reference operator [ ] ( size_t n1 ) const noexcept
-    { return at ( n1 ) ; }
-
-  reference front ( ) noexcept
-    { return at ( 0 ) ; }
-
-  const_reference front ( ) const noexcept
-    { return at ( 0 ) ; }
-
-  reference back ( ) noexcept
-    { return at ( N1 - 1 ) ; }
-
-  const_reference back ( ) const noexcept
-    { return at ( N1 - 1 ) ; }
-
-  element_pointer element_data ( ) noexcept
-    { return * elements ; }
-
-  const_element_pointer element_data ( ) const noexcept
-    { return * elements ; }
-
-  element_iterator element_begin ( ) noexcept
-    { return element_data ( ) ; }
-
-  const_element_iterator element_begin ( ) const noexcept
-    { return element_data ( ) ; }
-
-  element_iterator element_end ( ) noexcept
-    { return element_data ( ) + N1 * N2 ; }
-
-  const_element_iterator element_end ( ) const noexcept
-    { return element_data ( ) + N1 * N2 ; }
-
-  reverse_element_iterator element_rbegin ( ) noexcept
-    { return reverse_element_iterator ( element_end ( ) ) ; }
-
-  const_reverse_element_iterator element_rbegin ( ) const noexcept
-    { return const_reverse_element_iterator ( element_end ( ) ) ; }
-
-  reverse_element_iterator element_rend ( ) noexcept
-    { return reverse_element_iterator ( element_begin ( ) ) ; }
-
-  const_reverse_element_iterator element_rend ( ) const noexcept
-    { return const_reverse_element_iterator ( element_begin ( ) ) ; }
-
-  const_element_iterator element_cbegin ( ) const noexcept
-    { return element_begin ( ) ; }
-
-  const_element_iterator element_cend ( ) const noexcept
-    { return element_end ( ) ; }
-
-  const_reverse_element_iterator element_crbegin ( ) const noexcept
-    { return element_rbegin ( ) ; }
-
-  const_reverse_element_iterator element_crend ( ) const noexcept
-    { return element_rend ( ) ; }
-
-  constexpr size_t element_size ( ) noexcept
+  constexpr size_t size ( ) const noexcept
     { return N1 * N2 ; }
 
-  constexpr size_t size1 ( ) noexcept
+  constexpr size_t size1 ( ) const noexcept
     { return N1 ; }
 
-  constexpr size_t size2 ( ) noexcept
+  constexpr size_t size2 ( ) const noexcept
     { return N2 ; }
 
-  element_reference at ( size_t n1, size_t n2 ) noexcept
+  constexpr bool empty ( ) const noexcept
+    { return false ; }
+
+  reference access ( size_t n1, size_t n2 ) noexcept
     { assert ( n1 < N1 ) ;
       assert ( n2 < N2 ) ;
-      return data ( ) [ n1 ] [ n2 ] ; }
+      return elements [ n1 ] [ n2 ] ; }
 
-  const_element_reference at ( size_t n1, size_t n2 ) const noexcept
+  const_reference access ( size_t n1, size_t n2 ) const noexcept
     { assert ( n1 < N1 ) ;
       assert ( n2 < N2 ) ;
-      return data ( ) [ n1 ] [ n2 ] ; }
+      return elements [ n1 ] [ n2 ] ; }
 
-  element_reference operator ( ) ( size_t n1, size_t n2 ) noexcept
-    { return at ( n1, n2 ) ; }
+  reference at ( size_t n1, size_t n2 )
+    { if ( n1 >= N1 )
+        throw out_of_range ( "fs_matrix :: at, index1 out of range" ) ;
+      if ( n2 >= N2 )
+        throw out_of_range ( "fs_matrix :: at, index2 out of range" ) ;
+      return elements [ n1 ] [ n2 ] ; }
 
-  const_element_reference
-    operator ( ) ( size_t n1, size_t n2 ) const noexcept
-    { return at ( n1, n2 ) ; }
+  const_reference at ( size_t n1, size_t n2 ) const
+    { if ( n1 >= N1 )
+        throw out_of_range ( "fs_matrix :: at, index1 out of range" ) ;
+      if ( n2 >= N2 )
+        throw out_of_range ( "fs_matrix :: at, index2 out of range" ) ;
+      return elements [ n1 ] [ n2 ] ; }
 
-  element_reference element_front ( ) noexcept
-    { return at ( 0, 0 ) ; }
+  row_reference operator [ ] ( size_t n1 ) noexcept
+    { assert ( n1 < N1 ) ;
+      return elements [ n1 ] ; }
 
-  const_element_reference element_front ( ) const noexcept
-    { return at ( 0, 0 ) ; }
+  const_row_reference operator [ ] ( size_t n1 ) const noexcept
+    { assert ( n1 < N1 ) ;
+      return elements [ n1 ] ; }
 
-  element_reference element_back ( ) noexcept
-    { return at ( N1 - 1, N2 - 1 ) ; }
+  reference operator ( ) ( size_t n1, size_t n2 ) noexcept
+    { return access ( n1, n2 ) ; }
 
-  const_element_reference element_back ( ) const noexcept
-    { return at ( N1 - 1, N2 - 1 ) ; }
+  const_reference operator ( ) ( size_t n1, size_t n2 ) const noexcept
+    { return access ( n1, n2 ) ; }
 
   void fill ( const T & x )
-    { :: fill ( element_begin ( ), element_end ( ), x ) ; }
+    { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
-    { swap_ranges ( element_begin ( ), element_end ( ),
-                    b.element_begin ( ) ) ; }
+    { swap_ranges ( begin ( ), end ( ),
+                    b.begin ( ) ) ; }
 
   const fs_matrix & operator + ( ) const
     { return * this ; }
 
   fs_matrix operator - ( ) const
-    { fs_matrix result ;
-      transform ( element_begin ( ), element_end ( ),
-                  result.element_begin ( ),
-                  :: negate < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( * this, :: negate < T > ( ) ) ; }
 
-  friend fs_matrix operator + ( const fs_matrix & a,
-                                const fs_matrix & b )
-    { fs_matrix result ;
-      transform ( a.element_begin ( ), a.element_end ( ),
-                  b.element_begin ( ),
-                  result.element_begin ( ),
-                  plus < T > ( ) ) ;
-      return result ; }
+  friend fs_matrix operator + ( const fs_matrix & a, const fs_matrix & b )
+    { return componentwise ( a, b, plus < T > ( ) ) ; }
 
-  friend fs_matrix operator - ( const fs_matrix & a,
-                                const fs_matrix & b )
-    { fs_matrix result ;
-      transform ( a.element_begin ( ), a.element_end ( ),
-                  b.element_begin ( ),
-                  result.element_begin ( ),
-                  minus < T > ( ) ) ;
-      return result ; }
+  friend fs_matrix operator - ( const fs_matrix & a, const fs_matrix & b )
+    { return componentwise ( a, b, minus < T > ( ) ) ; }
 
   friend fs_matrix operator * ( const fs_matrix & a, const T & b )
-    { fs_matrix result ;
-      transform ( a.element_begin ( ), a.element_end ( ),
-                  result.element_begin ( ),
-                  [ & ] ( const T & x ) { return x * b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x * b ; } ) ; }
 
   friend fs_matrix operator * ( const T & a, const fs_matrix & b )
-    { fs_matrix result ;
-      transform ( b.element_begin ( ), b.element_end ( ),
-                  result.element_begin ( ),
-                  [ & ] ( const T & x ) { return a * x ; } ) ;
-      return result ; }
+    { return componentwise ( b, [ & ] ( const T & x ) { return a * x ; } ) ; }
 
   friend fs_matrix operator / ( const fs_matrix & a, const T & b )
-    { fs_matrix result ;
-      transform ( a.element_begin ( ), a.element_end ( ),
-                  result.element_begin ( ),
-                  [ & ] ( const T & x ) { return x / b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x / b ; } ) ; }
 
   friend fs_matrix operator % ( const fs_matrix & a, const T & b )
-    { fs_matrix result ;
-      transform ( a.element_begin ( ), a.element_end ( ),
-                  result.element_begin ( ),
-                  [ & ] ( const T & x ) { return x % b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x % b ; } ) ; }
 
   fs_matrix < T, N2, N1 > transposed ( ) const
     { fs_matrix < T, N2, N1 > result ;
       for ( size_t n1 = 0 ; n1 < N1 ; ++ n1 )
         for ( size_t n2 = 0 ; n2 < N2 ; ++ n2 )
-          result.at ( n2, n1 ) = at ( n1, n2 ) ;
+          result ( n2, n1 ) = access ( n1, n2 ) ;
       return result ; }
 
   fs_matrix & negate ( )
-    { for_each ( element_begin ( ), element_end ( ),
+    { for_each ( begin ( ), end ( ),
                  [ ] ( T & x ) { x = - x ; } ) ;
       return * this ; }
 
   fs_matrix & operator += ( const fs_matrix & b )
-    { for_each_pair ( element_begin ( ), element_end ( ),
-                      b.element_begin ( ),
+    { for_each_pair ( begin ( ), end ( ),
+                      b.begin ( ),
                       [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
   fs_matrix & operator -= ( const fs_matrix & b )
-    { for_each_pair ( element_begin ( ), element_end ( ),
-                      b.element_begin ( ),
+    { for_each_pair ( begin ( ), end ( ),
+                      b.begin ( ),
                       [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
   fs_matrix & operator *= ( const T & b )
-    { for_each ( element_begin ( ), element_end ( ),
+    { for_each ( begin ( ), end ( ),
                  [ & ] ( T & x ) { x *= b ; } ) ;
       return * this ; }
 
   fs_matrix & operator *= ( const fs_matrix < T, N2, N2 > & b )
     { return * this = * this * b ; }
 
-  fs_matrix & operator *=
-    ( const fs_lower_triangular_matrix < T, N2 > & b )
+  fs_matrix & operator *= ( const fs_lower_triangular_matrix < T, N2 > & b )
     { return * this = * this * b ; }
 
-  fs_matrix & operator *=
-    ( const fs_upper_triangular_matrix < T, N2 > & b )
+  fs_matrix & operator *= ( const fs_upper_triangular_matrix < T, N2 > & b )
     { return * this = * this * b ; }
 
   fs_matrix & operator /= ( const T & b )
-    { for_each ( element_begin ( ), element_end ( ),
+    { for_each ( begin ( ), end ( ),
                  [ & ] ( T & x ) { x /= b ; } ) ;
       return * this ; }
 
   fs_matrix & operator %= ( const T & b )
-    { for_each ( element_begin ( ), element_end ( ),
+    { for_each ( begin ( ), end ( ),
                  [ & ] ( T & x ) { x %= b ; } ) ;
       return * this ; }
 
   friend bool operator == ( const fs_matrix & a, const fs_matrix & b )
-    { return equal ( a.element_begin ( ), a.element_end ( ),
-                     b.element_begin ( ) ) ; }
+    { return equal ( a.begin ( ), a.end ( ),
+                     b.begin ( ) ) ; }
 
   friend bool operator < ( const fs_matrix & a, const fs_matrix & b )
-    { return lexicographical_compare
-               ( a.element_begin ( ), a.element_end ( ),
-                 b.element_begin ( ), b.element_end ( ) ) ; }
+    { return lexicographical_compare ( a.begin ( ), a.end ( ),
+                                       b.begin ( ), b.end ( ) ) ; }
 
   friend void swap ( fs_matrix & a, fs_matrix & b )
     { a.swap ( b ) ; }
@@ -1006,13 +910,7 @@ inline fs_matrix < T, N1, N2 >
                          UnaryOperation unary_operation )
 
 {
-fs_matrix < T, N1, N2 > result ;
-
-transform ( a.element_begin ( ), a.element_end ( ),
-            result.element_begin ( ),
-            unary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, unary_operation ) ;
 }
 
 
@@ -1025,14 +923,7 @@ inline fs_matrix < T, N1, N2 >
                          BinaryOperation binary_operation )
 
 {
-fs_matrix < T, N1, N2 > result ;
-
-transform ( a.element_begin ( ), a.element_end ( ),
-            b.element_begin ( ),
-            result.element_begin ( ),
-            binary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
 }
 
 
@@ -1140,7 +1031,7 @@ public:
   typedef size_t index_type ;
   typedef T value_type [ N2 ] ;
 
-  static constexpr size_t size ( const fs_matrix < T, N1, N2 > & x )
+  static constexpr size_t size ( const fs_matrix < T, N1, N2 > & )
     { return N1 ; }
 
 } ;
@@ -1163,11 +1054,11 @@ public:
   typedef size_t size_type ;
   typedef ptrdiff_t difference_type ;
 
-  typedef value_type * pointer ;
-  typedef const value_type * const_pointer ;
+  typedef T * pointer ;
+  typedef const T * const_pointer ;
 
-  typedef value_type & reference ;
-  typedef const value_type & const_reference ;
+  typedef T & reference ;
+  typedef const T & const_reference ;
 
   typedef pointer iterator ;
   typedef const_pointer const_iterator ;
@@ -1175,13 +1066,16 @@ public:
   typedef :: reverse_iterator < iterator > reverse_iterator ;
   typedef :: reverse_iterator < const_iterator > const_reverse_iterator ;
 
-  T elements [ ( N * ( N + 1 ) ) >> 1 ] ;
+private:
 
-  constexpr size_t size ( ) noexcept
-    { return ( N * ( N + 1 ) ) >> 1 ; }
+  static const size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
 
-  constexpr bool empty ( ) noexcept
-    { return false ; }
+  static constexpr size_t high_index_offset ( size_t n )
+    { return ( n * ( n + 1 ) ) >> 1 ; }
+
+public:
+
+  T elements [ size_ ] ;
 
   pointer data ( ) noexcept
     { return elements ; }
@@ -1190,16 +1084,16 @@ public:
     { return elements ; }
 
   iterator begin ( ) noexcept
-    { return data ( ) ; }
+    { return elements ; }
 
   const_iterator begin ( ) const noexcept
-    { return data ( ) ; }
+    { return elements ; }
 
   iterator end ( ) noexcept
-    { return data ( ) + size ( ) ; }
+    { return elements + size_ ; }
 
   const_iterator end ( ) const noexcept
-    { return data ( ) + size ( ) ; }
+    { return elements + size_ ; }
 
   reverse_iterator rbegin ( ) noexcept
     { return reverse_iterator ( end ( ) ) ; }
@@ -1225,113 +1119,115 @@ public:
   const_reverse_iterator crend ( ) const noexcept
     { return rend ( ) ; }
 
+  constexpr size_t size ( ) const noexcept
+    { return size_ ; }
+
+  constexpr size_t size1 ( ) const noexcept
+    { return N ; }
+
+  constexpr size_t size2 ( ) const noexcept
+    { return N ; }
+
+  constexpr bool empty ( ) const noexcept
+    { return false ; }
+
+  reference access ( size_t n1, size_t n2 ) noexcept
+    { assert ( n1 < N ) ;
+      assert ( n2 <= n1 ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  const_reference access ( size_t n1, size_t n2 ) const noexcept
+    { assert ( n1 < N ) ;
+      assert ( n2 <= n1 ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  reference at ( size_t n1, size_t n2 )
+    { if ( n1 >= N )
+        throw out_of_range
+                ( "fs_lower_triangular_matrix :: at, index1 out of range" ) ;
+      if ( n2 > n1 )
+        throw out_of_range
+                ( "fs_lower_triangular_matrix :: at, index2 out of range" ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  const_reference at ( size_t n1, size_t n2 ) const
+    { if ( n1 >= N )
+        throw out_of_range
+                ( "fs_lower_triangular_matrix :: at, index1 out of range" ) ;
+      if ( n2 > n1 )
+        throw out_of_range
+                ( "fs_lower_triangular_matrix :: at, index2 out of range" ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
   pointer operator [ ] ( size_t n1 ) noexcept
     { assert ( n1 < N ) ;
-      return elements + ( ( n1 * ( n1 + 1 ) ) >> 1 ) ; }
+      return elements + high_index_offset ( n1 ) ; }
 
   const_pointer operator [ ] ( size_t n1 ) const noexcept
     { assert ( n1 < N ) ;
-      return elements + ( ( n1 * ( n1 + 1 ) ) >> 1 ) ; }
-
-  reference at ( size_t n1, size_t n2 ) noexcept
-    { assert ( n2 <= n1 ) ;
-      return ( * this ) [ n1 ] [ n2 ] ; }
-
-  const_reference at ( size_t n1, size_t n2 ) const noexcept
-    { assert ( n2 <= n1 ) ;
-      return ( * this ) [ n1 ] [ n2 ] ; }
+      return elements + high_index_offset ( n1 ) ; }
 
   reference operator ( ) ( size_t n1, size_t n2 ) noexcept
-    { return at ( n1, n2 ) ; }
+    { return access ( n1, n2 ) ; }
 
   const_reference operator ( ) ( size_t n1, size_t n2 ) const noexcept
-    { return at ( n1, n2 ) ; }
+    { return access ( n1, n2 ) ; }
 
-  T symmetric_at ( size_t n1, size_t n2 ) const
-    { return n2 <= n1 ? at ( n1, n2 ) : at ( n2, n1 ) ; }
+  T access_symmetric ( size_t n1, size_t n2 ) const
+    { assert ( n1 < N ) ;
+      assert ( n2 < N ) ;
+      return n2 <= n1 ? access ( n1, n2 ) : access ( n2, n1 ) ; }
 
-  T complete_at ( size_t n1, size_t n2 ) const
-    { return n2 <= n1 ? at ( n1, n2 ) : T ( 0 ) ; }
-
-  reference front ( ) noexcept
-    { return elements [ 0 ] ; }
-
-  const_reference front ( ) const noexcept
-    { return elements [ 0 ] ; }
-
-  reference back ( ) noexcept
-    { return elements [ size ( ) - 1 ] ; }
-
-  const_reference back ( ) const noexcept
-    { return elements [ size ( ) - 1 ] ; }
+  T access_full ( size_t n1, size_t n2 ) const
+    { assert ( n1 < N ) ;
+      assert ( n2 < N ) ;
+      return n2 <= n1 ? access ( n1, n2 ) : T ( 0 ) ; }
 
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_lower_triangular_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
-    { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
+    { swap_ranges ( begin ( ), end ( ),
+                    b.begin ( ) ) ; }
 
   const fs_lower_triangular_matrix & operator + ( ) const
     { return * this ; }
 
   fs_lower_triangular_matrix operator - ( ) const
-    { fs_lower_triangular_matrix result ;
-      transform ( begin ( ), end ( ),
-                  result.begin ( ),
-                  :: negate < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( * this, :: negate < T > ( ) ) ; }
 
   friend fs_lower_triangular_matrix
            operator + ( const fs_lower_triangular_matrix & a,
                         const fs_lower_triangular_matrix & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  plus < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( a, b, plus < T > ( ) ) ; }
 
   friend fs_lower_triangular_matrix
            operator - ( const fs_lower_triangular_matrix & a,
                         const fs_lower_triangular_matrix & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  minus < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( a, b, minus < T > ( ) ) ; }
 
   friend fs_lower_triangular_matrix
            operator * ( const fs_lower_triangular_matrix & a, const T & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x * b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x * b ; } ) ; }
 
   friend fs_lower_triangular_matrix
            operator * ( const T & a, const fs_lower_triangular_matrix & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( b.begin ( ), b.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return a * x ; } ) ;
-      return result ; }
+    { return componentwise ( b, [ & ] ( const T & x ) { return a * x ; } ) ; }
 
   friend fs_lower_triangular_matrix
            operator / ( const fs_lower_triangular_matrix & a, const T & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x / b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x / b ; } ) ; }
 
   friend fs_lower_triangular_matrix
            operator % ( const fs_lower_triangular_matrix & a, const T & b )
-    { fs_lower_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x % b ; } ) ;
+    { return componentwise ( a, [ & ] ( const T & x ) { return x % b ; } ) ; }
+
+  fs_upper_triangular_matrix < T, N > transposed ( ) const
+    { fs_upper_triangular_matrix < T, N > result ;
+      for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
+        for ( size_t n2 = 0 ; n2 <= n1 ; ++ n2 )
+          result ( n2, n1 ) = access ( n1, n2 ) ;
       return result ; }
 
   fs_lower_triangular_matrix & negate ( )
@@ -1358,8 +1254,8 @@ public:
         x *= b ;
       return * this ; }
 
-  fs_lower_triangular_matrix & operator *=
-    ( const fs_lower_triangular_matrix & b )
+  fs_lower_triangular_matrix &
+    operator *= ( const fs_lower_triangular_matrix & b )
     { return * this = * this * b ; }
 
   fs_lower_triangular_matrix & operator /= ( const T & b )
@@ -1374,7 +1270,8 @@ public:
 
   friend bool operator == ( const fs_lower_triangular_matrix & a,
                             const fs_lower_triangular_matrix & b )
-    { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
+    { return equal ( a.begin ( ), a.end ( ),
+                     b.begin ( ) ) ; }
 
   friend bool operator < ( const fs_lower_triangular_matrix & a,
                            const fs_lower_triangular_matrix & b )
@@ -1412,13 +1309,7 @@ inline fs_lower_triangular_matrix < T, N >
                          UnaryOperation unary_operation )
 
 {
-fs_lower_triangular_matrix < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            result.begin ( ),
-            unary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, unary_operation ) ;
 }
 
 
@@ -1431,14 +1322,7 @@ inline fs_lower_triangular_matrix < T, N >
                          BinaryOperation binary_operation )
 
 {
-fs_lower_triangular_matrix < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            b.begin ( ),
-            result.begin ( ),
-            binary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
 }
 
 
@@ -1576,7 +1460,7 @@ fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
-    result ( n1, n2 ) = m.symmetric_at ( n1, n2 ) ;
+    result ( n1, n2 ) = m.access_symmetric ( n1, n2 ) ;
 
 return result ;
 }
@@ -1586,14 +1470,14 @@ return result ;
 
 template < class T, size_t N >
 inline fs_matrix < T, N, N >
-         make_complete ( const fs_lower_triangular_matrix < T, N > & m )
+         make_full ( const fs_lower_triangular_matrix < T, N > & m )
 
 {
 fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
-    result ( n1, n2 ) = m.complete_at ( n1, n2 ) ;
+    result ( n1, n2 ) = m.access_full ( n1, n2 ) ;
 
 return result ;
 }
@@ -1612,8 +1496,7 @@ public:
   typedef size_t index_type ;
   typedef T * value_type ;
 
-  static constexpr
-    size_t size ( const fs_lower_triangular_matrix < T, N > & x )
+  static constexpr size_t size ( const fs_lower_triangular_matrix < T, N > & )
     { return N ; }
 
 } ;
@@ -1636,11 +1519,11 @@ public:
   typedef size_t size_type ;
   typedef ptrdiff_t difference_type ;
 
-  typedef value_type * pointer ;
-  typedef const value_type * const_pointer ;
+  typedef T * pointer ;
+  typedef const T * const_pointer ;
 
-  typedef value_type & reference ;
-  typedef const value_type & const_reference ;
+  typedef T & reference ;
+  typedef const T & const_reference ;
 
   typedef pointer iterator ;
   typedef const_pointer const_iterator ;
@@ -1648,13 +1531,16 @@ public:
   typedef :: reverse_iterator < iterator > reverse_iterator ;
   typedef :: reverse_iterator < const_iterator > const_reverse_iterator ;
 
-  T elements [ ( N * ( N + 1 ) ) >> 1 ] ;
+private:
 
-  constexpr size_t size ( ) noexcept
-    { return ( N * ( N + 1 ) ) >> 1 ; }
+  static const size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
 
-  constexpr bool empty ( ) noexcept
-    { return false ; }
+  static constexpr size_t high_index_offset ( size_t n )
+    { return ( n * ( ( N << 1 ) - 1 - n ) ) >> 1 ; }
+
+public:
+
+  T elements [ size_ ] ;
 
   pointer data ( ) noexcept
     { return elements ; }
@@ -1663,16 +1549,16 @@ public:
     { return elements ; }
 
   iterator begin ( ) noexcept
-    { return data ( ) ; }
+    { return elements ; }
 
   const_iterator begin ( ) const noexcept
-    { return data ( ) ; }
+    { return elements ; }
 
   iterator end ( ) noexcept
-    { return data ( ) + size ( ) ; }
+    { return elements + size_ ; }
 
   const_iterator end ( ) const noexcept
-    { return data ( ) + size ( ) ; }
+    { return elements + size_ ; }
 
   reverse_iterator rbegin ( ) noexcept
     { return reverse_iterator ( end ( ) ) ; }
@@ -1698,115 +1584,115 @@ public:
   const_reverse_iterator crend ( ) const noexcept
     { return rend ( ) ; }
 
+  constexpr size_t size ( ) const noexcept
+    { return size_ ; }
+
+  constexpr size_t size1 ( ) const noexcept
+    { return N ; }
+
+  constexpr size_t size2 ( ) const noexcept
+    { return N ; }
+
+  constexpr bool empty ( ) const noexcept
+    { return false ; }
+
+  reference access ( size_t n1, size_t n2 ) noexcept
+    { assert ( n1 < N ) ;
+      assert ( n2 >= n1  &&  n2 < N ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  const_reference access ( size_t n1, size_t n2 ) const noexcept
+    { assert ( n1 < N ) ;
+      assert ( n2 >= n1  &&  n2 < N ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  reference at ( size_t n1, size_t n2 )
+    { if ( n1 >= N )
+        throw out_of_range
+                ( "fs_upper_triangular_matrix :: at, index1 out of range" ) ;
+      if ( n2 < n1  &&  n2 >= N )
+        throw out_of_range
+                ( "fs_upper_triangular_matrix :: at, index2 out of range" ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
+  const_reference at ( size_t n1, size_t n2 ) const
+    { if ( n1 >= N )
+        throw out_of_range
+                ( "fs_upper_triangular_matrix :: at, index1 out of range" ) ;
+      if ( n2 < n1  &&  n2 >= N )
+        throw out_of_range
+                ( "fs_upper_triangular_matrix :: at, index2 out of range" ) ;
+      return elements [ high_index_offset ( n1 ) + n2 ] ; }
+
   pointer operator [ ] ( size_t n1 ) noexcept
     { assert ( n1 < N ) ;
-      return elements + ( ( n1 * ( ( N << 1 ) + 1 - n1 ) ) >> 1 ) ; }
+      return elements + high_index_offset ( n1 ) ; }
 
   const_pointer operator [ ] ( size_t n1 ) const noexcept
     { assert ( n1 < N ) ;
-      return elements + ( ( n1 * ( ( N << 1 ) + 1 - n1 ) ) >> 1 ) ; }
-
-  reference at ( size_t n1, size_t n2 ) noexcept
-    { assert ( n2 >= n1 ) ;
-      assert ( n2 < N ) ;
-      return ( * this ) [ n1 ] [ n2 - n1 ] ; }
-
-  const_reference at ( size_t n1, size_t n2 ) const noexcept
-    { assert ( n2 >= n1 ) ;
-      assert ( n2 < N ) ;
-      return ( * this ) [ n1 ] [ n2 - n1 ] ; }
+      return elements + high_index_offset ( n1 ) ; }
 
   reference operator ( ) ( size_t n1, size_t n2 ) noexcept
-    { return at ( n1, n2 ) ; }
+    { return access ( n1, n2 ) ; }
 
   const_reference operator ( ) ( size_t n1, size_t n2 ) const noexcept
-    { return at ( n1, n2 ) ; }
+    { return access ( n1, n2 ) ; }
 
-  T symmetric_at ( size_t n1, size_t n2 ) const
-    { return n2 >= n1 ? at ( n1, n2 ) : at ( n2, n1 ) ; }
+  T access_symmetric ( size_t n1, size_t n2 ) const
+    { assert ( n1 < N ) ;
+      assert ( n2 < N ) ;
+      return n2 >= n1 ? access ( n1, n2 ) : access ( n2, n1 ) ; }
 
-  T complete_at ( size_t n1, size_t n2 ) const
-    { return n2 >= n1 ? at ( n1, n2 ) : T ( 0 ) ; }
-
-  reference front ( ) noexcept
-    { return elements [ 0 ] ; }
-
-  const_reference front ( ) const noexcept
-    { return elements [ 0 ] ; }
-
-  reference back ( ) noexcept
-    { return elements [ size ( ) - 1 ] ; }
-
-  const_reference back ( ) const noexcept
-    { return elements [ size ( ) - 1 ] ; }
+  T access_full ( size_t n1, size_t n2 ) const
+    { assert ( n1 < N ) ;
+      assert ( n2 < N ) ;
+      return n2 >= n1 ? access ( n1, n2 ) : T ( 0 ) ; }
 
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_upper_triangular_matrix & b )
     noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
-    { swap_ranges ( begin ( ), end ( ), b.begin ( ) ) ; }
+    { swap_ranges ( begin ( ), end ( ),
+                    b.begin ( ) ) ; }
 
   const fs_upper_triangular_matrix & operator + ( ) const
     { return * this ; }
 
   fs_upper_triangular_matrix operator - ( ) const
-    { fs_upper_triangular_matrix result ;
-      transform ( begin ( ), end ( ),
-                  result.begin ( ),
-                  :: negate < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( * this, :: negate < T > ( ) ) ; }
 
   friend fs_upper_triangular_matrix
            operator + ( const fs_upper_triangular_matrix & a,
                         const fs_upper_triangular_matrix & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  plus < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( a, b, plus < T > ( ) ) ; }
 
   friend fs_upper_triangular_matrix
            operator - ( const fs_upper_triangular_matrix & a,
                         const fs_upper_triangular_matrix & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  b.begin ( ),
-                  result.begin ( ),
-                  minus < T > ( ) ) ;
-      return result ; }
+    { return componentwise ( a, b, minus < T > ( ) ) ; }
 
   friend fs_upper_triangular_matrix
            operator * ( const fs_upper_triangular_matrix & a, const T & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x * b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x * b ; } ) ; }
 
   friend fs_upper_triangular_matrix
            operator * ( const T & a, const fs_upper_triangular_matrix & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( b.begin ( ), b.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return a * x ; } ) ;
-      return result ; }
+    { return componentwise ( b, [ & ] ( const T & x ) { return a * x ; } ) ; }
 
   friend fs_upper_triangular_matrix
            operator / ( const fs_upper_triangular_matrix & a, const T & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x / b ; } ) ;
-      return result ; }
+    { return componentwise ( a, [ & ] ( const T & x ) { return x / b ; } ) ; }
 
   friend fs_upper_triangular_matrix
            operator % ( const fs_upper_triangular_matrix & a, const T & b )
-    { fs_upper_triangular_matrix result ;
-      transform ( a.begin ( ), a.end ( ),
-                  result.begin ( ),
-                  [ & ] ( const T & x ) { return x % b ; } ) ;
+    { return componentwise ( a, [ & ] ( const T & x ) { return x % b ; } ) ; }
+
+  fs_lower_triangular_matrix < T, N > transposed ( ) const
+    { fs_lower_triangular_matrix < T, N > result ;
+      for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
+        for ( size_t n2 = n1 ; n2 < N ; ++ n2 )
+          result ( n2, n1 ) = access ( n1, n2 ) ;
       return result ; }
 
   fs_upper_triangular_matrix & negate ( )
@@ -1833,8 +1719,8 @@ public:
         x *= b ;
       return * this ; }
 
-  fs_upper_triangular_matrix & operator *=
-    ( const fs_upper_triangular_matrix & b )
+  fs_upper_triangular_matrix &
+    operator *= ( const fs_upper_triangular_matrix & b )
     { return * this = * this * b ; }
 
   fs_upper_triangular_matrix & operator /= ( const T & b )
@@ -1849,7 +1735,8 @@ public:
 
   friend bool operator == ( const fs_upper_triangular_matrix & a,
                             const fs_upper_triangular_matrix & b )
-    { return equal ( a.begin ( ), a.end ( ), b.begin ( ) ) ; }
+    { return equal ( a.begin ( ), a.end ( ),
+                     b.begin ( ) ) ; }
 
   friend bool operator < ( const fs_upper_triangular_matrix & a,
                            const fs_upper_triangular_matrix & b )
@@ -1887,13 +1774,7 @@ inline fs_upper_triangular_matrix < T, N >
                          UnaryOperation unary_operation )
 
 {
-fs_upper_triangular_matrix < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            result.begin ( ),
-            unary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, unary_operation ) ;
 }
 
 
@@ -1906,14 +1787,7 @@ inline fs_upper_triangular_matrix < T, N >
                          BinaryOperation binary_operation )
 
 {
-fs_upper_triangular_matrix < T, N > result ;
-
-transform ( a.begin ( ), a.end ( ),
-            b.begin ( ),
-            result.begin ( ),
-            binary_operation ) ;
-
-return result ;
+return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
 }
 
 
@@ -2026,7 +1900,7 @@ inline fs_upper_triangular_matrix < T, N >
 fs_upper_triangular_matrix < T, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
-  for ( size_t n2 = 0 ; n2 <= n1 ; ++ n2 )
+  for ( size_t n2 = n1 ; n2 < N ; ++ n2 )
     {
     T s ( 0 ) ;
 
@@ -2051,7 +1925,7 @@ fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
-    result ( n1, n2 ) = m.symmetric_at ( n1, n2 ) ;
+    result ( n1, n2 ) = m.access_symmetric ( n1, n2 ) ;
 
 return result ;
 }
@@ -2061,14 +1935,14 @@ return result ;
 
 template < class T, size_t N >
 inline fs_matrix < T, N, N >
-         make_complete ( const fs_upper_triangular_matrix < T, N > & m )
+         make_full ( const fs_upper_triangular_matrix < T, N > & m )
 
 {
 fs_matrix < T, N, N > result ;
 
 for ( size_t n1 = 0 ; n1 < N ; ++ n1 )
   for ( size_t n2 = 0 ; n2 < N ; ++ n2 )
-    result ( n1, n2 ) = m.complete_at ( n1, n2 ) ;
+    result ( n1, n2 ) = m.access_full ( n1, n2 ) ;
 
 return result ;
 }
@@ -2087,8 +1961,7 @@ public:
   typedef size_t index_type ;
   typedef T * value_type ;
 
-  static constexpr
-    size_t size ( const fs_upper_triangular_matrix < T, N > & x )
+  static constexpr size_t size ( const fs_upper_triangular_matrix < T, N > & )
     { return N ; }
 
 } ;
