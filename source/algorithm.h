@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2020.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,10 @@
 
 
 #include <algorithm>
+
+#include "type_traits.h"
+#include "cstddef.h"
+#include "utility.h"
 
 
 
@@ -78,6 +82,8 @@ using std :: reverse_copy ;
 using std :: rotate ;
 using std :: rotate_copy ;
 
+using std :: sample ;
+
 // using std :: random_shuffle ;
 using std :: shuffle ;
 
@@ -124,6 +130,8 @@ using std :: min_element ;
 using std :: max_element ;
 using std :: minmax_element ;
 
+using std :: clamp ;
+
 using std :: lexicographical_compare ;
 
 using std :: next_permutation ;
@@ -137,19 +145,305 @@ using std :: prev_permutation ;
 //
 
 template < class InputIterator1, class InputIterator2, class Function >
-Function for_each_pair ( InputIterator1 first1, InputIterator1 last1,
-                         InputIterator2 first2,
-                         Function f )
+InputIterator2 for_pairs ( InputIterator1 first1, InputIterator1 last1,
+                           InputIterator2 first2,
+                           Function fun )
 
 {
 while ( first1 != last1 )
   {
-  f ( * first1, * first2 ) ;
+  fun ( * first1, * first2 ) ;
   ++ first1 ;
   ++ first2 ;
   }
 
-return f ;
+return first2 ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2,
+           class Function, class Predicate >
+enable_if_t < is_invocable_v < Predicate,
+                               decltype ( * declval < InputIterator1 > ( ) ),
+                               decltype ( * declval < InputIterator2 > ( ) ) >,
+              InputIterator2 >
+  for_pairs_asymmetric_if ( InputIterator1 first1, InputIterator1 last1,
+                            InputIterator2 first2,
+                            Function fun,
+                            Predicate pred )
+
+{
+while ( first1 != last1 )
+  {
+  if ( pred ( * first1, * first2 ) )
+    {
+    fun ( * first1, * first2 ) ;
+    ++ first2 ;
+    }
+
+  ++ first1 ;
+  }
+
+return first2 ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2,
+           class Function, class Predicate >
+enable_if_t
+  <     is_invocable_v < Predicate,
+                         decltype ( * declval < InputIterator1 > ( ) ) >
+    &&  ! is_invocable_v < Predicate,
+                           decltype ( * declval < InputIterator1 > ( ) ),
+                           decltype ( * declval < InputIterator2 > ( ) ) >,
+    InputIterator2 >
+  for_pairs_asymmetric_if ( InputIterator1 first1, InputIterator1 last1,
+                            InputIterator2 first2,
+                            Function fun,
+                            Predicate pred )
+
+{
+while ( first1 != last1 )
+  {
+  if ( pred ( * first1 ) )
+    {
+    fun ( * first1, * first2 ) ;
+    ++ first2 ;
+    }
+
+  ++ first1 ;
+  }
+
+return first2 ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2,
+           class Function, class PositionPredicate >
+InputIterator2
+  for_pairs_if_position ( InputIterator1 first1, InputIterator1 last1,
+                          InputIterator2 first2,
+                          Function fun,
+                          PositionPredicate pred )
+
+{
+size_t n = 0 ;
+
+while ( first1 != last1 )
+  {
+  if ( pred ( n ) )
+    fun ( * first1, * first2 ) ;
+
+  ++ first1 ;
+  ++ first2 ;
+  ++ n ;
+  }
+
+return first2 ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2,
+           class Function, class PositionPredicate >
+InputIterator2
+  for_pairs_asymmetric_if_position
+    ( InputIterator1 first1, InputIterator1 last1,
+      InputIterator2 first2,
+      Function fun,
+      PositionPredicate pred )
+
+{
+size_t n = 0 ;
+
+while ( first1 != last1 )
+  {
+  if ( pred ( n ) )
+    {
+    fun ( * first1, * first2 ) ;
+    ++ first2 ;
+    }
+
+  ++ first1 ;
+  ++ n ;
+  }
+
+return first2 ;
+}
+
+
+//
+
+template < class InputIterator, class OutputIterator, class PositionPredicate >
+OutputIterator
+  copy_if_position ( InputIterator first, InputIterator last,
+                     OutputIterator result,
+                     PositionPredicate pred )
+
+{
+size_t n = 0 ;
+
+while ( first != last )
+  {
+  if ( pred ( n ) )
+    {
+    * result = * first ;
+    ++ result ;
+    }
+
+  ++ first ;
+  ++ n ;
+  }
+
+return result;
+}
+
+
+//
+
+template < class ForwardIterator, class PositionPredicate >
+ForwardIterator
+  remove_if_position ( ForwardIterator first, ForwardIterator last,
+                       PositionPredicate pred )
+
+{
+size_t n = 0 ;
+ForwardIterator result = first ;
+
+while ( first != last )
+  {
+  if ( ! pred ( n ) )
+    {
+    if ( result != first )
+      * result = move ( * first ) ;
+
+    ++ result ;
+    }
+
+  ++ first ;
+  ++ n ;
+  }
+
+return result ;
+}
+
+
+//
+
+template < class InputIterator, class OutputIterator,
+           class UnaryOperation, class UnaryPredicate >
+OutputIterator transform_if ( InputIterator first, InputIterator last,
+                              OutputIterator result,
+                              UnaryOperation op,
+                              UnaryPredicate pred )
+
+{
+while ( first != last )
+  {
+  if ( pred ( * first ) )
+    {
+    * result = op ( * first ) ;
+    ++ result ;
+    }
+
+  ++ first ;
+  }
+
+return result ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2, class OutputIterator,
+           class BinaryOperation, class BinaryPredicate >
+OutputIterator transform_if ( InputIterator1 first1, InputIterator1 last1,
+                              InputIterator2 first2,
+                              OutputIterator result,
+                              BinaryOperation op,
+                              BinaryPredicate pred )
+
+{
+while ( first1 != last1 )
+  {
+  if ( pred ( * first1, * first2 ) )
+    {
+    * result = op ( * first1, * first2 ) ;
+    ++ result ;
+    }
+
+  ++ first1 ;
+  ++ first2 ;
+  }
+
+return result ;
+}
+
+
+//
+
+template < class InputIterator, class OutputIterator,
+           class UnaryOperation, class PositionPredicate >
+OutputIterator
+  transform_if_position ( InputIterator first, InputIterator last,
+                          OutputIterator result,
+                          UnaryOperation op,
+                          PositionPredicate pred )
+
+{
+size_t n = 0 ;
+
+while ( first != last )
+  {
+  if ( pred ( n ) )
+    {
+    * result = op ( * first ) ;
+    ++ result ;
+    }
+
+  ++ first ;
+  ++ n ;
+  }
+
+return result ;
+}
+
+
+//
+
+template < class InputIterator1, class InputIterator2, class OutputIterator,
+           class BinaryOperation, class PositionPredicate >
+OutputIterator
+  transform_if_position ( InputIterator1 first1, InputIterator1 last1,
+                          InputIterator2 first2,
+                          OutputIterator result,
+                          BinaryOperation op,
+                          PositionPredicate pred )
+
+{
+size_t n = 0 ;
+
+while ( first1 != last1 )
+  {
+  if ( pred ( n ) )
+    {
+    * result = op ( * first1, * first2 ) ;
+    ++ result ;
+    }
+
+  ++ first1 ;
+  ++ first2 ;
+  ++ n ;
+  }
+
+return result ;
 }
 
 
