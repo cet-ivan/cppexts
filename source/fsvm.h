@@ -19,6 +19,7 @@
 #include "algorithm.h"
 #include "functional.h"
 #include "numeric.h"
+#include "complex.h"
 
 #include "streaming.h"
 #include "funtr.h"
@@ -94,11 +95,28 @@ fs_vector < T, N > componentwise ( const fs_vector < T, N > & a,
                                    BinaryOperation binary_operation ) ;
 
 template < class T, size_t N >
+fs_vector < complex < T >, N >
+  conj ( const fs_vector < complex < T >, N > & a ) ;
+
+template < class T, size_t N >
 T inner_product ( const fs_vector < T, N > & a,
                   const fs_vector < T, N > & b ) ;
 
 template < class T, size_t N >
-inline T norm ( const fs_vector < T, N > & a ) ;
+typename complex_traits < T > :: real_type
+  norm ( const fs_vector < T, N > & a ) ;
+
+template < class T, size_t N >
+typename complex_traits < T > :: real_type
+  length ( const fs_vector < T, N > & a ) ;
+
+template < class T >
+fs_vector < T, 3 > cross_product ( const fs_vector < T, 3 > & a,
+                                   const fs_vector < T, 3 > & b ) ;
+
+template < class T >
+T cross_product_z ( const fs_vector < T, 2 > & a,
+                    const fs_vector < T, 2 > & b ) ;
 
 
 
@@ -150,6 +168,10 @@ fs_matrix < T, N1, N2 >
   componentwise ( const fs_matrix < T, N1, N2 > & a,
                   const fs_matrix < T, N1, N2 > & b,
                   BinaryOperation binary_operation ) ;
+
+template < class T, size_t N1, size_t N2 >
+fs_matrix < complex < T >, N1, N2 >
+  conj ( const fs_matrix < complex < T >, N1, N2 > & a ) ;
 
 template < class T, size_t N1, size_t N2 >
 fs_matrix < T, N1, N2 > outer_product ( const fs_vector < T, N1 > & a,
@@ -220,6 +242,10 @@ fs_lower_triangular_matrix < T, N >
   componentwise ( const fs_lower_triangular_matrix < T, N > & a,
                   const fs_lower_triangular_matrix < T, N > & b,
                   BinaryOperation binary_operation ) ;
+
+template < class T, size_t N >
+fs_lower_triangular_matrix < complex < T >, N >
+  conj ( const fs_lower_triangular_matrix < complex < T >, N > & a ) ;
 
 template < class T, size_t N >
 fs_vector < T, N >
@@ -309,6 +335,10 @@ fs_upper_triangular_matrix < T, N >
                   BinaryOperation binary_operation ) ;
 
 template < class T, size_t N >
+fs_upper_triangular_matrix < complex < T >, N >
+  conj ( const fs_upper_triangular_matrix < complex < T >, N > & a ) ;
+
+template < class T, size_t N >
 fs_vector < T, N >
   operator * ( const fs_upper_triangular_matrix < T, N > & m,
                const fs_vector < T, N > & v ) ;
@@ -384,6 +414,67 @@ transform ( a.begin ( ), a.end ( ),
 
 return result ;
 }
+
+
+
+// *** FS_VECTOR_OPERATOR ***
+
+
+//
+
+template < class T, size_t N >
+class fs_vector_operator
+
+{
+public:
+
+  static T inner_product ( const fs_vector < T, N > & a,
+                           const fs_vector < T, N > & b )
+    { return :: inner_product ( a.begin ( ), a.end ( ),
+                                b.begin ( ),
+                                T ( 0 ) ) ; }
+
+  static T norm ( const fs_vector < T, N > & a )
+    { return accumulate ( a.begin ( ), a.end ( ),
+                          T ( 0 ),
+                          [ ] ( const T & x, const T & y )
+                            { return x + sqr ( y ) ; } ) ; }
+
+  static T length ( const fs_vector < T, N > & a )
+    { return sqrt ( norm ( a ) ) ; }
+
+} ;
+
+
+//
+
+template < class T, size_t N >
+class fs_vector_operator < complex < T >, N >
+
+{
+public:
+
+  static complex < T >
+           inner_product ( const fs_vector < complex < T >, N > & a,
+                           const fs_vector < complex < T >, N > & b )
+    { return :: inner_product
+                  ( a.begin ( ), a.end ( ),
+                    b.begin ( ),
+                    complex < T > ( 0 ),
+                    plus < complex < T > > ( ),
+                    [ ] ( const complex < T > & x, const complex < T > & y )
+                      { return conj ( x ) * y ; } ) ; }
+
+  static T norm ( const fs_vector < complex < T >, N > & a )
+    { return accumulate ( a.begin ( ), a.end ( ),
+                          T ( 0 ),
+                          [ ] ( const T & x, const complex < T > & y )
+                            { return x + :: norm ( y ) ; } ) ; }
+
+  static T length ( const fs_vector < complex < T >, N > & a )
+    { return sqrt ( norm ( a ) ) ; }
+
+} ;
 
 
 
@@ -505,7 +596,8 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_vector & b )
-    noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
+    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
+                                    declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -544,15 +636,15 @@ public:
       return * this ; }
 
   fs_vector & operator += ( const fs_vector & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x += y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
   fs_vector & operator -= ( const fs_vector & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x -= y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
   fs_vector & operator *= ( const T & b )
@@ -628,21 +720,68 @@ return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
 //
 
 template < class T, size_t N >
-inline T inner_product ( const fs_vector < T, N > & a,
-                         const fs_vector < T, N > & b )
+inline fs_vector < complex < T >, N >
+         conj ( const fs_vector < complex < T >, N > & a )
 
 {
-return a * b ;
+return componentwise ( a, conj < T > ) ;
 }
 
 
 //
 
 template < class T, size_t N >
-inline T norm ( const fs_vector < T, N > & a )
+inline T inner_product ( const fs_vector < T, N > & a,
+                         const fs_vector < T, N > & b )
 
 {
-return a * a ;
+return fs_vector_operator < T, N > :: inner_product ( a, b ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline typename complex_traits < T > :: real_type
+         norm ( const fs_vector < T, N > & a )
+
+{
+return fs_vector_operator < T, N > :: norm ( a ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline typename complex_traits < T > :: real_type
+         length ( const fs_vector < T, N > & a )
+
+{
+return fs_vector_operator < T, N > :: length ( a ) ;
+}
+
+
+//
+
+template < class T >
+inline fs_vector < T, 3 > cross_product ( const fs_vector < T, 3 > & a,
+                                          const fs_vector < T, 3 > & b )
+
+{
+return fs_vector < T, 3 > { a [ 1 ] * b [ 2 ] - a [ 2 ] * b [ 1 ],
+                            a [ 2 ] * b [ 0 ] - a [ 0 ] * b [ 2 ],
+                            a [ 0 ] * b [ 1 ] - a [ 1 ] * b [ 0 ] } ;
+}
+
+
+//
+
+template < class T >
+inline T cross_product_z ( const fs_vector < T, 2 > & a,
+                           const fs_vector < T, 2 > & b )
+
+{
+return a [ 0 ] * b [ 1 ] - a [ 1 ] * b [ 0 ] ;
 }
 
 
@@ -701,22 +840,22 @@ public:
   T elements [ N1 ] [ N2 ] ;
 
   pointer data ( ) noexcept
-    { return elements [ 0 ] ; }
+    { return * elements ; }
 
   const_pointer data ( ) const noexcept
-    { return elements [ 0 ] ; }
+    { return * elements ; }
 
   iterator begin ( ) noexcept
-    { return elements [ 0 ] ; }
+    { return * elements ; }
 
   const_iterator begin ( ) const noexcept
-    { return elements [ 0 ] ; }
+    { return * elements ; }
 
   iterator end ( ) noexcept
-    { return elements [ N1 ] ; }
+    { return * ( elements + N1 ) ; }
 
   const_iterator end ( ) const noexcept
-    { return elements [ N1 ] ; }
+    { return * ( elements + N1 ) ; }
 
   reverse_iterator rbegin ( ) noexcept
     { return reverse_iterator ( end ( ) ) ; }
@@ -796,7 +935,8 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_matrix & b )
-    noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
+    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
+                                    declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -837,15 +977,15 @@ public:
       return * this ; }
 
   fs_matrix & operator += ( const fs_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x += y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
   fs_matrix & operator -= ( const fs_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x -= y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
   fs_matrix & operator *= ( const T & b )
@@ -924,6 +1064,17 @@ inline fs_matrix < T, N1, N2 >
 
 {
 return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
+}
+
+
+//
+
+template < class T, size_t N1, size_t N2 >
+inline fs_matrix < complex < T >, N1, N2 >
+         conj ( const fs_matrix < complex < T >, N1, N2 > & a )
+
+{
+return componentwise ( a, conj < T > ) ;
 }
 
 
@@ -1187,7 +1338,8 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_lower_triangular_matrix & b )
-    noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
+    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
+                                    declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -1237,16 +1389,16 @@ public:
 
   fs_lower_triangular_matrix &
     operator += ( const fs_lower_triangular_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x += y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
   fs_lower_triangular_matrix &
     operator -= ( const fs_lower_triangular_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x -= y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
   fs_lower_triangular_matrix & operator *= ( const T & b )
@@ -1323,6 +1475,17 @@ inline fs_lower_triangular_matrix < T, N >
 
 {
 return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline fs_lower_triangular_matrix < complex < T >, N >
+         conj ( const fs_lower_triangular_matrix < complex < T >, N > & a )
+
+{
+return componentwise ( a, conj < T > ) ;
 }
 
 
@@ -1652,7 +1815,8 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_upper_triangular_matrix & b )
-    noexcept ( noexcept ( swap ( declval < T & > ( ), declval < T & > ( ) ) ) )
+    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
+                                    declval < T & > ( ) ) ) )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -1702,16 +1866,16 @@ public:
 
   fs_upper_triangular_matrix &
     operator += ( const fs_upper_triangular_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x += y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x += y ; } ) ;
       return * this ; }
 
   fs_upper_triangular_matrix &
     operator -= ( const fs_upper_triangular_matrix & b )
-    { for_each_pair ( begin ( ), end ( ),
-                      b.begin ( ),
-                      [ ] ( T & x, const T & y ) { x -= y ; } ) ;
+    { for_pairs ( begin ( ), end ( ),
+                  b.begin ( ),
+                  [ ] ( T & x, const T & y ) { x -= y ; } ) ;
       return * this ; }
 
   fs_upper_triangular_matrix & operator *= ( const T & b )
@@ -1788,6 +1952,17 @@ inline fs_upper_triangular_matrix < T, N >
 
 {
 return fixed_size_structure_componentwise ( a, b, binary_operation ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline fs_upper_triangular_matrix < complex < T >, N >
+         conj ( const fs_upper_triangular_matrix < complex < T >, N > & a )
+
+{
+return componentwise ( a, conj < T > ) ;
 }
 
 
