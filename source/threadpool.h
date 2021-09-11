@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2021.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -176,7 +176,7 @@ private:
       pth ( handle < packaged_task < Result ( ) > > :: make ( move ( f ) ) )
       { }
 
-    void operator ( ) ( )
+    void operator ( ) ( ) const
       { ( * pth ) ( ) ; }
 
   } ;
@@ -239,15 +239,10 @@ public:
         pdh.clear ( ) ; }
 
     template < class F, class ... Args >
-    future < typename result_of < typename decay < F > :: type
-                                    ( typename decay < Args > :: type ... ) >
-                      :: type >
+    future < invoke_result_t < decay_t < F > ( decay_t < Args > ... ) > >
       run_monitored ( F && f, Args && ... args )
       { assert ( valid ( ) ) ;
-        typedef
-          typename result_of < typename decay < F > :: type
-                                 ( typename decay < Args > :: type ... ) >
-                   :: type
+        typedef invoke_result_t < decay_t < F > ( decay_t < Args > ... ) >
           result_type ;
         monitored_task < result_type >
           mt ( bind ( forward < F > ( f ),
@@ -258,17 +253,12 @@ public:
         return ft ; }
 
     template < class F, class ... Args >
-    future < typename result_of < typename decay < F > :: type
-                                    ( typename decay < Args > :: type ... ,
-                                      size_t ) >
-                      :: type >
+    future < invoke_result_t < decay_t < F > ( decay_t < Args > ... ,
+                                               size_t ) > >
       run_monitored_with_index ( F && f, Args && ... args )
       { assert ( valid ( ) ) ;
-        typedef
-          typename result_of < typename decay < F > :: type
-                                 ( typename decay < Args > :: type ... ,
-                                   size_t ) >
-                   :: type
+        typedef invoke_result_t < decay_t < F > ( decay_t < Args > ... ,
+                                                  size_t ) >
           result_type ;
         monitored_task < result_type >
           mt ( bind ( forward < F > ( f ),
@@ -324,18 +314,14 @@ public:
                                     forward < Args > ( args ) ... ) ; }
 
   template < class F, class ... Args >
-  future < typename result_of < typename decay < F > :: type
-                                  ( typename decay < Args > :: type ... ) >
-                    :: type >
+  future < invoke_result_t < decay_t < F > ( decay_t < Args > ... ) > >
     run_monitored ( F && f, Args && ... args )
     { return get_slot ( ).run_monitored ( forward < F > ( f ),
                                           forward < Args > ( args ) ... ) ; }
 
   template < class F, class ... Args >
-  future < typename result_of < typename decay < F > :: type
-                                  ( typename decay < Args > :: type ... ,
-                                    size_t ) >
-                    :: type >
+  future < invoke_result_t < decay_t < F > ( decay_t < Args > ... ,
+                                             size_t ) > >
     run_monitored_with_index ( F && f, Args && ... args )
     { return get_slot ( ).run_monitored_with_index
                             ( forward < F > ( f ),
