@@ -1,20 +1,9 @@
 CONFIGURATION := clang-debug-32
 CXX := clang
 
-CXXFLAGS := -Weverything \
-            -std=c++11 \
+CXXFLAGS := -Wall \
+            -std=c++17 \
             -m32 \
-            -Wno-atomic-implicit-seq-cst \
-            -Wno-c++98-compat-pedantic \
-            -Wno-covered-switch-default \
-            -Wno-exit-time-destructors \
-            -Wno-global-constructors \
-            -Wno-padded \
-            -Wno-reserved-id-macro \
-            -Wno-shift-sign-overflow \
-            -Wno-sign-compare \
-            -Wno-sign-conversion \
-            -Wno-switch-enum \
             -stdlib=libc++ \
             -isystem ../overrides/clang \
             -fwrapv \

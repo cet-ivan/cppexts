@@ -2,7 +2,7 @@ CONFIGURATION := gcc-debug-32
 CXX := g++
 
 CXXFLAGS := -Wall \
-            -std=c++11 \
+            -std=c++17 \
             -m32 \
             -Wno-sign-compare \
             -Wno-switch \
