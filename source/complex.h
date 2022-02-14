@@ -13,6 +13,7 @@
 
 #include "cmath.h"
 #include "utility.h"
+#include "algorithm.h"
 
 #include "numbase.h"
 #include "typeconv.h"
@@ -536,6 +537,47 @@ inline complex < T > tan ( const complex < T > & z )
 {
 complex < T > t ( tanh ( complex < T > ( - z.im, z.re ) ) ) ;
 return complex < T > ( t.im, - t.re ) ;
+}
+
+
+//
+
+template < class T >
+inline complex < T > inner_product_multiply ( const complex < T > & a,
+                                              const complex < T > & b )
+
+{
+return conj ( a ) * b ;
+}
+
+
+//
+
+template < class T >
+inline T l1_norm ( const complex < T > & z )
+
+{
+return abs ( z.re ) + abs ( z.im ) ;
+}
+
+
+//
+
+template < class T >
+inline T sqr_l2_norm ( const complex < T > & z )
+
+{
+return norm ( z ) ;
+}
+
+
+//
+
+template < class T >
+inline T linf_norm ( const complex < T > & z )
+
+{
+return max ( abs ( z.re ), abs ( z.im ) ) ;
 }
 
 
