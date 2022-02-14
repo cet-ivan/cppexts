@@ -84,7 +84,6 @@ using std :: rotate_copy ;
 
 using std :: sample ;
 
-// using std :: random_shuffle ;
 using std :: shuffle ;
 
 using std :: is_partitioned ;
@@ -195,8 +194,8 @@ return first2 ;
 template < class InputIterator1, class InputIterator2,
            class Function, class Predicate >
 enable_if_t
-  <     is_invocable_v < Predicate,
-                         decltype ( * declval < InputIterator1 > ( ) ) >
+  <       is_invocable_v < Predicate,
+                           decltype ( * declval < InputIterator1 > ( ) ) >
     &&  ! is_invocable_v < Predicate,
                            decltype ( * declval < InputIterator1 > ( ) ),
                            decltype ( * declval < InputIterator2 > ( ) ) >,
