@@ -17,6 +17,7 @@
 #include "iterator.h"
 #include "initializer_list.h"
 #include "cassert.h"
+#include "stdexcept.h"
 #include "utility.h"
 #include "algorithm.h"
 
@@ -330,33 +331,48 @@ public:
   void shrink_to_fit ( )
     { data_.shrink_to_fit ( ) ; }
 
-  reference at ( size_t n ) noexcept
+  reference access ( size_t n ) noexcept
     { assert ( n < size_ ) ;
       return reference ( data_ [ n >> log2_word_bit_size ],
                          n & word_bit_size_1 ) ; }
 
-  const_reference at ( size_t n ) const noexcept
+  const_reference access ( size_t n ) const noexcept
     { assert ( n < size_ ) ;
       return const_reference ( data_ [ n >> log2_word_bit_size ],
                                n & word_bit_size_1 ) ; }
 
+  bool access_value ( size_t n, bool b = false ) const noexcept
+    { return n < size_ ? access ( n ) : b ; }
+
+  reference at ( size_t n )
+    { if ( n >= size_ )
+        throw out_of_range ( "bit_vector :: at, index out of range" ) ;
+      return reference ( data_ [ n >> log2_word_bit_size ],
+                         n & word_bit_size_1 ) ; }
+
+  const_reference at ( size_t n ) const
+    { if ( n >= size_ )
+        throw out_of_range ( "bit_vector :: at, index out of range" ) ;
+      return const_reference ( data_ [ n >> log2_word_bit_size ],
+                               n & word_bit_size_1 ) ; }
+
   reference operator [ ] ( size_t n ) noexcept
-    { return at ( n ) ; }
+    { return access ( n ) ; }
 
   const_reference operator [ ] ( size_t n ) const noexcept
-    { return at ( n ) ; }
+    { return access ( n ) ; }
 
   reference front ( ) noexcept
-    { return at ( 0 ) ; }
+    { return access ( 0 ) ; }
 
   const_reference front ( ) const noexcept
-    { return at ( 0 ) ; }
+    { return access ( 0 ) ; }
 
   reference back ( ) noexcept
-    { return at ( size_ - 1 ) ; }
+    { return access ( size_ - 1 ) ; }
 
   const_reference back ( ) const noexcept
-    { return at ( size_ - 1 ) ; }
+    { return access ( size_ - 1 ) ; }
 
   Word * data ( ) noexcept
     { return data_.data ( ) ; }
