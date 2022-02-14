@@ -11,6 +11,7 @@
 
 
 
+#include "type_traits.h"
 #include "cstddef.h"
 #include "cassert.h"
 #include "utility.h"
@@ -29,18 +30,21 @@
 template < class Matrix,
            class FreeVector,
            class SolutionVector >
-void solve_linear_system ( Matrix & a,
-                           FreeVector & b,
+void solve_linear_system ( Matrix && a,
+                           FreeVector && b,
                            SolutionVector & x,
                            bool * singular )
 
 {
-typedef typename
-  indexing_traits
-    < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
-typedef typename indexing_traits < SolutionVector > :: value_type
+typedef
+  typename indexing_traits < SolutionVector > :: value_type
   solution_vector_element ;
 
 size_t dimension = indexing_size ( a ) ;
@@ -109,8 +113,8 @@ if ( singular != nullptr )
 template < class Matrix,
            class FreeVector,
            class SolutionVector >
-inline void solve_linear_system ( Matrix & a,
-                                  FreeVector & b,
+inline void solve_linear_system ( Matrix && a,
+                                  FreeVector && b,
                                   SolutionVector & x )
 
 {
@@ -123,8 +127,8 @@ solve_linear_system ( a, b, x, nullptr ) ;
 template < class Matrix,
            class FreeVector,
            class SolutionVector >
-inline void solve_linear_system ( Matrix & a,
-                                  FreeVector & b,
+inline void solve_linear_system ( Matrix && a,
+                                  FreeVector && b,
                                   SolutionVector & x,
                                   bool & singular )
 
@@ -136,14 +140,18 @@ solve_linear_system ( a, b, x, & singular ) ;
 //
 
 template < class Matrix >
-typename indexing_traits
-           < typename indexing_traits < Matrix > :: value_type > :: value_type
-  determinant ( Matrix & a )
+typename    indexing_traits
+              < typename    indexing_traits < remove_reference_t < Matrix > >
+                         :: value_type >
+         :: value_type
+  determinant ( Matrix && a )
 
 {
-typedef typename
-  indexing_traits
-    < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
 size_t dimension = indexing_size ( a ) ;
@@ -200,18 +208,22 @@ template < class Matrix,
            class PivotingCompareOperator,
            class SolutionVector >
 void solve_linear_system_with_pivoting
-       ( Matrix & a,
-         FreeVector & b,
+       ( Matrix && a,
+         FreeVector && b,
          PivotingCompareOperator pivoting_compare_operator,
          SolutionVector & x,
          bool * singular )
 
 {
-typedef typename indexing_traits
-          < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
-typedef typename indexing_traits < SolutionVector > :: value_type
+typedef
+  typename indexing_traits < SolutionVector > :: value_type
   solution_vector_element ;
 
 size_t dimension = indexing_size ( a ) ;
@@ -312,8 +324,8 @@ template < class Matrix,
            class PivotingCompareOperator,
            class SolutionVector >
 inline void solve_linear_system_with_pivoting
-              ( Matrix & a,
-                FreeVector & b,
+              ( Matrix && a,
+                FreeVector && b,
                 PivotingCompareOperator pivoting_compare_operator,
                 SolutionVector & x )
 
@@ -330,8 +342,8 @@ template < class Matrix,
            class PivotingCompareOperator,
            class SolutionVector >
 inline void solve_linear_system_with_pivoting
-              ( Matrix & a,
-                FreeVector & b,
+              ( Matrix && a,
+                FreeVector && b,
                 PivotingCompareOperator pivoting_compare_operator,
                 SolutionVector & x,
                 bool & singular )
@@ -348,13 +360,16 @@ template < class Matrix,
            class FreeVector,
            class SolutionVector >
 inline void solve_linear_system_with_pivoting
-              ( Matrix & a,
-                FreeVector & b,
+              ( Matrix && a,
+                FreeVector && b,
                 SolutionVector & x )
 
 {
-typedef typename indexing_traits
-          < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
 solve_linear_system_with_pivoting
@@ -368,14 +383,17 @@ template < class Matrix,
            class FreeVector,
            class SolutionVector >
 inline void solve_linear_system_with_pivoting
-              ( Matrix & a,
-                FreeVector & b,
+              ( Matrix && a,
+                FreeVector && b,
                 SolutionVector & x,
                 bool & singular )
 
 {
-typedef typename indexing_traits
-          < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
 solve_linear_system_with_pivoting
@@ -386,15 +404,20 @@ solve_linear_system_with_pivoting
 //
 
 template < class Matrix, class PivotingCompareOperator >
-typename indexing_traits
-           < typename indexing_traits < Matrix > :: value_type > :: value_type
+typename    indexing_traits
+               < typename    indexing_traits < remove_reference_t < Matrix > >
+                          :: value_type >
+         :: value_type
   determinant_with_pivoting
-    ( Matrix & a,
+    ( Matrix && a,
       PivotingCompareOperator pivoting_compare_operator )
 
 {
-typedef typename indexing_traits
-          < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
 size_t dimension = indexing_size ( a ) ;
@@ -471,13 +494,18 @@ return r ;
 
 template < class Matrix >
 inline
-  typename indexing_traits
-             < typename indexing_traits < Matrix > :: value_type > :: value_type
-    determinant_with_pivoting ( Matrix & a )
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
+    determinant_with_pivoting ( Matrix && a )
 
 {
-typedef typename indexing_traits
-          < typename indexing_traits < Matrix > :: value_type > :: value_type
+typedef
+  typename    indexing_traits
+                < typename    indexing_traits < remove_reference_t < Matrix > >
+                           :: value_type >
+           :: value_type
   matrix_element ;
 
 return
