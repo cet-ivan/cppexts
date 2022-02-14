@@ -23,6 +23,7 @@
 
 #include "streaming.h"
 #include "funtr.h"
+#include "numbase.h"
 
 
 
@@ -82,9 +83,6 @@ template < class T, size_t N >
 bool operator < ( const fs_vector < T, N > & a,
                   const fs_vector < T, N > & b ) ;
 
-template < class T, size_t N >
-void swap ( fs_vector < T, N > & a, fs_vector < T, N > & b ) ;
-
 template < class T, size_t N, class UnaryOperation >
 fs_vector < T, N > componentwise ( const fs_vector < T, N > & a,
                                    UnaryOperation unary_operation ) ;
@@ -93,30 +91,6 @@ template < class T, size_t N, class BinaryOperation >
 fs_vector < T, N > componentwise ( const fs_vector < T, N > & a,
                                    const fs_vector < T, N > & b,
                                    BinaryOperation binary_operation ) ;
-
-template < class T, size_t N >
-fs_vector < complex < T >, N >
-  conj ( const fs_vector < complex < T >, N > & a ) ;
-
-template < class T, size_t N >
-T inner_product ( const fs_vector < T, N > & a,
-                  const fs_vector < T, N > & b ) ;
-
-template < class T, size_t N >
-typename complex_traits < T > :: real_type
-  norm ( const fs_vector < T, N > & a ) ;
-
-template < class T, size_t N >
-typename complex_traits < T > :: real_type
-  length ( const fs_vector < T, N > & a ) ;
-
-template < class T >
-fs_vector < T, 3 > cross_product ( const fs_vector < T, 3 > & a,
-                                   const fs_vector < T, 3 > & b ) ;
-
-template < class T >
-T cross_product_z ( const fs_vector < T, 2 > & a,
-                    const fs_vector < T, 2 > & b ) ;
 
 
 
@@ -155,9 +129,6 @@ template < class T, size_t N1, size_t N2 >
 bool operator < ( const fs_matrix < T, N1, N2 > & a,
                   const fs_matrix < T, N1, N2 > & b ) ;
 
-template < class T, size_t N1, size_t N2 >
-void swap ( fs_matrix < T, N1, N2 > & a, fs_matrix < T, N1, N2 > & b ) ;
-
 template < class T, size_t N1, size_t N2, class UnaryOperation >
 fs_matrix < T, N1, N2 >
   componentwise ( const fs_matrix < T, N1, N2 > & a,
@@ -168,26 +139,6 @@ fs_matrix < T, N1, N2 >
   componentwise ( const fs_matrix < T, N1, N2 > & a,
                   const fs_matrix < T, N1, N2 > & b,
                   BinaryOperation binary_operation ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < complex < T >, N1, N2 >
-  conj ( const fs_matrix < complex < T >, N1, N2 > & a ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < T, N1, N2 > outer_product ( const fs_vector < T, N1 > & a,
-                                        const fs_vector < T, N2 > & b ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_vector < T, N1 > operator * ( const fs_matrix < T, N1, N2 > & m,
-                                 const fs_vector < T, N2 > & v ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_vector < T, N2 > operator * ( const fs_vector < T, N1 > & v,
-                                 const fs_matrix < T, N1, N2 > & m ) ;
-
-template < class T, size_t N1, size_t N2, size_t N3 >
-fs_matrix < T, N1, N3 > operator * ( const fs_matrix < T, N1, N2 > & a,
-                                     const fs_matrix < T, N2, N3 > & b ) ;
 
 
 
@@ -228,10 +179,6 @@ template < class T, size_t N >
 bool operator < ( const fs_lower_triangular_matrix < T, N > & a,
                   const fs_lower_triangular_matrix < T, N > & b ) ;
 
-template < class T, size_t N >
-void swap ( const fs_lower_triangular_matrix < T, N > & a,
-            const fs_lower_triangular_matrix < T, N > & b ) ;
-
 template < class T, size_t N, class UnaryOperation >
 fs_lower_triangular_matrix < T, N >
   componentwise ( const fs_lower_triangular_matrix < T, N > & a,
@@ -242,43 +189,6 @@ fs_lower_triangular_matrix < T, N >
   componentwise ( const fs_lower_triangular_matrix < T, N > & a,
                   const fs_lower_triangular_matrix < T, N > & b,
                   BinaryOperation binary_operation ) ;
-
-template < class T, size_t N >
-fs_lower_triangular_matrix < complex < T >, N >
-  conj ( const fs_lower_triangular_matrix < complex < T >, N > & a ) ;
-
-template < class T, size_t N >
-fs_vector < T, N >
-  operator * ( const fs_lower_triangular_matrix < T, N > & m,
-               const fs_vector < T, N > & v ) ;
-
-template < class T, size_t N >
-fs_vector < T, N >
-  operator * ( const fs_vector < T, N > & v,
-               const fs_lower_triangular_matrix < T, N > & m ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < T, N1, N2 >
-  operator * ( const fs_lower_triangular_matrix < T, N1 > & a,
-               const fs_matrix < T, N1, N2 > & b ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < T, N1, N2 >
-  operator * ( const fs_matrix < T, N1, N2 > & a,
-               const fs_lower_triangular_matrix < T, N2 > & b ) ;
-
-template < class T, size_t N >
-fs_lower_triangular_matrix < T, N >
-  operator * ( const fs_lower_triangular_matrix < T, N > & a,
-               const fs_lower_triangular_matrix < T, N > & b ) ;
-
-template < class T, size_t N >
-fs_matrix < T, N, N >
-  make_symmetric ( const fs_lower_triangular_matrix < T, N > & m ) ;
-
-template < class T, size_t N >
-fs_matrix < T, N, N >
-  make_complete ( const fs_lower_triangular_matrix < T, N > & m ) ;
 
 
 
@@ -319,10 +229,6 @@ template < class T, size_t N >
 bool operator < ( const fs_upper_triangular_matrix < T, N > & a,
                   const fs_upper_triangular_matrix < T, N > & b ) ;
 
-template < class T, size_t N >
-void swap ( const fs_upper_triangular_matrix < T, N > & a,
-            const fs_upper_triangular_matrix < T, N > & b ) ;
-
 template < class T, size_t N, class UnaryOperation >
 fs_upper_triangular_matrix < T, N >
   componentwise ( const fs_upper_triangular_matrix < T, N > & a,
@@ -333,43 +239,6 @@ fs_upper_triangular_matrix < T, N >
   componentwise ( const fs_upper_triangular_matrix < T, N > & a,
                   const fs_upper_triangular_matrix < T, N > & b,
                   BinaryOperation binary_operation ) ;
-
-template < class T, size_t N >
-fs_upper_triangular_matrix < complex < T >, N >
-  conj ( const fs_upper_triangular_matrix < complex < T >, N > & a ) ;
-
-template < class T, size_t N >
-fs_vector < T, N >
-  operator * ( const fs_upper_triangular_matrix < T, N > & m,
-               const fs_vector < T, N > & v ) ;
-
-template < class T, size_t N >
-fs_vector < T, N >
-  operator * ( const fs_vector < T, N > & v,
-               const fs_upper_triangular_matrix < T, N > & m ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < T, N1, N2 >
-  operator * ( const fs_upper_triangular_matrix < T, N1 > & a,
-               const fs_matrix < T, N1, N2 > & b ) ;
-
-template < class T, size_t N1, size_t N2 >
-fs_matrix < T, N1, N2 >
-  operator * ( const fs_matrix < T, N1, N2 > & a,
-               const fs_upper_triangular_matrix < T, N2 > & b ) ;
-
-template < class T, size_t N >
-fs_upper_triangular_matrix < T, N >
-  operator * ( const fs_upper_triangular_matrix < T, N > & a,
-               const fs_upper_triangular_matrix < T, N > & b ) ;
-
-template < class T, size_t N >
-fs_matrix < T, N, N >
-  make_symmetric ( const fs_upper_triangular_matrix < T, N > & m ) ;
-
-template < class T, size_t N >
-fs_matrix < T, N, N >
-  make_complete ( const fs_upper_triangular_matrix < T, N > & m ) ;
 
 
 
@@ -414,67 +283,6 @@ transform ( a.begin ( ), a.end ( ),
 
 return result ;
 }
-
-
-
-// *** FS_VECTOR_OPERATOR ***
-
-
-//
-
-template < class T, size_t N >
-class fs_vector_operator
-
-{
-public:
-
-  static T inner_product ( const fs_vector < T, N > & a,
-                           const fs_vector < T, N > & b )
-    { return :: inner_product ( a.begin ( ), a.end ( ),
-                                b.begin ( ),
-                                T ( 0 ) ) ; }
-
-  static T norm ( const fs_vector < T, N > & a )
-    { return accumulate ( a.begin ( ), a.end ( ),
-                          T ( 0 ),
-                          [ ] ( const T & x, const T & y )
-                            { return x + sqr ( y ) ; } ) ; }
-
-  static T length ( const fs_vector < T, N > & a )
-    { return sqrt ( norm ( a ) ) ; }
-
-} ;
-
-
-//
-
-template < class T, size_t N >
-class fs_vector_operator < complex < T >, N >
-
-{
-public:
-
-  static complex < T >
-           inner_product ( const fs_vector < complex < T >, N > & a,
-                           const fs_vector < complex < T >, N > & b )
-    { return :: inner_product
-                  ( a.begin ( ), a.end ( ),
-                    b.begin ( ),
-                    complex < T > ( 0 ),
-                    plus < complex < T > > ( ),
-                    [ ] ( const complex < T > & x, const complex < T > & y )
-                      { return conj ( x ) * y ; } ) ; }
-
-  static T norm ( const fs_vector < complex < T >, N > & a )
-    { return accumulate ( a.begin ( ), a.end ( ),
-                          T ( 0 ),
-                          [ ] ( const T & x, const complex < T > & y )
-                            { return x + :: norm ( y ) ; } ) ; }
-
-  static T length ( const fs_vector < complex < T >, N > & a )
-    { return sqrt ( norm ( a ) ) ; }
-
-} ;
 
 
 
@@ -595,9 +403,7 @@ public:
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
-  void swap ( fs_vector & b )
-    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
-                                    declval < T & > ( ) ) ) )
+  void swap ( fs_vector & b ) noexcept ( is_nothrow_swappable_v < T > )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -670,9 +476,6 @@ public:
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fs_vector & a, fs_vector & b )
-    { a.swap ( b ) ; }
-
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
@@ -690,6 +493,16 @@ public:
       return i ; }
 
 } ;
+
+
+//
+
+template < class T, size_t N >
+void swap ( fs_vector < T, N > & a, fs_vector < T, N > & b )
+
+{
+a.swap ( b ) ;
+}
 
 
 //
@@ -735,29 +548,156 @@ inline T inner_product ( const fs_vector < T, N > & a,
                          const fs_vector < T, N > & b )
 
 {
-return fs_vector_operator < T, N > :: inner_product ( a, b ) ;
+return inner_product ( a.begin ( ), a.end ( ),
+                       b.begin ( ),
+                       T ( 0 ),
+                       plus < T > ( ),
+                       [ ] ( const T & x, const T & y )
+                         { return inner_product_multiply ( x, y ) ; } ) ;
 }
 
 
 //
 
 template < class T, size_t N >
-inline typename complex_traits < T > :: real_type
-         norm ( const fs_vector < T, N > & a )
+inline auto l1_norm ( const fs_vector < T, N > & a )
 
 {
-return fs_vector_operator < T, N > :: norm ( a ) ;
+typedef decltype ( l1_norm ( declval < T > ( ) ) ) result_type ;
+
+return accumulate ( a.begin ( ), a.end ( ),
+                    result_type ( 0 ),
+                    [ ] ( const result_type & x, const T & y )
+                      { return x + l1_norm ( y ) ; } ) ;
 }
 
 
 //
 
 template < class T, size_t N >
-inline typename complex_traits < T > :: real_type
-         length ( const fs_vector < T, N > & a )
+inline auto l1_distance ( const fs_vector < T, N > & a,
+                          const fs_vector < T, N > & b )
 
 {
-return fs_vector_operator < T, N > :: length ( a ) ;
+typedef decltype ( l1_distance ( declval < T > ( ), declval < T > ( ) ) )
+        result_type ;
+
+return inner_product ( a.begin ( ), a.end ( ),
+                       b.begin ( ),
+                       result_type ( 0 ),
+                       plus < result_type > ( ),
+                       [ ] ( const T & x, const T & y )
+                         { return l1_distance ( x, y ) ; } ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto sqr_l2_norm ( const fs_vector < T, N > & a )
+
+{
+typedef decltype ( sqr_l2_norm ( declval < T > ( ) ) ) result_type ;
+
+return accumulate ( a.begin ( ), a.end ( ),
+                    result_type ( 0 ),
+                    [ ] ( const result_type & x, const T & y )
+                      { return x + sqr_l2_norm ( y ) ; } ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto sqr_l2_distance ( const fs_vector < T, N > & a,
+                              const fs_vector < T, N > & b )
+
+{
+typedef decltype ( sqr_l2_distance ( declval < T > ( ), declval < T > ( ) ) )
+        result_type ;
+
+return inner_product ( a.begin ( ), a.end ( ),
+                       b.begin ( ),
+                       result_type ( 0 ),
+                       plus < result_type > ( ),
+                       [ ] ( const T & x, const T & y )
+                         { return sqr_l2_distance ( x, y ) ; } ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto l2_norm ( const fs_vector < T, N > & a )
+
+{
+return sqrt ( sqr_l2_norm ( a ) ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto l2_distance ( const fs_vector < T, N > & a,
+                          const fs_vector < T, N > & b )
+
+{
+return sqrt ( sqr_l2_distance ( a, b ) ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto linf_norm ( const fs_vector < T, N > & a )
+
+{
+typedef decltype ( linf_norm ( declval < T > ( ) ) ) result_type ;
+
+return accumulate ( a.begin ( ), a.end ( ),
+                    result_type ( 0 ),
+                    [ ] ( const result_type & x, const T & y )
+                      { return max ( x, linf_norm ( y ) ) ; } ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto linf_distance ( const fs_vector < T, N > & a,
+                            const fs_vector < T, N > & b )
+
+{
+typedef decltype ( linf_distance ( declval < T > ( ), declval < T > ( ) ) )
+        result_type ;
+
+return inner_product ( a.begin ( ), a.end ( ),
+                       b.begin ( ),
+                       result_type ( 0 ),
+                       [ ] ( const result_type & x, const result_type & y )
+                         { return max ( x, y ) ; },
+                       [ ] ( const T & x, const T & y )
+                         { return linf_distance ( x, y ) ; } ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto norm ( const fs_vector < T, N > & a )
+
+{
+return sqr_l2_norm ( a ) ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline auto length ( const fs_vector < T, N > & a )
+
+{
+return sqrt ( norm ( a ) ) ;
 }
 
 
@@ -934,9 +874,7 @@ public:
   void fill ( const T & x )
     { :: fill ( begin ( ), end ( ), x ) ; }
 
-  void swap ( fs_matrix & b )
-    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
-                                    declval < T & > ( ) ) ) )
+  void swap ( fs_matrix & b ) noexcept ( is_nothrow_swappable_v < T > )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -1020,9 +958,6 @@ public:
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fs_matrix & a, fs_matrix & b )
-    { a.swap ( b ) ; }
-
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
@@ -1040,6 +975,16 @@ public:
       return i ; }
 
 } ;
+
+
+//
+
+template < class T, size_t N1, size_t N2 >
+void swap ( fs_matrix < T, N1, N2 > & a, fs_matrix < T, N1, N2 > & b )
+
+{
+a.swap ( b ) ;
+}
 
 
 //
@@ -1338,8 +1283,7 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_lower_triangular_matrix & b )
-    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
-                                    declval < T & > ( ) ) ) )
+    noexcept ( is_nothrow_swappable_v < T > )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -1430,10 +1374,6 @@ public:
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fs_lower_triangular_matrix & a,
-                     fs_lower_triangular_matrix & b )
-    { a.swap ( b ) ; }
-
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
@@ -1451,6 +1391,17 @@ public:
       return i ; }
 
 } ;
+
+
+//
+
+template < class T, size_t N >
+void swap ( fs_lower_triangular_matrix < T, N > & a,
+            fs_lower_triangular_matrix < T, N > & b )
+
+{
+a.swap ( b ) ;
+}
 
 
 //
@@ -1815,8 +1766,7 @@ public:
     { :: fill ( begin ( ), end ( ), x ) ; }
 
   void swap ( fs_upper_triangular_matrix & b )
-    noexcept ( noexcept ( :: swap ( declval < T & > ( ),
-                                    declval < T & > ( ) ) ) )
+    noexcept ( is_nothrow_swappable_v < T > )
     { swap_ranges ( begin ( ), end ( ),
                     b.begin ( ) ) ; }
 
@@ -1907,10 +1857,6 @@ public:
     { return lexicographical_compare ( a.begin ( ), a.end ( ),
                                        b.begin ( ), b.end ( ) ) ; }
 
-  friend void swap ( fs_upper_triangular_matrix & a,
-                     fs_upper_triangular_matrix & b )
-    { a.swap ( b ) ; }
-
   template < class CharT, class CharTraits >
   friend basic_ostream < CharT, CharTraits > &
     operator << ( basic_ostream < CharT, CharTraits > & o,
@@ -1928,6 +1874,17 @@ public:
       return i ; }
 
 } ;
+
+
+//
+
+template < class T, size_t N >
+void swap ( fs_upper_triangular_matrix < T, N > & a,
+            fs_upper_triangular_matrix < T, N > & b )
+
+{
+a.swap ( b ) ;
+}
 
 
 //
