@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2019.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -156,7 +156,7 @@ class __builtin_double_size_type < Type >                      \
 public:                                                        \
                                                                \
   static const bool exists = true ;                            \
-  typedef DoubleSizeType type ;                              \
+  typedef DoubleSizeType type ;                                \
                                                                \
 } ;
 
@@ -544,6 +544,7 @@ inline T rotate_left ( T x, sint n )
 
 {
 assert ( n >= 0  &&  n < numeric_traits < T > :: bit_size ) ;
+
 return   n == 0
        ? x
        :   ( x << n )
@@ -558,6 +559,7 @@ inline T rotate_right ( T x, sint n )
 
 {
 assert ( n >= 0  &&  n < numeric_traits < T > :: bit_size ) ;
+
 return   n == 0
        ? x
        :   unsigned_shift_right ( x, n )
@@ -1015,7 +1017,7 @@ return                                                                        \
   ? const_exponent                                                            \
       ( static_cast < numeric_traits < Type > :: unsigned_type > ( - x ) )    \
   : const_exponent                                                            \
-      ( static_cast < numeric_traits < Type > :: unsigned_type >  ( x ) ) ;   \
+      ( static_cast < numeric_traits < Type > :: unsigned_type > ( x ) ) ;    \
 }                                                                             \
                                                                               \
 inline sint exponent ( Type x )                                               \
@@ -1173,6 +1175,102 @@ inline Base power ( const Base & base, const Exponent & exponent )
 return   is_negative ( exponent )
        ? Base ( 1 ) / positive_power ( base, - exponent )
        : power ( base, exponent, multiplies < Base > ( ) ) ;
+}
+
+
+
+// *** INNER_PRODUCT_MULTIPLY ***
+
+
+template < class T >
+inline T inner_product_multiply ( const T & a, const T & b )
+
+{
+return a * b ;
+}
+
+
+
+// *** NORMS & DISTANCES ***
+
+
+//
+
+template < class T >
+inline auto l1_norm ( const T & x )
+
+{
+return abs ( x ) ;
+}
+
+
+//
+
+template < class T >
+inline auto l1_distance ( const T & a, const T & b )
+
+{
+return l1_norm ( b - a ) ;
+}
+
+
+//
+
+template < class T >
+inline auto sqr_l2_norm ( const T & x )
+
+{
+return sqr ( x ) ;
+}
+
+
+//
+
+template < class T >
+inline auto sqr_l2_distance ( const T & a, const T & b )
+
+{
+return sqr_l2_norm ( b - a ) ;
+}
+
+
+//
+
+template < class T >
+inline auto l2_norm ( const T & x )
+
+{
+return abs ( x ) ;
+}
+
+
+//
+
+template < class T >
+inline auto l2_distance ( const T & a, const T & b )
+
+{
+return l2_norm ( b - a ) ;
+}
+
+
+//
+
+template < class T >
+inline auto linf_norm ( const T & x )
+
+{
+return abs ( x ) ;
+}
+
+
+//
+
+template < class T >
+inline auto linf_distance ( const T & a, const T & b )
+
+{
+return linf_norm ( b - a ) ;
 }
 
 
