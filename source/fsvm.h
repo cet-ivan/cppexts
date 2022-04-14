@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -703,6 +703,49 @@ return sqrt ( norm ( a ) ) ;
 
 //
 
+template < class T, size_t N >
+inline fs_vector < T, N > l1_ort ( const fs_vector < T, N > & a )
+
+{
+auto n = l1_norm ( a ) ;
+return n != 0 ? a / n : a ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline fs_vector < T, N > l2_ort ( const fs_vector < T, N > & a )
+
+{
+auto n = l2_norm ( a ) ;
+return n != 0 ? a / n : a ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline fs_vector < T, N > linf_ort ( const fs_vector < T, N > & a )
+
+{
+auto n = linf_norm ( a ) ;
+return n != 0 ? a / n : a ;
+}
+
+
+//
+
+template < class T, size_t N >
+inline fs_vector < T, N > ort ( const fs_vector < T, N > & a )
+
+{
+return l2_ort ( a ) ;
+}
+
+
+//
+
 template < class T >
 inline fs_vector < T, 3 > cross_product ( const fs_vector < T, 3 > & a,
                                           const fs_vector < T, 3 > & b )
@@ -738,10 +781,19 @@ public:
   typedef size_t index_type ;
   typedef T value_type ;
 
-  static constexpr size_t size ( const fs_vector < T, N > & )
-    { return N ; }
-
 } ;
+
+
+
+// *** FS_VECTOR SEQUENCE_SIZE ***
+
+
+template < class T, size_t N >
+constexpr size_t sequence_size ( const fs_vector < T, N > & )
+
+{
+return N ;
+}
 
 
 
@@ -1127,10 +1179,19 @@ public:
   typedef size_t index_type ;
   typedef T value_type [ N2 ] ;
 
-  static constexpr size_t size ( const fs_matrix < T, N1, N2 > & )
-    { return N1 ; }
-
 } ;
+
+
+
+// *** FS_MATRIX SEQUENCE_SIZE ***
+
+
+template < class T, size_t N1, size_t N2 >
+constexpr size_t sequence_size ( const fs_matrix < T, N1, N2 > & )
+
+{
+return N1 ;
+}
 
 
 
@@ -1610,10 +1671,19 @@ public:
   typedef size_t index_type ;
   typedef T * value_type ;
 
-  static constexpr size_t size ( const fs_lower_triangular_matrix < T, N > & )
-    { return N ; }
-
 } ;
+
+
+
+// *** FS_LOWER_TRIANGULAR_MATRIX SEQUENCE_SIZE ***
+
+
+template < class T, size_t N >
+constexpr size_t sequence_size ( const fs_lower_triangular_matrix < T, N > & )
+
+{
+return N ;
+}
 
 
 
@@ -2093,10 +2163,19 @@ public:
   typedef size_t index_type ;
   typedef T * value_type ;
 
-  static constexpr size_t size ( const fs_upper_triangular_matrix < T, N > & )
-    { return N ; }
-
 } ;
+
+
+
+// *** FS_UPPER_TRIANGULAR_MATRIX SEQUENCE_SIZE ***
+
+
+template < class T, size_t N >
+constexpr size_t sequence_size ( const fs_upper_triangular_matrix < T, N > & )
+
+{
+return N ;
+}
 
 
 
