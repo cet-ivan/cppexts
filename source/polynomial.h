@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -632,8 +632,6 @@ return result ;
 // *** INDEXING_TRAITS ***
 
 
-//
-
 template < class T, class Allocator >
 class indexing_traits < polynomial < T, Allocator > >
 
@@ -642,9 +640,6 @@ public:
 
   typedef typename polynomial < T, Allocator > :: size_type index_type ;
   typedef T value_type ;
-
-  static size_t size ( const polynomial < T, Allocator > & x )
-    { return x.size ( ) ; }
 
 } ;
 
