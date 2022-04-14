@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -46,10 +46,33 @@ public:
   typedef Key index_type ;
   typedef T value_type ;
 
-  static size_t size ( const map < Key, T, Compare, Allocator > & x )
-    { return x.size ( ) ; }
-
 } ;
+
+
+
+// *** SEQUENCE_SIZE ***
+
+
+//
+
+template < class Key, class T, class Compare, class Allocator >
+inline
+  size_t sequence_size ( const map < Key, T, Compare, Allocator > & x )
+
+{
+return x.size ( ) ;
+}
+
+
+//
+
+template < class Key, class T, class Compare, class Allocator >
+inline
+  size_t sequence_size ( const multimap < Key, T, Compare, Allocator > & x )
+
+{
+return x.size ( ) ;
+}
 
 
 
