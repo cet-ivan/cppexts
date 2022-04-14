@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +16,7 @@
 #include "type_traits.h"
 #include "cstddef.h"
 #include "utility.h"
+#include "functional.h"
 
 
 
@@ -164,10 +165,11 @@ return first2 ;
 
 template < class InputIterator1, class InputIterator2,
            class Function, class Predicate >
-enable_if_t < is_invocable_v < Predicate,
-                               decltype ( * declval < InputIterator1 > ( ) ),
-                               decltype ( * declval < InputIterator2 > ( ) ) >,
-              InputIterator2 >
+enable_if_t
+  < is_invocable_v < Predicate,
+                     decltype ( * declval < InputIterator1 > ( ) ),
+                     decltype ( * declval < InputIterator2 > ( ) ) >,
+    InputIterator2 >
   for_pairs_asymmetric_if ( InputIterator1 first1, InputIterator1 last1,
                             InputIterator2 first2,
                             Function fun,
@@ -443,6 +445,70 @@ while ( first1 != last1 )
   }
 
 return result ;
+}
+
+
+//
+
+template < class T, class Min, class Compare >
+inline void limit_min ( T & x, const Min & min, Compare comp )
+
+{
+if ( comp ( x, min ) )
+  x = min ;
+}
+
+
+//
+
+template < class T, class Min >
+inline void limit_min ( T & x, const Min & min )
+
+{
+limit_min ( x, min, less < T > ( ) ) ;
+}
+
+
+//
+
+template < class T, class Max, class Compare >
+inline void limit_max ( T & x, const Max & max, Compare comp )
+
+{
+if ( comp ( max, x ) )
+  x = max ;
+}
+
+
+//
+
+template < class T, class Max >
+inline void limit_max ( T & x, const Max & max )
+
+{
+limit_max ( x, max, less < T > ( ) ) ;
+}
+
+
+//
+
+template < class T, class Min, class Max, class Compare >
+inline
+  void limit_minmax ( T & x, const Min & min, const Max & max, Compare comp )
+
+{
+limit_min ( x, min, comp ) ;
+limit_max ( x, max, comp ) ;
+}
+
+
+//
+
+template < class T, class Min, class Max >
+inline void limit_minmax ( T & x, const Min & min, const Max & max )
+
+{
+limit_minmax ( x, min, max, less < T > ( ) ) ;
 }
 
 
