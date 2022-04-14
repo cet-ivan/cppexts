@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -48,17 +48,17 @@ typedef typename
     < typename indexing_traits < Tableau > :: value_type > :: value_type
   element ;
 
-size_t total_variables = indexing_size ( column_to_row ),
-       total_constraints = indexing_size ( row_to_column ) ;
+size_t total_variables = sequence_size ( column_to_row ),
+       total_constraints = sequence_size ( row_to_column ) ;
 
 #ifndef NDEBUG
 
 assert ( total_variables >= total_constraints ) ;
 
-assert ( indexing_size ( tableau ) == total_constraints + 1 ) ;
+assert ( sequence_size ( tableau ) == total_constraints + 1 ) ;
 
 for ( size_t i = 0 ; i < total_constraints + 1 ; ++ i )
-  assert ( indexing_size ( tableau [ i ] ) == total_variables + 1 ) ;
+  assert ( sequence_size ( tableau [ i ] ) == total_variables + 1 ) ;
 
 {
 vector < size_t > sorted_column_to_row ;
@@ -222,17 +222,17 @@ static_assert
     :: value,
     "" ) ;
 
-size_t total_variables = indexing_size ( objective_function_vector ),
-       total_constraints = indexing_size ( eq_constraint_matrix ) ;
+size_t total_variables = sequence_size ( objective_function_vector ),
+       total_constraints = sequence_size ( eq_constraint_matrix ) ;
 
 #ifndef NDEBUG
 
 for ( size_t i = 0 ; i < total_constraints ; ++ i )
-  assert ( indexing_size ( eq_constraint_matrix [ i ] ) == total_variables ) ;
+  assert ( sequence_size ( eq_constraint_matrix [ i ] ) == total_variables ) ;
 
-assert ( indexing_size ( eq_constraint_free_vector ) == total_constraints ) ;
+assert ( sequence_size ( eq_constraint_free_vector ) == total_constraints ) ;
 
-assert ( indexing_size ( result_vector ) == total_variables ) ;
+assert ( sequence_size ( result_vector ) == total_variables ) ;
 
 #endif
 
@@ -504,35 +504,35 @@ static_assert
     :: value,
     "" ) ;
 
-size_t total_base_variables = indexing_size ( objective_function_vector ),
-       total_eq_constraints = indexing_size ( eq_constraint_matrix ),
-       total_leq_constraints = indexing_size ( leq_constraint_matrix ),
-       total_geq_constraints = indexing_size ( geq_constraint_matrix ) ;
+size_t total_base_variables = sequence_size ( objective_function_vector ),
+       total_eq_constraints = sequence_size ( eq_constraint_matrix ),
+       total_leq_constraints = sequence_size ( leq_constraint_matrix ),
+       total_geq_constraints = sequence_size ( geq_constraint_matrix ) ;
 
 #ifndef NDEBUG
 
 for ( size_t i = 0 ; i < total_eq_constraints ; ++ i )
-  assert (    indexing_size ( eq_constraint_matrix [ i ] )
+  assert (    sequence_size ( eq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    indexing_size ( eq_constraint_free_vector )
+assert (    sequence_size ( eq_constraint_free_vector )
          == total_eq_constraints ) ;
 
 for ( size_t i = 0 ; i < total_leq_constraints ; ++ i )
-  assert (    indexing_size ( leq_constraint_matrix [ i ] )
+  assert (    sequence_size ( leq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    indexing_size ( leq_constraint_free_vector )
+assert (    sequence_size ( leq_constraint_free_vector )
          == total_leq_constraints ) ;
 
 for ( size_t i = 0 ; i < total_geq_constraints ; ++ i )
-  assert (    indexing_size ( geq_constraint_matrix [ i ] )
+  assert (    sequence_size ( geq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    indexing_size ( geq_constraint_free_vector )
+assert (    sequence_size ( geq_constraint_free_vector )
          == total_geq_constraints ) ;
 
-assert ( indexing_size ( result_vector ) == total_base_variables ) ;
+assert ( sequence_size ( result_vector ) == total_base_variables ) ;
 
 #endif
 
