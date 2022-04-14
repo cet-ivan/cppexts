@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -28,16 +28,6 @@ class indexing_traits ;
 //
 
 template < class T >
-inline size_t indexing_size ( const T & x )
-
-{
-return indexing_traits < T > :: size ( x ) ;
-}
-
-
-//
-
-template < class T >
 class indexing_traits < T [ ] >
 
 {
@@ -51,17 +41,14 @@ public:
 
 //
 
-template < class T, size_t Size >
-class indexing_traits < T [ Size ] >
+template < class T, size_t N >
+class indexing_traits < T [ N ] >
 
 {
 public:
 
   typedef size_t index_type ;
   typedef typename remove_const < T > :: type value_type ;
-
-  static constexpr size_t size ( const T /* x */ [ ] )
-    { return Size ; }
 
 } ;
 
@@ -161,9 +148,6 @@ public:
   typedef size_t index_type ;
   typedef empty_indexing < T, Dimension - 1 > value_type ;
 
-  static constexpr size_t size ( empty_indexing < T, Dimension > )
-    { return 0 ; }
-
 } ;
 
 
@@ -171,6 +155,18 @@ public:
 
 template < class T >
 class indexing_traits < empty_indexing_imp < T, 0 > > ;
+
+
+
+// *** SEQUENCE_SIZE ***
+
+
+template < class T, size_t N >
+constexpr size_t sequence_size ( const T ( & ) [ N ] )
+
+{
+return N ;
+}
 
 
 
