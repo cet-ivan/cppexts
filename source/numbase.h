@@ -307,31 +307,31 @@ class numeric_constants < float >
 {
 public:
 
-  static float pi ( )
+  static constexpr float pi ( )
     { return 3.14159265358979323846f ; }
 
-  static float sqrt_2pi ( ) // sqrt ( 2 * pi )
+  static constexpr float sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.50662827463100050242f ; }
 
-  static float log_2pi_2 ( ) // log ( 2 * pi ) / 2
+  static constexpr float log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.91893853320467274178f ; }
 
-  static float log2e ( )
+  static constexpr float log2e ( )
     { return 1.44269504088896338700f ; }
 
-  static float log10e ( )
+  static constexpr float log10e ( )
     { return 0.43429448190325182765f ; }
 
-  static float ln2 ( )
+  static constexpr float ln2 ( )
     { return 0.69314718055994530942f ; }
 
-  static float ln10 ( )
+  static constexpr float ln10 ( )
     { return 2.30258509299404568402f ; }
 
-  static float gamma_cf_shift_limit ( )
+  static constexpr float gamma_cf_shift_limit ( )
     { return 4 ; }
 
-  static float log_gamma_cf_shift_limit ( )
+  static constexpr float log_gamma_cf_shift_limit ( )
     { return 6 ; }
 
 } ;
@@ -345,31 +345,31 @@ class numeric_constants < double >
 {
 public:
 
-  static double pi ( )
+  static constexpr double pi ( )
     { return 3.14159265358979323846 ; }
 
-  static double sqrt_2pi ( ) // sqrt ( 2 * pi )
+  static constexpr double sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.50662827463100050242 ; }
 
-  static double log_2pi_2 ( ) // log ( 2 * pi ) / 2
+  static constexpr double log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.91893853320467274178 ; }
 
-  static double log2e ( )
+  static constexpr double log2e ( )
     { return 1.44269504088896338700 ; }
 
-  static double log10e ( )
+  static constexpr double log10e ( )
     { return 0.43429448190325182765 ; }
 
-  static double ln2 ( )
+  static constexpr double ln2 ( )
     { return 0.69314718055994530942 ; }
 
-  static double ln10 ( )
+  static constexpr double ln10 ( )
     { return 2.30258509299404568402 ; }
 
-  static double gamma_cf_shift_limit ( )
+  static constexpr double gamma_cf_shift_limit ( )
     { return 8 ; }
 
-  static double log_gamma_cf_shift_limit ( )
+  static constexpr double log_gamma_cf_shift_limit ( )
     { return 9 ; }
 
 } ;
@@ -383,31 +383,31 @@ class numeric_constants < long double >
 {
 public:
 
-  static long double pi ( )
+  static constexpr long double pi ( )
     { return 3.1415926535897932384626433832795029L ; }
 
-  static long double sqrt_2pi ( ) // sqrt ( 2 * pi )
+  static constexpr long double sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.5066282746310005024157652848110456L ; }
 
-  static long double log_2pi_2 ( ) // log ( 2 * pi ) / 2
+  static constexpr long double log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.9189385332046727417803297364056176L ; }
 
-  static long double log2e ( )
+  static constexpr long double log2e ( )
     { return 1.4426950408889633870046509400708601L ; }
 
-  static long double log10e ( )
+  static constexpr long double log10e ( )
     { return 0.4342944819032518276511289189166051L ; }
 
-  static long double ln2 ( )
+  static constexpr long double ln2 ( )
     { return 0.6931471805599453094172321214581766L ; }
 
-  static long double ln10 ( )
+  static constexpr long double ln10 ( )
     { return 2.3025850929940456840179914546843642L ; }
 
-  static long double gamma_cf_shift_limit ( )
+  static constexpr long double gamma_cf_shift_limit ( )
     { return 11 ; }
 
-  static long double log_gamma_cf_shift_limit ( )
+  static constexpr long double log_gamma_cf_shift_limit ( )
     { return 12 ; }
 
 } ;
