@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2020.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -39,8 +39,6 @@ using std :: get ;
 // *** INDEXING_TRAITS ***
 
 
-//
-
 template < class T, size_t N >
 class indexing_traits < array < T, N > >
 
@@ -50,10 +48,19 @@ public:
   typedef size_t index_type ;
   typedef T value_type ;
 
-  static constexpr size_t size ( const array < T, N > & )
-    { return N ; }
-
 } ;
+
+
+
+// *** SEQUENCE_SIZE ***
+
+
+template < class T, size_t N >
+inline constexpr size_t sequence_size ( const array < T, N > & )
+
+{
+return N ;
+}
 
 
 
