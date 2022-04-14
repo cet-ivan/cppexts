@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -47,14 +47,14 @@ typedef
   typename indexing_traits < SolutionVector > :: value_type
   solution_vector_element ;
 
-size_t dimension = indexing_size ( a ) ;
+size_t dimension = sequence_size ( a ) ;
 
-assert ( indexing_size ( b ) == dimension ) ;
-assert ( indexing_size ( x ) == dimension ) ;
+assert ( sequence_size ( b ) == dimension ) ;
+assert ( sequence_size ( x ) == dimension ) ;
 
 for ( size_t i = 0 ; i < dimension ; ++ i )
   {
-  assert ( indexing_size ( a [ i ] ) == dimension ) ;
+  assert ( sequence_size ( a [ i ] ) == dimension ) ;
 
   if ( a [ i ] [ i ] == 0 )
     {
@@ -154,13 +154,13 @@ typedef
            :: value_type
   matrix_element ;
 
-size_t dimension = indexing_size ( a ) ;
+size_t dimension = sequence_size ( a ) ;
 
 bool negate = false ;
 
 for ( size_t i = 0 ; i < dimension ; ++ i )
   {
-  assert ( indexing_size ( a [ i ] ) == dimension ) ;
+  assert ( sequence_size ( a [ i ] ) == dimension ) ;
 
   if ( a [ i ] [ i ] == 0 )
     {
@@ -226,10 +226,10 @@ typedef
   typename indexing_traits < SolutionVector > :: value_type
   solution_vector_element ;
 
-size_t dimension = indexing_size ( a ) ;
+size_t dimension = sequence_size ( a ) ;
 
-assert ( indexing_size ( b ) == dimension ) ;
-assert ( indexing_size ( x ) == dimension ) ;
+assert ( sequence_size ( b ) == dimension ) ;
+assert ( sequence_size ( x ) == dimension ) ;
 
 vector < size_t > solution_index ;
 solution_index.reserve ( dimension ) ;
@@ -238,7 +238,7 @@ for ( size_t i = 0 ; i < dimension ; ++ i )
 
 for ( size_t i = 0 ; i < dimension ; ++ i )
   {
-  assert ( indexing_size ( a [ i ] ) == dimension ) ;
+  assert ( sequence_size ( a [ i ] ) == dimension ) ;
 
   {
   matrix_element c ( a [ i ] [ i ] ) ;
@@ -420,13 +420,13 @@ typedef
            :: value_type
   matrix_element ;
 
-size_t dimension = indexing_size ( a ) ;
+size_t dimension = sequence_size ( a ) ;
 
 bool negate = false ;
 
 for ( size_t i = 0 ; i < dimension ; ++ i )
   {
-  assert ( indexing_size ( a [ i ] ) == dimension ) ;
+  assert ( sequence_size ( a [ i ] ) == dimension ) ;
 
   {
   matrix_element c ( a [ i ] [ i ] ) ;
