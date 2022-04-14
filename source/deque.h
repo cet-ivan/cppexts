@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -36,8 +36,6 @@ using std :: swap ;
 // *** INDEXING_TRAITS ***
 
 
-//
-
 template < class T, class Allocator >
 class indexing_traits < deque < T, Allocator > >
 
@@ -47,10 +45,19 @@ public:
   typedef typename deque < T, Allocator > :: size_type index_type ;
   typedef T value_type ;
 
-  static size_t size ( const deque < T, Allocator > & x )
-    { return x.size ( ) ; }
-
 } ;
+
+
+
+// *** SEQUENCE_SIZE ***
+
+
+template < class T, class Allocator >
+inline size_t sequence_size ( const deque < T, Allocator > & x )
+
+{
+return x.size ( ) ;
+}
 
 
 
@@ -130,6 +137,69 @@ public:
 
 
 #endif
+
+
+
+// *** CONCATENATION ***
+
+
+template < class T, class Allocator >
+class deque_concatenator
+
+{
+public:
+
+  deque < T, Allocator > d ;
+
+  deque_concatenator ( const deque < T, Allocator > & i_d ) :
+    d ( i_d )
+    { }
+
+  deque_concatenator ( deque < T, Allocator > && i_d ) :
+    d ( move ( i_d ) )
+    { }
+
+  template < class Sequence >
+  deque_concatenator & operator + ( const Sequence & s )
+    { d.insert ( d.end ( ), begin ( s ), end ( s ) ) ;
+      return * this ; }
+
+  template < class Sequence >
+  deque_concatenator & operator + ( Sequence & s )
+    { d.insert ( d.end ( ), cbegin ( s ), cend ( s ) ) ;
+      return * this ; }
+
+  template < class Sequence >
+  deque_concatenator & operator + ( Sequence && s )
+    { d.insert ( d.end ( ), make_move_iterator ( begin ( s ) ),
+                            make_move_iterator ( end   ( s ) ) ) ;
+      return * this ; }
+
+} ;
+
+
+//
+
+template < class T, class Allocator, class ... Sequences >
+inline deque < T, Allocator >
+  concatenate ( const deque < T, Allocator > & d, Sequences && ... s )
+
+{
+return move ( (         deque_concatenator < T, Allocator > ( d )
+                + ... + forward < Sequences > ( s ) ).d ) ;
+}
+
+
+//
+
+template < class T, class Allocator, class ... Sequences >
+inline deque < T, Allocator >
+  concatenate ( deque < T, Allocator > && d, Sequences && ... s )
+
+{
+return move ( (         deque_concatenator < T, Allocator > ( move ( d ) )
+                + ... + forward < Sequences > ( s ) ).d ) ;
+}
 
 
 
