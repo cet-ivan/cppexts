@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -22,10 +22,11 @@
 #include "list.h"
 #include "set.h"
 #include "map.h"
-#include "exint.h"
 #include "chrono.h"
 
 #include "numbase.h"
+#include "exint.h"
+#include "conring.h"
 
 
 
@@ -160,74 +161,75 @@ __DEFINE_PVM_FUNCTIONS(double,double)
 
 //
 
-inline void pvm_pack ( signed char x )
-
-{
-pvm_pack ( static_cast < char > ( x ) ) ;
+#define __DEFINE_PVM_FUNCTIONS(Type)                            \
+                                                                \
+inline void pvm_pack ( Type x )                                 \
+                                                                \
+{                                                               \
+pvm_pack ( static_cast < char > ( x ) ) ;                       \
+}                                                               \
+                                                                \
+inline void pvm_unpack ( Type & x )                             \
+                                                                \
+{                                                               \
+pvm_unpack ( reinterpret_cast < char & > ( x ) ) ;              \
+}                                                               \
+                                                                \
+inline void pvm_pack_array ( const Type * x, size_t n )         \
+                                                                \
+{                                                               \
+pvm_pack_array ( reinterpret_cast < const char * > ( x ), n ) ; \
+}                                                               \
+                                                                \
+inline void pvm_unpack_array ( Type * x, size_t n )             \
+                                                                \
+{                                                               \
+pvm_unpack_array ( reinterpret_cast < char * > ( x ), n ) ;     \
 }
+
+__DEFINE_PVM_FUNCTIONS(signed char)
+__DEFINE_PVM_FUNCTIONS(unsigned char)
+
+#undef __DEFINE_PVM_FUNCTIONS
 
 
 //
 
-inline void pvm_unpack ( signed char & x )
-
-{
-pvm_unpack ( reinterpret_cast < char & > ( x ) ) ;
+#define __DEFINE_PVM_FUNCTIONS(Type)                        \
+                                                            \
+inline void pvm_pack ( Type x )                             \
+                                                            \
+{                                                           \
+pvm_pack_array ( reinterpret_cast < const char * > ( & x ), \
+                 sizeof ( Type ) ) ;                        \
+}                                                           \
+                                                            \
+inline void pvm_unpack ( Type & x )                         \
+                                                            \
+{                                                           \
+pvm_unpack_array ( reinterpret_cast < char * > ( & x ),     \
+                   sizeof ( Type ) ) ;                      \
+}                                                           \
+                                                            \
+inline void pvm_pack_array ( const Type * x, size_t n )     \
+                                                            \
+{                                                           \
+pvm_pack_array ( reinterpret_cast < const char * > ( x ),   \
+                 n * sizeof ( Type ) ) ;                    \
+}                                                           \
+                                                            \
+inline void pvm_unpack_array ( Type * x, size_t n )         \
+                                                            \
+{                                                           \
+pvm_unpack_array ( reinterpret_cast < char * > ( x ),       \
+                   n * sizeof ( Type ) ) ;                  \
 }
 
+__DEFINE_PVM_FUNCTIONS(long long)
+__DEFINE_PVM_FUNCTIONS(unsigned long long)
+__DEFINE_PVM_FUNCTIONS(long double)
 
-//
-
-inline void pvm_pack_array ( const signed char * x, size_t n )
-
-{
-pvm_pack_array ( reinterpret_cast < const char * > ( x ), n ) ;
-}
-
-
-//
-
-inline void pvm_unpack_array ( signed char * x, size_t n )
-
-{
-pvm_unpack_array ( reinterpret_cast < char * > ( x ), n ) ;
-}
-
-
-//
-
-inline void pvm_pack ( unsigned char x )
-
-{
-pvm_pack ( static_cast < char > ( x ) ) ;
-}
-
-
-//
-
-inline void pvm_unpack ( unsigned char & x )
-
-{
-pvm_unpack ( reinterpret_cast < char & > ( x ) ) ;
-}
-
-
-//
-
-inline void pvm_pack_array ( const unsigned char * x, size_t n )
-
-{
-pvm_pack_array ( reinterpret_cast < const char * > ( x ), n ) ;
-}
-
-
-//
-
-inline void pvm_unpack_array ( unsigned char * x, size_t n )
-
-{
-pvm_unpack_array ( reinterpret_cast < char * > ( x ), n ) ;
-}
+#undef __DEFINE_PVM_FUNCTIONS
 
 
 //
@@ -353,7 +355,7 @@ template < class Container >
 inline void pvm_pack_container ( const Container & c )
 
 {
-pvm_pack ( static_cast < unsigned long > ( c.size ( ) ) ) ;
+pvm_pack ( static_cast < size_t > ( c.size ( ) ) ) ;
 pvm_pack_range ( c.begin ( ), c.end ( ) ) ;
 }
 
@@ -364,7 +366,7 @@ template < class Container >
 inline void pvm_unpack_container ( Container & c )
 
 {
-unsigned long size ;
+size_t size ;
 pvm_unpack ( size ) ;
 
 Container t ;
@@ -380,7 +382,7 @@ template < class AssociativeContainer >
 inline void pvm_unpack_associative_container ( AssociativeContainer & a )
 
 {
-unsigned long size ;
+size_t size ;
 pvm_unpack ( size ) ;
 
 AssociativeContainer t ;
@@ -406,7 +408,7 @@ template < class T, class Allocator >
 inline void pvm_unpack ( vector < T, Allocator > & x )
 
 {
-unsigned long size ;
+size_t size ;
 pvm_unpack ( size ) ;
 
 vector < T, Allocator > t ;
@@ -556,6 +558,28 @@ inline void pvm_unpack ( basic_exint < T, Allocator > & x )
 vector < T, Allocator > data ;
 pvm_unpack ( data ) ;
 x = basic_exint < T, Allocator > ( move ( data ) ) ;
+}
+
+
+//
+
+template < class RingTraits >
+inline void pvm_pack ( const congruence_ring < RingTraits > & x )
+
+{
+pvm_pack ( x.base ( ) ) ;
+}
+
+
+//
+
+template < class RingTraits >
+inline void pvm_unpack ( congruence_ring < RingTraits > & x )
+
+{
+typename congruence_ring < RingTraits > :: value_type v ;
+pvm_unpack ( v ) ;
+x = v ;
 }
 
 
