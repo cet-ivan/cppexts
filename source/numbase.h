@@ -310,8 +310,14 @@ public:
   static constexpr float pi ( )
     { return 3.14159265358979323846f ; }
 
+  static constexpr float sqrt_pi ( ) // sqrt ( pi )
+    { return 1.77245385090551602730f ; }
+
   static constexpr float sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.50662827463100050242f ; }
+
+  static constexpr float _1_2_sqrt_pi ( ) // 1 / ( 2 * sqrt ( pi ) )
+    { return 0.28209479177387814347f ; }
 
   static constexpr float log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.91893853320467274178f ; }
@@ -348,8 +354,14 @@ public:
   static constexpr double pi ( )
     { return 3.14159265358979323846 ; }
 
+  static constexpr double sqrt_pi ( ) // sqrt ( pi )
+    { return 1.77245385090551602730 ; }
+
   static constexpr double sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.50662827463100050242 ; }
+
+  static constexpr double _1_2_sqrt_pi ( ) // 1 / ( 2 * sqrt ( pi ) )
+    { return 0.28209479177387814347 ; }
 
   static constexpr double log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.91893853320467274178 ; }
@@ -386,8 +398,14 @@ public:
   static constexpr long double pi ( )
     { return 3.1415926535897932384626433832795029L ; }
 
+  static constexpr long double sqrt_pi ( ) // sqrt ( pi )
+    { return 1.7724538509055160272981674833411452L ; }
+
   static constexpr long double sqrt_2pi ( ) // sqrt ( 2 * pi )
     { return 2.5066282746310005024157652848110456L ; }
+
+  static constexpr long double _1_2_sqrt_pi ( ) // 1 / ( 2 * sqrt ( pi ) )
+    { return 0.2820947917738781434740397257803863L ; }
 
   static constexpr long double log_2pi_2 ( ) // log ( 2 * pi ) / 2
     { return 0.9189385332046727417803297364056176L ; }
