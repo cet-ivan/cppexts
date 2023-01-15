@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -40,6 +40,21 @@ template < class Word, class Allocator >
 size_t hamming_distance
          ( const basic_bit_vector < Word, Allocator > & a,
            const basic_bit_vector < Word, Allocator > & b ) ;
+
+template < class Word, class Allocator >
+size_t bit_and_weight
+         ( const basic_bit_vector < Word, Allocator > & a,
+           const basic_bit_vector < Word, Allocator > & b ) ;
+
+template < class Word, class Allocator >
+size_t bit_or_weight
+         ( const basic_bit_vector < Word, Allocator > & a,
+           const basic_bit_vector < Word, Allocator > & b ) ;
+
+template < class Word, class Allocator >
+bool bit_and_nonzero
+       ( const basic_bit_vector < Word, Allocator > & a,
+         const basic_bit_vector < Word, Allocator > & b ) ;
 
 template < class Word, class Allocator >
 basic_bit_vector < Word, Allocator >
@@ -495,10 +510,24 @@ public:
   bool none ( ) const
     { return ! any ( ) ; }
 
-  friend size_t hamming_weight < > ( const basic_bit_vector & x ) ;
+  friend size_t hamming_weight < >
+                  ( const basic_bit_vector & x ) ;
 
-  friend size_t hamming_distance < > ( const basic_bit_vector & a,
-                                       const basic_bit_vector & b ) ;
+  friend size_t hamming_distance < >
+                  ( const basic_bit_vector & a,
+                    const basic_bit_vector & b ) ;
+
+  friend size_t bit_and_weight < >
+                  ( const basic_bit_vector & a,
+                    const basic_bit_vector & b ) ;
+
+  friend size_t bit_or_weight < >
+                  ( const basic_bit_vector & a,
+                    const basic_bit_vector & b ) ;
+
+  friend bool bit_and_nonzero < >
+                ( const basic_bit_vector & a,
+                  const basic_bit_vector & b ) ;
 
   basic_bit_vector operator ~ ( ) const
     { return basic_bit_vector ( * this ).flip ( ) ; }
@@ -696,6 +725,100 @@ for_each ( bp -> data_.begin ( ) + ap -> data_.size ( ), bp -> data_.end ( ),
            [ & ] ( Word x ) { result += hamming_weight ( x ) ; } ) ;
 
 return result ;
+}
+
+
+//
+
+template < class Word, class Allocator >
+size_t bit_and_weight ( const basic_bit_vector < Word, Allocator > & a,
+                        const basic_bit_vector < Word, Allocator > & b )
+
+{
+const basic_bit_vector < Word, Allocator > * ap ;
+const basic_bit_vector < Word, Allocator > * bp ;
+
+if ( a.data_.size ( ) < b.data_.size ( ) )
+  {
+  ap = & a ;
+  bp = & b ;
+  }
+else
+  {
+  ap = & b ;
+  bp = & a ;
+  }
+
+size_t result = 0 ;
+
+for_pairs
+  ( ap -> data_.begin ( ), ap -> data_.end ( ),
+    bp -> data_.begin ( ),
+    [ & ] ( Word x, Word y ) { result += hamming_weight ( x & y ) ; } ) ;
+
+return result ;
+}
+
+
+//
+
+template < class Word, class Allocator >
+size_t bit_or_weight ( const basic_bit_vector < Word, Allocator > & a,
+                       const basic_bit_vector < Word, Allocator > & b )
+
+{
+const basic_bit_vector < Word, Allocator > * ap ;
+const basic_bit_vector < Word, Allocator > * bp ;
+
+if ( a.data_.size ( ) < b.data_.size ( ) )
+  {
+  ap = & a ;
+  bp = & b ;
+  }
+else
+  {
+  ap = & b ;
+  bp = & a ;
+  }
+
+size_t result = 0 ;
+
+for_pairs
+  ( ap -> data_.begin ( ), ap -> data_.end ( ),
+    bp -> data_.begin ( ),
+    [ & ] ( Word x, Word y ) { result += hamming_weight ( x | y ) ; } ) ;
+
+for_each ( bp -> data_.begin ( ) + ap -> data_.size ( ), bp -> data_.end ( ),
+           [ & ] ( Word x ) { result += hamming_weight ( x ) ; } ) ;
+
+return result ;
+}
+
+
+//
+
+template < class Word, class Allocator >
+bool bit_and_nonzero ( const basic_bit_vector < Word, Allocator > & a,
+                       const basic_bit_vector < Word, Allocator > & b )
+
+{
+const basic_bit_vector < Word, Allocator > * ap ;
+const basic_bit_vector < Word, Allocator > * bp ;
+
+if ( a.data_.size ( ) < b.data_.size ( ) )
+  {
+  ap = & a ;
+  bp = & b ;
+  }
+else
+  {
+  ap = & b ;
+  bp = & a ;
+  }
+
+return ! equal ( ap -> data_.begin ( ), ap -> data_.end ( ),
+                 bp -> data_.begin ( ),
+                 [ ] ( Word x, Word y ) { return ( x & y ) == Word ( 0 ) ; } ) ;
 }
 
 
