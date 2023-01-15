@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2017.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -103,6 +103,9 @@ template < class T >
 sint exponent ( const signed_double_int < T > & x ) ;
 
 template < class T >
+signed_double_int < T > reverse ( const signed_double_int < T > & x ) ;
+
+template < class T >
 void normalize_gcd ( signed_double_int < T > & gcd ) ;
 
 template < class T >
@@ -180,6 +183,9 @@ unsigned_double_int < T >
 
 template < class T >
 sint exponent ( const unsigned_double_int < T > & x ) ;
+
+template < class T >
+unsigned_double_int < T > reverse ( const unsigned_double_int < T > & x ) ;
 
 
 
@@ -1201,6 +1207,16 @@ return x.exponent ( ) ;
 //
 
 template < class T >
+inline signed_double_int < T > reverse ( const signed_double_int < T > & x )
+
+{
+return signed_double_int < T > ( reverse ( x.low ), reverse ( x.high ) ) ;
+}
+
+
+//
+
+template < class T >
 inline void normalize_gcd ( signed_double_int < T > & gcd )
 
 {
@@ -1673,6 +1689,16 @@ inline sint exponent ( const unsigned_double_int < T > & x )
 
 {
 return x.exponent ( ) ;
+}
+
+
+//
+
+template < class T >
+inline unsigned_double_int < T > reverse ( const unsigned_double_int < T > & x )
+
+{
+return unsigned_double_int < T > ( reverse ( x.low ), reverse ( x.high ) ) ;
 }
 
 
