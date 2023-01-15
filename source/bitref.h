@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2019.
+// Copyright Ivan Stanojevic 2022.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -186,6 +186,12 @@ ReverseBitIterator reverse_find_bit_1 ( ReverseBitIterator iter, size_t n ) ;
 
 template < class ReverseBitIterator >
 ReverseBitIterator reverse_find_bit_0 ( ReverseBitIterator iter, size_t n ) ;
+
+template < class BitIterator >
+ptrdiff_t count_bit_1 ( BitIterator iter, size_t n ) ;
+
+template < class BitIterator >
+ptrdiff_t count_bit_0 ( BitIterator iter, size_t n ) ;
 
 
 //
@@ -395,6 +401,12 @@ private:
   friend bit_iterator find_bit_0 < > ( bit_iterator iter,
                                        size_t n ) ;
 
+  friend ptrdiff_t count_bit_1 < > ( bit_iterator iter,
+                                     size_t n ) ;
+
+  friend ptrdiff_t count_bit_0 < > ( bit_iterator iter,
+                                     size_t n ) ;
+
   friend bit_iterator copy_n_bits < > ( bit_iterator source,
                                         size_t n,
                                         bit_iterator dest ) ;
@@ -556,6 +568,12 @@ private:
 
   friend const_bit_iterator find_bit_0 < > ( const_bit_iterator iter,
                                              size_t n ) ;
+
+  friend ptrdiff_t count_bit_1 < > ( const_bit_iterator iter,
+                                     size_t n ) ;
+
+  friend ptrdiff_t count_bit_0 < > ( const_bit_iterator iter,
+                                     size_t n ) ;
 
   friend bit_iterator < Word > copy_n_bits < > ( const_bit_iterator source,
                                                  size_t n,
@@ -1277,7 +1295,6 @@ if ( iter.bit_position > 0 )
     return iter + n ;
 
   ++ iter.word_position ;
-
   n -= relevant_bits ;
   }
 
@@ -1288,7 +1305,6 @@ while ( n >= word_bit_size )
                          raw_find_bit_1 ( * iter.word_position ) ) ;
 
   ++ iter.word_position ;
-
   n -= word_bit_size ;
   }
 
@@ -1331,7 +1347,6 @@ if ( iter.bit_position > 0 )
     return iter + n ;
 
   ++ iter.word_position ;
-
   n -= relevant_bits ;
   }
 
@@ -1342,7 +1357,6 @@ while ( n >= word_bit_size )
                          raw_find_bit_0 ( * iter.word_position ) ) ;
 
   ++ iter.word_position ;
-
   n -= word_bit_size ;
   }
 
@@ -1387,7 +1401,6 @@ if ( iter.bit_position < word_bit_size_1 )
     return iter + n ;
 
   -- iter.word_position ;
-
   n -= relevant_bits ;
   }
 
@@ -1398,7 +1411,6 @@ while ( n >= word_bit_size )
                                 raw_find_last_bit_1 ( * iter.word_position ) ) ;
 
   -- iter.word_position ;
-
   n -= word_bit_size ;
   }
 
@@ -1445,7 +1457,6 @@ if ( iter.bit_position < word_bit_size_1 )
     return iter + n ;
 
   -- iter.word_position ;
-
   n -= relevant_bits ;
   }
 
@@ -1456,7 +1467,6 @@ while ( n >= word_bit_size )
                                 raw_find_last_bit_0 ( * iter.word_position ) ) ;
 
   -- iter.word_position ;
-
   n -= word_bit_size ;
   }
 
@@ -1555,6 +1565,160 @@ return reverse_find_bit ( first, last, b ) ;
 
 
 
+// *** COUNT ***
+
+
+//
+
+template < class BitIterator >
+ptrdiff_t count_bit_1 ( BitIterator iter, size_t n )
+
+{
+typedef typename BitIterator :: word_type word_type ;
+
+constexpr size_t word_bit_size = BitIterator :: word_bit_size ;
+
+if ( n == 0 )
+  return 0 ;
+
+ptrdiff_t result = 0 ;
+
+if ( iter.bit_position > 0 )
+  {
+  size_t relevant_bits = min ( word_bit_size - iter.bit_position, n ) ;
+
+  result += hamming_weight (   ( * iter.word_position >> iter.bit_position )
+                             & ( ( word_type ( 1 ) << relevant_bits ) - 1 ) ) ;
+
+  ++ iter.word_position ;
+  n -= relevant_bits ;
+  }
+
+while ( n >= word_bit_size )
+  {
+  result += hamming_weight ( * iter.word_position ) ;
+
+  ++ iter.word_position ;
+  n -= word_bit_size ;
+  }
+
+if ( n > 0 )
+  result += hamming_weight (   * iter.word_position
+                             & ( ( word_type ( 1 ) << n ) - 1 ) ) ;
+
+return result ;
+}
+
+
+//
+
+template < class BitIterator >
+ptrdiff_t count_bit_0 ( BitIterator iter, size_t n )
+
+{
+typedef typename BitIterator :: word_type word_type ;
+
+constexpr size_t word_bit_size = BitIterator :: word_bit_size ;
+
+if ( n == 0 )
+  return 0 ;
+
+ptrdiff_t result = 0 ;
+
+if ( iter.bit_position > 0 )
+  {
+  size_t relevant_bits = min ( word_bit_size - iter.bit_position, n ) ;
+
+  result += hamming_weight (   ~ ( * iter.word_position >> iter.bit_position )
+                             & ( ( word_type ( 1 ) << relevant_bits ) - 1 ) ) ;
+
+  ++ iter.word_position ;
+  n -= relevant_bits ;
+  }
+
+while ( n >= word_bit_size )
+  {
+  result += hamming_weight ( ~ * iter.word_position ) ;
+
+  ++ iter.word_position ;
+  n -= word_bit_size ;
+  }
+
+if ( n > 0 )
+  result += hamming_weight (   ~ * iter.word_position
+                             & ( ( word_type ( 1 ) << n ) - 1 ) ) ;
+
+return result ;
+}
+
+
+//
+
+template < class BitIterator >
+inline ptrdiff_t count_bit ( const BitIterator & first,
+                             const BitIterator & last,
+                             bool b )
+
+{
+assert ( valid_bit_iterator_range ( first, last ) ) ;
+ptrdiff_t n = last - first ;
+return b ? count_bit_1 ( first, n ) : count_bit_0 ( first, n ) ;
+}
+
+
+//
+
+template < class Word, class T >
+inline ptrdiff_t count ( const bit_iterator < Word > & first,
+                         const bit_iterator < Word > & last,
+                         T b )
+
+{
+return count_bit ( first, last, b ) ;
+}
+
+
+//
+
+template < class Word, class T >
+inline ptrdiff_t count ( const const_bit_iterator < Word > & first,
+                         const const_bit_iterator < Word > & last,
+                         T b )
+
+{
+return count_bit ( first, last, b ) ;
+}
+
+
+//
+
+template < class Word, class T >
+inline ptrdiff_t count ( const reverse_bit_iterator < Word > & first,
+                         const reverse_bit_iterator < Word > & last,
+                         T b )
+
+{
+return count_bit ( bit_iterator < Word > ( last ),
+                   bit_iterator < Word > ( first ),
+                   b ) ;
+}
+
+
+//
+
+template < class Word, class T >
+inline ptrdiff_t count ( const const_reverse_bit_iterator < Word > & first,
+                         const const_reverse_bit_iterator < Word > & last,
+                         T b )
+
+{
+return count_bit ( const_bit_iterator < Word > ( last ),
+                   const_bit_iterator < Word > ( first ),
+                   b ) ;
+}
+
+
+
 // *** COPY ***
 
 
@@ -1600,7 +1764,6 @@ if ( dest.bit_position == source.bit_position )
 
     ++ source.word_position ;
     ++ dest.word_position ;
-
     n -= relevant_bits ;
     }
 
@@ -1609,7 +1772,6 @@ if ( dest.bit_position == source.bit_position )
     * dest.word_position = * source.word_position ;
     ++ source.word_position ;
     ++ dest.word_position ;
-
     n -= word_bit_size ;
     }
 
@@ -1663,7 +1825,6 @@ else
       return dest + n ;
 
     ++ dest.word_position ;
-
     n -= relevant_bits ;
     }
 
@@ -1676,7 +1837,6 @@ else
 
     * dest.word_position = source_word ;
     ++ dest.word_position ;
-
     n -= word_bit_size ;
     }
 
@@ -1734,7 +1894,6 @@ if ( dest.bit_position == source.bit_position )
 
     -- source.word_position ;
     -- dest.word_position ;
-
     n -= relevant_bits ;
     }
 
@@ -1743,7 +1902,6 @@ if ( dest.bit_position == source.bit_position )
     * dest.word_position = * source.word_position ;
     -- source.word_position ;
     -- dest.word_position ;
-
     n -= word_bit_size ;
     }
 
@@ -1798,7 +1956,6 @@ else
       return dest + n ;
 
     -- dest.word_position ;
-
     n -= relevant_bits ;
     }
 
@@ -1811,7 +1968,6 @@ else
 
     * dest.word_position = source_word ;
     -- dest.word_position ;
-
     n -= word_bit_size ;
     }
 
