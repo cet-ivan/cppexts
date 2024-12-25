@@ -5,6 +5,7 @@ CXXFLAGS := -Wall \
             -std=c++17 \
             -m32 \
             -stdlib=libc++ \
+            -Wno-unqualified-std-cast-call \
             -isystem ../overrides/clang \
             -fwrapv \
             -g3
