@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -258,7 +258,7 @@ public:
   typedef typename numeric_traits < T > :: signed_type signed_value_type ;
   typedef typename numeric_traits < T > :: unsigned_type unsigned_value_type ;
 
-  static const sint bit_size = Bits ;
+  static constexpr sint bit_size = Bits ;
 
 private:
 
@@ -316,7 +316,7 @@ public:                                                                   \
   typedef numeric_traits < Type > :: signed_type signed_value_type ;      \
   typedef numeric_traits < Type > :: unsigned_type unsigned_value_type ;  \
                                                                           \
-  static const sint bit_size = Bits ;                                     \
+  static constexpr sint bit_size = Bits ;                                 \
                                                                           \
 private:                                                                  \
                                                                           \
@@ -327,13 +327,13 @@ private:                                                                  \
                                                                           \
 protected:                                                                \
                                                                           \
-  static const unsigned_value_type                                        \
+  static constexpr unsigned_value_type                                    \
     high_bit_mask = unsigned_value_type ( 1 ) << ( bit_size - 1 ) ;       \
                                                                           \
-  static const unsigned_value_type                                        \
+  static constexpr unsigned_value_type                                    \
     low_bits_mask = high_bit_mask - unsigned_value_type ( 1 ) ;           \
                                                                           \
-  static const unsigned_value_type                                        \
+  static constexpr unsigned_value_type                                    \
     mask = high_bit_mask + low_bits_mask ;                                \
                                                                           \
 } ;
@@ -572,21 +572,21 @@ class numeric_traits < signed_small_int < T, Bits > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = true ;
+  static constexpr bool is_signed = true ;
 
   typedef signed_small_int < T, Bits > signed_type ;
   typedef unsigned_small_int < T, Bits > unsigned_type ;
 
-  static const sint bit_size = signed_small_int < T, Bits > :: bit_size ;
+  static constexpr sint bit_size = signed_small_int < T, Bits > :: bit_size ;
 
-  static const bool has_double_size_type =
+  static constexpr bool has_double_size_type =
     bit_size * 2 <= numeric_traits < T > :: bit_size ;
 
-  typedef typename conditional < has_double_size_type,
-                                 signed_small_int < T, bit_size * 2 >,
-                                 void > :: type
+  typedef conditional_t < has_double_size_type,
+                          signed_small_int < T, bit_size * 2 >,
+                          void >
     double_size_type ;
 
   static signed_small_int < T, Bits > min ( )
@@ -1049,21 +1049,21 @@ class numeric_traits < unsigned_small_int < T, Bits > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = false ;
+  static constexpr bool is_signed = false ;
 
   typedef signed_small_int < T, Bits > signed_type ;
   typedef unsigned_small_int < T, Bits > unsigned_type ;
 
-  static const sint bit_size = unsigned_small_int < T, Bits > :: bit_size ;
+  static constexpr sint bit_size = unsigned_small_int < T, Bits > :: bit_size ;
 
-  static const bool has_double_size_type =
+  static constexpr bool has_double_size_type =
     bit_size * 2 <= numeric_traits < T > :: bit_size ;
 
-  typedef typename conditional < has_double_size_type,
-                                 unsigned_small_int < T, bit_size * 2 >,
-                                 void > :: type
+  typedef conditional_t < has_double_size_type,
+                          unsigned_small_int < T, bit_size * 2 >,
+                          void >
     double_size_type ;
 
   static unsigned_small_int < T, Bits > min ( )

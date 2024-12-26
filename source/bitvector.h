@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -124,17 +124,17 @@ public:
   typedef iterator pointer ;
   typedef const_iterator const_pointer ;
 
-  static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
+  static constexpr size_t word_bit_size = numeric_traits < Word > :: bit_size ;
 
-  static const size_t log2_word_bit_size =
-                        const_exponent ( word_bit_size ) - 1 ;
+  static constexpr size_t log2_word_bit_size =
+                            const_exponent ( word_bit_size ) - 1 ;
 
   static_assert ( word_bit_size == size_t ( 1 ) << log2_word_bit_size,
                   "Illegal word bit size." ) ;
 
 private:
 
-  static const size_t word_bit_size_1 = word_bit_size - 1 ;
+  static constexpr size_t word_bit_size_1 = word_bit_size - 1 ;
 
   vector < Word > data_ ;
   size_t size_ ;
@@ -243,9 +243,8 @@ public:
 
   template < class InputIterator >
   basic_bit_vector ( InputIterator first,
-                     typename enable_if
-                                < is_input_iterator < InputIterator > :: value,
-                                  InputIterator > :: type
+                     enable_if_t < is_input_iterator_v < InputIterator >,
+                                   InputIterator >
                        last,
                      const Allocator & a = Allocator ( ) ) :
     data_ ( a ),
@@ -266,9 +265,8 @@ public:
 
   template < class InputIterator >
   void assign ( InputIterator first,
-                typename enable_if
-                           < is_input_iterator < InputIterator > :: value,
-                             InputIterator > :: type
+                enable_if_t < is_input_iterator_v < InputIterator >,
+                              InputIterator >
                   last )
     { copy_from_range ( first, last ) ; }
 
@@ -439,9 +437,8 @@ public:
   template < class InputIterator >
   iterator insert ( const_iterator position,
                     InputIterator first,
-                    typename enable_if
-                               < is_input_iterator < InputIterator > :: value,
-                                 InputIterator > :: type
+                    enable_if_t < is_input_iterator_v < InputIterator >,
+                                  InputIterator >
                       last )
     { return insert_from_range ( position, first, last ) ; }
 
