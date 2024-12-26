@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2022 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -147,7 +147,7 @@ typedef __suseconds_t suseconds_t;
 /* Old compatibility names for C types.  */
 typedef unsigned long int ulong;
 typedef unsigned short int ushort;
-// typedef unsigned int uint;
+/* typedef unsigned int uint; */
 #endif
 
 /* These size-specific names are used by some of the inet code.  */
