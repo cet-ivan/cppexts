@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -30,6 +30,18 @@
 
 template < class T, class Allocator = allocator < T > >
 class polynomial ;
+
+template < class T, class Allocator >
+polynomial < T, Allocator >
+  reduce ( const polynomial < T, Allocator > & p ) ;
+
+template < class T, class Allocator >
+polynomial < T, Allocator >
+  remove_delay ( const polynomial < T, Allocator > & p ) ;
+
+template < class T, class Allocator >
+polynomial < T, Allocator >
+  add_delay ( const polynomial < T, Allocator > & p, size_t d ) ;
 
 template < class T, class Allocator >
 polynomial < T, Allocator >
@@ -233,8 +245,17 @@ public:
   void reduce ( )
     { erase ( first_ending_zero ( ), end ( ) ) ; }
 
+  friend polynomial reduce ( const polynomial & p )
+    { return polynomial ( p.begin ( ), p.first_ending_zero ( ) ) ; }
+
   void remove_delay ( )
     { erase ( begin ( ), first_nonzero ( ) ) ; }
+
+  friend polynomial remove_delay ( const polynomial & p )
+    { return polynomial ( p.first_nonzero ( ), p.end ( ) ) ; }
+
+  void add_delay ( size_t d )
+    { insert ( begin ( ), d, T ( 0 ) ) ; }
 
   template < class U >
   U operator ( ) ( const U & x ) const ;
@@ -480,6 +501,21 @@ do
 while ( a.size ( ) >= b.size ( ) ) ;
 
 r = a ;
+}
+
+
+//
+
+template < class T, class Allocator >
+polynomial < T, Allocator >
+  add_delay ( const polynomial < T, Allocator > & p, size_t d )
+
+{
+polynomial < T, Allocator > result ;
+result.reserve ( d + p.size ( ) ) ;
+result.assign ( d, T ( 0 ) ) ;
+result.insert ( result.end ( ), p.begin ( ), p.end ( ) ) ;
+return result ;
 }
 
 
@@ -739,8 +775,8 @@ class implicit_conversion_test < polynomial < S, AllocatorS >,
 //
 
 template < class T1, class Allocator1, class T2, class Allocator2 >
-class type_converter
-        < polynomial < T1, Allocator1 >, polynomial < T2, Allocator2 > >
+class type_converter < polynomial < T1, Allocator1 >,
+                       polynomial < T2, Allocator2 > >
 
 {
 public:
