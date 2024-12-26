@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -24,13 +24,15 @@ typedef std :: timed_mutex           unmovable_timed_mutex ;
 typedef std :: recursive_timed_mutex unmovable_recursive_timed_mutex ;
 
 using std :: defer_lock_t ;
-using std :: defer_lock ;
 using std :: try_to_lock_t ;
-using std :: try_to_lock ;
 using std :: adopt_lock_t ;
+
+using std :: defer_lock ;
+using std :: try_to_lock ;
 using std :: adopt_lock ;
 
 using std :: lock_guard ;
+using std :: scoped_lock ;
 using std :: unique_lock ;
 
 using std :: swap ;

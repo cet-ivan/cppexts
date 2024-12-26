@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -37,6 +37,10 @@ using std :: wcmatch ;
 using std :: smatch ;
 using std :: wsmatch ;
 
+using std :: regex_match ;
+using std :: regex_search ;
+using std :: regex_replace ;
+
 using std :: regex_iterator ;
 using std :: cregex_iterator ;
 using std :: wcregex_iterator ;
@@ -60,9 +64,6 @@ using std :: operator << ;
 
 using std :: swap ;
 
-using std :: regex_match ;
-using std :: regex_search ;
-using std :: regex_replace ;
 
 
 

@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -16,12 +16,22 @@
 
 
 using std :: swap ;
+using std :: exchange ;
 
 using std :: forward ;
 using std :: move ;
 using std :: move_if_noexcept ;
 
+using std :: as_const ;
+
 using std :: declval ;
+
+using std :: integer_sequence ;
+using std :: index_sequence ;
+
+using std :: make_integer_sequence ;
+using std :: make_index_sequence ;
+using std :: index_sequence_for ;
 
 using std :: pair ;
 
@@ -42,6 +52,13 @@ using std :: piecewise_construct_t ;
 using std :: piecewise_construct ;
 
 using std :: tuple ;
+
+using std :: in_place_t ;
+using std :: in_place ;
+using std :: in_place_type_t ;
+using std :: in_place_type ;
+using std :: in_place_index_t ;
+using std :: in_place_index ;
 
 
 

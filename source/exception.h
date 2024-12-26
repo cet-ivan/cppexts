@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2014.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -19,17 +19,12 @@ using std :: exception ;
 using std :: bad_exception ;
 using std :: nested_exception ;
 
-using std :: unexpected_handler ;
-using std :: get_unexpected ;
-using std :: set_unexpected ;
-using std :: unexpected ;
-
 using std :: terminate_handler ;
 using std :: get_terminate ;
 using std :: set_terminate ;
 using std :: terminate ;
 
-using std :: uncaught_exception ;
+using std :: uncaught_exceptions ;
 
 using std :: exception_ptr ;
 
@@ -39,6 +34,11 @@ using std :: make_exception_ptr ;
 
 using std :: throw_with_nested ;
 using std :: rethrow_if_nested ;
+
+// using std :: unexpected_handler ;
+// using std :: get_unexpected ;
+// using std :: set_unexpected ;
+// using std :: unexpected ;
 
 
 
