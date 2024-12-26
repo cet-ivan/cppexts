@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -207,19 +207,17 @@ typedef typename indexing_traits < ObjectiveFunctionVector > :: value_type
   element ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits
+  ( is_same_v < element,
+                   typename indexing_traits
                       <    typename indexing_traits < EqConstraintMatrix >
                         :: value_type >
-                 :: value_type >
-    :: value,
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits < EqConstraintFreeVector >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits < EqConstraintFreeVector >
+                :: value_type >,
     "" ) ;
 
 size_t total_variables = sequence_size ( objective_function_vector ),
@@ -457,51 +455,45 @@ typedef typename indexing_traits < ObjectiveFunctionVector > :: value_type
   element ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits
-                      <    typename indexing_traits < EqConstraintMatrix >
-                        :: value_type >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits
+                     <    typename indexing_traits < EqConstraintMatrix >
+                       :: value_type >
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits < EqConstraintFreeVector >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits < EqConstraintFreeVector >
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits
-                      <    typename indexing_traits < LeqConstraintMatrix >
-                        :: value_type >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits
+                     <    typename indexing_traits < LeqConstraintMatrix >
+                       :: value_type >
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits < LeqConstraintFreeVector >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits < LeqConstraintFreeVector >
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits
+  ( is_same_v < element,
+                   typename indexing_traits
                       <    typename indexing_traits < GeqConstraintMatrix >
                         :: value_type >
-                 :: value_type >
-    :: value,
+                :: value_type >,
     "" ) ;
 
 static_assert
-  (    is_same < element,
-                    typename indexing_traits < GeqConstraintFreeVector >
-                 :: value_type >
-    :: value,
+  ( is_same_v < element,
+                   typename indexing_traits < GeqConstraintFreeVector >
+                :: value_type >,
     "" ) ;
 
 size_t total_base_variables = sequence_size ( objective_function_vector ),

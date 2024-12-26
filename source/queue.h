@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2018.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -53,7 +53,7 @@ public:
   typedef Container container_type ;
   typedef Compare value_compare ;
 
-  static_assert ( ( is_same < T, value_type > :: value ), "" ) ;
+  static_assert ( ( is_same_v < T, value_type > ), "" ) ;
 
 protected:
 
@@ -114,22 +114,16 @@ public:
       make_heap ( c.begin ( ), c.end ( ), comp ) ; }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   explicit priority_queue ( const Alloc & a ) :
     c ( a ),
     comp ( )
     { }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   priority_queue ( const value_compare & i_comp,
                    const Alloc & a ) :
     c ( a ),
@@ -137,11 +131,8 @@ public:
     { }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   priority_queue ( const value_compare & i_comp,
                    const container_type & i_c,
                    const Alloc & a ) :
@@ -150,11 +141,8 @@ public:
     { make_heap ( c.begin ( ), c.end ( ), comp ) ; }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   priority_queue ( const value_compare & i_comp,
                    container_type && i_c,
                    const Alloc & a ) :
@@ -163,11 +151,8 @@ public:
     { make_heap ( c.begin ( ), c.end ( ), comp ) ; }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   priority_queue ( const priority_queue & q,
                    const Alloc & a ) :
     c ( q.c, a ),
@@ -175,11 +160,8 @@ public:
     { }
 
   template < class Alloc,
-             class =
-               typename
-                    enable_if <    uses_allocator < container_type, Alloc >
-                                :: value >
-                 :: type >
+             class = enable_if_t < uses_allocator_v < container_type,
+                                                      Alloc > > >
   priority_queue ( priority_queue && q,
                    const Alloc & a ) :
     c ( move ( q.c ), a ),

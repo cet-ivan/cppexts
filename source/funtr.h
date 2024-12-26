@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +34,7 @@ class indexing_traits < T [ ] >
 public:
 
   typedef size_t index_type ;
-  typedef typename remove_const < T > :: type value_type ;
+  typedef remove_const_t < T > value_type ;
 
 } ;
 
@@ -48,7 +48,7 @@ class indexing_traits < T [ N ] >
 public:
 
   typedef size_t index_type ;
-  typedef typename remove_const < T > :: type value_type ;
+  typedef remove_const_t < T > value_type ;
 
 } ;
 
@@ -62,7 +62,7 @@ class indexing_traits < T * >
 public:
 
   typedef size_t index_type ;
-  typedef typename remove_const < T > :: type value_type ;
+  typedef remove_const_t < T > value_type ;
 
 } ;
 
@@ -126,7 +126,7 @@ class empty_indexing_traits < T, 0 >
 {
 public:
 
-  typedef typename remove_const < T > :: type type ;
+  typedef remove_const_t < T > type ;
 
 } ;
 
