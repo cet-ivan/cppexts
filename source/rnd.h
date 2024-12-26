@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -201,9 +201,9 @@ class floating_point_rnd_static_generator
 {
 private:
 
-  static const size_t ld_buffer_size = 7 ;
-  static const size_t buffer_size = size_t ( 1 ) << ld_buffer_size ;
-  static const size_t buffer_size_mask = buffer_size - 1 ;
+  static constexpr size_t ld_buffer_size = 7 ;
+  static constexpr size_t buffer_size = size_t ( 1 ) << ld_buffer_size ;
+  static constexpr size_t buffer_size_mask = buffer_size - 1 ;
 
   class buffer
 

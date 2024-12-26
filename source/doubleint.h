@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -791,7 +791,7 @@ public:
   typedef typename numeric_traits < T > :: signed_type signed_digit_type ;
   typedef typename numeric_traits < T > :: unsigned_type unsigned_digit_type ;
 
-  static const sint
+  static constexpr sint
     digit_bit_size = numeric_traits < unsigned_digit_type > :: bit_size ;
 
 private:
@@ -1069,16 +1069,16 @@ class numeric_traits < signed_double_int < T > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = true ;
+  static constexpr bool is_signed = true ;
 
   typedef signed_double_int < T > signed_type ;
   typedef unsigned_double_int < T > unsigned_type ;
 
-  static const sint bit_size = numeric_traits < T > :: bit_size * 2 ;
+  static constexpr sint bit_size = numeric_traits < T > :: bit_size * 2 ;
 
-  static const bool has_double_size_type = false ;
+  static constexpr bool has_double_size_type = false ;
   typedef void double_size_type ;
 
   static signed_double_int < T > min ( )
@@ -1309,7 +1309,7 @@ public:
   typedef typename numeric_traits < T > :: signed_type signed_digit_type ;
   typedef typename numeric_traits < T > :: unsigned_type unsigned_digit_type ;
 
-  static const sint
+  static constexpr sint
     digit_bit_size = numeric_traits < unsigned_digit_type > :: bit_size ;
 
 private:
@@ -1557,16 +1557,16 @@ class numeric_traits < unsigned_double_int < T > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = false ;
+  static constexpr bool is_signed = false ;
 
   typedef signed_double_int < T > signed_type ;
   typedef unsigned_double_int < T > unsigned_type ;
 
-  static const sint bit_size = numeric_traits < T > :: bit_size * 2 ;
+  static constexpr sint bit_size = numeric_traits < T > :: bit_size * 2 ;
 
-  static const bool has_double_size_type = false ;
+  static constexpr bool has_double_size_type = false ;
   typedef void double_size_type ;
 
   static unsigned_double_int < T > min ( )

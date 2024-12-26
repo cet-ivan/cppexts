@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2014.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -125,7 +125,7 @@ class implicit_conversion_test_ok
 public:
 
   typedef implicit_conversion_allowed_t result ;
-  static const bool allowed = true ;
+  static constexpr bool allowed = true ;
 
 } ;
 
@@ -138,7 +138,7 @@ class implicit_conversion_test
 {
 public:
 
-  static const bool allowed = false ;
+  static constexpr bool allowed = false ;
 
 } ;
 

@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2016.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -463,9 +463,9 @@ public:
   typedef typename numeric_traits < T > :: signed_type signed_value_type ;
   typedef typename numeric_traits < T > :: unsigned_type unsigned_value_type ;
 
-  static const sint bit_size = numeric_traits < T > :: bit_size ;
-  static const sint fractional_bits = FractionalBits ;
-  static const sint integer_bits = bit_size - fractional_bits ;
+  static constexpr sint bit_size = numeric_traits < T > :: bit_size ;
+  static constexpr sint fractional_bits = FractionalBits ;
+  static constexpr sint integer_bits = bit_size - fractional_bits ;
 
 private:
 
@@ -541,9 +541,9 @@ public:                                                                    \
   typedef numeric_traits < Type > :: signed_type signed_value_type ;       \
   typedef numeric_traits < Type > :: unsigned_type unsigned_value_type ;   \
                                                                            \
-  static const sint bit_size = numeric_traits < Type > :: bit_size ;       \
-  static const sint fractional_bits = FractionalBits ;                     \
-  static const sint integer_bits = bit_size - fractional_bits ;            \
+  static constexpr sint bit_size = numeric_traits < Type > :: bit_size ;   \
+  static constexpr sint fractional_bits = FractionalBits ;                 \
+  static constexpr sint integer_bits = bit_size - fractional_bits ;        \
                                                                            \
 private:                                                                   \
                                                                            \
@@ -552,25 +552,25 @@ private:                                                                   \
                                                                            \
 protected:                                                                 \
                                                                            \
-  static const unsigned_value_type                                         \
+  static constexpr unsigned_value_type                                     \
     fractional_part_high_bit_mask =                                        \
       unsigned_value_type ( 1 ) << ( fractional_bits - 1 ) ;               \
                                                                            \
-  static const unsigned_value_type                                         \
+  static constexpr unsigned_value_type                                     \
     fractional_part_low_bits_mask =                                        \
       fractional_part_high_bit_mask - unsigned_value_type ( 1 ) ;          \
                                                                            \
-  static const unsigned_value_type                                         \
+  static constexpr unsigned_value_type                                     \
     fractional_part_mask =                                                 \
       fractional_part_high_bit_mask + fractional_part_low_bits_mask ;      \
                                                                            \
-  static const unsigned_value_type                                         \
+  static constexpr unsigned_value_type                                     \
     integer_part_low_bit_mask =                                            \
         fractional_bits < bit_size                                         \
       ? unsigned_value_type ( 1 ) << fractional_bits                       \
       : 0 ;                                                                \
                                                                            \
-  static const unsigned_value_type                                         \
+  static constexpr unsigned_value_type                                     \
     integer_part_mask = ~ fractional_part_mask ;                           \
                                                                            \
 } ;
@@ -1038,17 +1038,17 @@ class numeric_traits < signed_fixed_point < T, FractionalBits > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = true ;
+  static constexpr bool is_signed = true ;
 
   typedef signed_fixed_point < T, FractionalBits > signed_type ;
   typedef unsigned_fixed_point < T, FractionalBits > unsigned_type ;
 
-  static const sint
+  static constexpr sint
     bit_size = signed_fixed_point < T, FractionalBits > :: bit_size ;
 
-  static const bool has_double_size_type = false ;
+  static constexpr bool has_double_size_type = false ;
   typedef void double_size_type ;
 
   static signed_fixed_point < T, FractionalBits > min ( )
@@ -1648,17 +1648,17 @@ class numeric_traits < unsigned_fixed_point < T, FractionalBits > >
 {
 public:
 
-  static const bool is_floating_point = false ;
+  static constexpr bool is_floating_point = false ;
 
-  static const bool is_signed = false ;
+  static constexpr bool is_signed = false ;
 
   typedef signed_fixed_point < T, FractionalBits > signed_type ;
   typedef unsigned_fixed_point < T, FractionalBits > unsigned_type ;
 
-  static const sint
+  static constexpr sint
     bit_size = unsigned_fixed_point < T, FractionalBits > :: bit_size ;
 
-  static const bool has_double_size_type = false ;
+  static constexpr bool has_double_size_type = false ;
   typedef void double_size_type ;
 
   static unsigned_fixed_point < T, FractionalBits > min ( )

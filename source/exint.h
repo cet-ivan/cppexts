@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -128,7 +128,7 @@ public:
   typedef typename numeric_traits < T > :: signed_type signed_digit_type ;
   typedef typename numeric_traits < T > :: unsigned_type unsigned_digit_type ;
 
-  static const sint
+  static constexpr sint
     digit_bit_size = numeric_traits < unsigned_digit_type > :: bit_size ;
 
 private:
@@ -154,7 +154,7 @@ private:
 
   public:
 
-    static const bool has_carry = true ;
+    static constexpr bool has_carry = true ;
 
   } ;
 
@@ -164,7 +164,7 @@ private:
   {
   public:
 
-    static const bool has_carry = false ;
+    static constexpr bool has_carry = false ;
 
   } ;
 

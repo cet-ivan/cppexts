@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -139,7 +139,7 @@ class __builtin_double_size_type
 {
 public:
 
-  static const bool exists = false ;
+  static constexpr bool exists = false ;
   typedef void type ;
 
 } ;
@@ -155,7 +155,7 @@ class __builtin_double_size_type < Type >                      \
 {                                                              \
 public:                                                        \
                                                                \
-  static const bool exists = true ;                            \
+  static constexpr bool exists = true ;                        \
   typedef DoubleSizeType type ;                                \
                                                                \
 } ;
@@ -185,25 +185,25 @@ class numeric_traits < Type >                                              \
 {                                                                          \
 public:                                                                    \
                                                                            \
-  static const bool is_floating_point = false ;                            \
+  static constexpr bool is_floating_point = false ;                        \
                                                                            \
-  static const bool is_signed = true ;                                     \
+  static constexpr bool is_signed = true ;                                 \
                                                                            \
   typedef Type signed_type ;                                               \
   typedef __builtin_unsigned_type < Type > :: type unsigned_type ;         \
                                                                            \
-  static const bool                                                        \
+  static constexpr bool                                                    \
     has_double_size_type = __builtin_double_size_type < Type > :: exists ; \
                                                                            \
   typedef __builtin_double_size_type < Type > :: type double_size_type ;   \
                                                                            \
-  static const sint byte_size = sizeof ( Type ) ;                          \
-  static const sint bit_size = byte_size * 8 ;                             \
+  static constexpr sint byte_size = sizeof ( Type ) ;                      \
+  static constexpr sint bit_size = byte_size * 8 ;                         \
                                                                            \
-  static Type min ( )                                                      \
+  static constexpr Type min ( )                                            \
     { return Type ( Type ( 1 ) << ( bit_size - 1 ) ) ; }                   \
                                                                            \
-  static Type max ( )                                                      \
+  static constexpr Type max ( )                                            \
     { return Type (   ( Type ( 1 ) << ( bit_size - 2 ) ) - Type ( 1 )      \
                     + ( Type ( 1 ) << ( bit_size - 2 ) ) ) ; }             \
                                                                            \
@@ -224,25 +224,25 @@ class numeric_traits < Type >                                              \
 {                                                                          \
 public:                                                                    \
                                                                            \
-  static const bool is_floating_point = false ;                            \
+  static constexpr bool is_floating_point = false ;                        \
                                                                            \
-  static const bool is_signed = false ;                                    \
+  static constexpr bool is_signed = false ;                                \
                                                                            \
   typedef __builtin_signed_type < Type > :: type signed_type ;             \
   typedef Type unsigned_type ;                                             \
                                                                            \
-  static const bool                                                        \
+  static constexpr bool                                                    \
     has_double_size_type = __builtin_double_size_type < Type > :: exists ; \
                                                                            \
   typedef __builtin_double_size_type < Type > :: type double_size_type ;   \
                                                                            \
-  static const sint byte_size = sizeof ( Type ) ;                          \
-  static const sint bit_size = byte_size * 8 ;                             \
+  static constexpr sint byte_size = sizeof ( Type ) ;                      \
+  static constexpr sint bit_size = byte_size * 8 ;                         \
                                                                            \
-  static Type min ( )                                                      \
+  static constexpr Type min ( )                                            \
     { return Type ( 0 ) ; }                                                \
                                                                            \
-  static Type max ( )                                                      \
+  static constexpr Type max ( )                                            \
     { return Type (   ( Type ( 1 ) << ( bit_size - 1 ) ) - Type ( 1 )      \
                     + ( Type ( 1 ) << ( bit_size - 1 ) ) ) ; }             \
                                                                            \
@@ -255,33 +255,36 @@ FOR_BUILTIN_UNSIGNED_INTEGRAL_TYPES(__DEFINE_NUMERIC_TRAITS)
 
 //
 
-#define __DEFINE_NUMERIC_TRAITS(Type)                                        \
-                                                                             \
-template < >                                                                 \
-class numeric_traits < Type >                                                \
-                                                                             \
-{                                                                            \
-public:                                                                      \
-                                                                             \
-  static const bool is_floating_point = true ;                               \
-                                                                             \
-  static const sint mantissa_bit_size = numeric_limits < Type > :: digits ;  \
-                                                                             \
-  typedef sint exponent_type ;                                               \
-                                                                             \
-  static Type min ( )                                                        \
-    { return numeric_limits < Type > :: min ( ) ; }                          \
-                                                                             \
-  static Type max ( )                                                        \
-    { return numeric_limits < Type > :: max ( ) ; }                          \
-                                                                             \
-  static Type epsilon ( )                                                    \
-    { return numeric_limits < Type > :: epsilon ( ) ; }                      \
-                                                                             \
-  static const sint min_exponent = numeric_limits < Type > :: min_exponent ; \
-                                                                             \
-  static const sint max_exponent = numeric_limits < Type > :: max_exponent ; \
-                                                                             \
+#define __DEFINE_NUMERIC_TRAITS(Type)                        \
+                                                             \
+template < >                                                 \
+class numeric_traits < Type >                                \
+                                                             \
+{                                                            \
+public:                                                      \
+                                                             \
+  static constexpr bool is_floating_point = true ;           \
+                                                             \
+  static constexpr sint                                      \
+    mantissa_bit_size = numeric_limits < Type > :: digits ;  \
+                                                             \
+  typedef sint exponent_type ;                               \
+                                                             \
+  static constexpr Type min ( )                              \
+    { return numeric_limits < Type > :: min ( ) ; }          \
+                                                             \
+  static constexpr Type max ( )                              \
+    { return numeric_limits < Type > :: max ( ) ; }          \
+                                                             \
+  static constexpr Type epsilon ( )                          \
+    { return numeric_limits < Type > :: epsilon ( ) ; }      \
+                                                             \
+  static constexpr sint                                      \
+    min_exponent = numeric_limits < Type > :: min_exponent ; \
+                                                             \
+  static constexpr sint                                      \
+    max_exponent = numeric_limits < Type > :: max_exponent ; \
+                                                             \
 } ;
 
 FOR_BUILTIN_FLOATING_POINT_TYPES(__DEFINE_NUMERIC_TRAITS)

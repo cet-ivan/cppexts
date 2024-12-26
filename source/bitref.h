@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -417,11 +417,11 @@ private:
 
   typedef Word word_type ;
 
-  static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
-  static const size_t word_bit_size_1 = word_bit_size - 1 ;
+  static constexpr size_t word_bit_size = numeric_traits < Word > :: bit_size ;
+  static constexpr size_t word_bit_size_1 = word_bit_size - 1 ;
 
-  static const size_t log2_word_bit_size =
-                        const_exponent ( word_bit_size ) - 1 ;
+  static constexpr size_t log2_word_bit_size =
+                            const_exponent ( word_bit_size ) - 1 ;
 
   static_assert ( word_bit_size == size_t ( 1 ) << log2_word_bit_size,
                   "Illegal word bit size." ) ;
@@ -581,11 +581,11 @@ private:
 
   typedef Word word_type ;
 
-  static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
-  static const size_t word_bit_size_1 = word_bit_size - 1 ;
+  static constexpr size_t word_bit_size = numeric_traits < Word > :: bit_size ;
+  static constexpr size_t word_bit_size_1 = word_bit_size - 1 ;
 
-  static const size_t log2_word_bit_size =
-                        const_exponent ( word_bit_size ) - 1 ;
+  static constexpr size_t log2_word_bit_size =
+                            const_exponent ( word_bit_size ) - 1 ;
 
   static_assert ( word_bit_size == size_t ( 1 ) << log2_word_bit_size,
                   "Illegal word bit size." ) ;
@@ -755,11 +755,11 @@ private:
 
   typedef Word word_type ;
 
-  static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
-  static const size_t word_bit_size_1 = word_bit_size - 1 ;
+  static constexpr size_t word_bit_size = numeric_traits < Word > :: bit_size ;
+  static constexpr size_t word_bit_size_1 = word_bit_size - 1 ;
 
-  static const size_t log2_word_bit_size =
-                        const_exponent ( word_bit_size ) - 1 ;
+  static constexpr size_t log2_word_bit_size =
+                            const_exponent ( word_bit_size ) - 1 ;
 
   static_assert ( word_bit_size == size_t ( 1 ) << log2_word_bit_size,
                   "Illegal word bit size." ) ;
@@ -922,11 +922,11 @@ private:
 
   typedef Word word_type ;
 
-  static const size_t word_bit_size = numeric_traits < Word > :: bit_size ;
-  static const size_t word_bit_size_1 = word_bit_size - 1 ;
+  static constexpr size_t word_bit_size = numeric_traits < Word > :: bit_size ;
+  static constexpr size_t word_bit_size_1 = word_bit_size - 1 ;
 
-  static const size_t log2_word_bit_size =
-                        const_exponent ( word_bit_size ) - 1 ;
+  static constexpr size_t log2_word_bit_size =
+                            const_exponent ( word_bit_size ) - 1 ;
 
   static_assert ( word_bit_size == size_t ( 1 ) << log2_word_bit_size,
                   "Illegal word bit size." ) ;

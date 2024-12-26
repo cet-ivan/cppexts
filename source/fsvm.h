@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2023.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -1225,7 +1225,7 @@ public:
 
 private:
 
-  static const size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
+  static constexpr size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
 
   static constexpr size_t high_index_offset ( size_t n )
     { return ( n * ( n + 1 ) ) >> 1 ; }
@@ -1717,7 +1717,7 @@ public:
 
 private:
 
-  static const size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
+  static constexpr size_t size_ = ( N * ( N + 1 ) ) >> 1 ;
 
   static constexpr size_t high_index_offset ( size_t n )
     { return ( n * ( ( N << 1 ) - 1 - n ) ) >> 1 ; }
