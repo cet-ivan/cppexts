@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2019.
+// Copyright Ivan Stanojevic 2024.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -20,8 +20,6 @@
 
 // using std :: iterator_traits ;
 
-using std :: iterator ;
-
 using std :: input_iterator_tag ;
 using std :: output_iterator_tag ;
 using std :: forward_iterator_tag ;
@@ -34,6 +32,7 @@ using std :: next ;
 using std :: prev ;
 
 using std :: reverse_iterator ;
+using std :: make_reverse_iterator ;
 
 using std :: back_insert_iterator ;
 using std :: back_inserter ;
@@ -62,6 +61,18 @@ using std :: operator - ;
 
 using std :: begin ;
 using std :: end ;
+using std :: cbegin ;
+using std :: cend ;
+using std :: rbegin ;
+using std :: rend ;
+using std :: crbegin ;
+using std :: crend ;
+
+using std :: size ;
+using std :: empty ;
+using std :: data ;
+
+// using std :: iterator ;
 
 
 
@@ -85,9 +96,16 @@ private:
 
 public:
 
-   static const bool value = sizeof ( test < T > ( nullptr ) ) == 1 ;
+   static constexpr bool value = sizeof ( test < T > ( nullptr ) ) == 1 ;
 
 } ;
+
+
+//
+
+template < class T >
+inline constexpr bool has_iterator_category_member_type_v =
+                        has_iterator_category_member_type < T > :: value ;
 
 
 
@@ -137,7 +155,7 @@ template < class Iterator >
 class iterator_traits :
   public __iterator_traits_base
            < Iterator,
-             has_iterator_category_member_type < Iterator > :: value >
+             has_iterator_category_member_type_v < Iterator > >
 
 {
 } ;
@@ -285,10 +303,9 @@ template < class T >
 class __is_input_iterator_base < T, true > :
   public integral_constant
            < bool,
-             is_convertible
+             is_convertible_v
                < typename iterator_traits < T > :: iterator_category,
-                 input_iterator_tag >
-               :: value >
+                 input_iterator_tag > >
 
 {
 } ;
@@ -311,11 +328,16 @@ template < class T >
 class is_input_iterator :
   public __is_input_iterator_base
            < T,
-             has_iterator_category_member_type < iterator_traits < T > >
-               :: value >
+             has_iterator_category_member_type_v < iterator_traits < T > > >
 
 {
 } ;
+
+
+//
+
+template < class  T >
+inline constexpr bool is_input_iterator_v = is_input_iterator < T > :: value ;
 
 
 
