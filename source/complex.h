@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2021.
+// Copyright Ivan Stanojevic 2024.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -660,6 +660,25 @@ class implicit_conversion_test < complex < S >, complex < T > > :
   public implicit_conversion_test < S, T >
 
 {
+} ;
+
+
+
+// *** TYPE CONVERSION ***
+
+
+//
+
+template < class T, class U >
+class type_converter < complex < T >, complex < U > >
+
+{
+public:
+
+  static complex < U > operate ( const complex < T > & x )
+    { return complex < U > ( convert_to < U > ( x.re ),
+                             convert_to < U > ( x.im ) ) ; }
+
 } ;
 
 
