@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2010.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -14,7 +14,8 @@
 // *** STIRLING_NUMBER_OF_1ST_KIND ***
 
 
-// pre: n >= 0, 0 <= k <= n
+// pre: n >= 0
+//      0 <= k <= n
 
 exint stirling_number_of_1st_kind ( sint n, sint k )
 
@@ -23,6 +24,13 @@ assert ( n >= 0 ) ;
 assert ( k >= 0 ) ;
 assert ( k <= n ) ;
 
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
+
 static vector < vector < exint > > data ( 1, vector < exint > ( 1, 1 ) ) ;
 
 while ( data.size ( ) <= n )
@@ -30,7 +38,7 @@ while ( data.size ( ) <= n )
   data.push_back ( vector < exint > ( ) ) ;
 
   const vector < exint > & dn_1 = * ( data.end ( ) - 2 ) ;
-  vector < exint > & dn = * ( data.end ( ) - 1 ) ;
+  vector < exint > & dn = data.back ( ) ;
 
   dn.reserve ( data.size ( ) ) ;
 
@@ -50,7 +58,7 @@ return data [ n ] [ k ] ;
 
 
 
-// *** BERNOULLI NUMBER ***
+// *** BERNOULLI_NUMBER ***
 
 
 // pre: n >= 0
@@ -58,39 +66,40 @@ return data [ n ] [ k ] ;
 fraction < exint > bernoulli_number ( sint n )
 
 {
-class local_data : public vector < fraction < exint > >
-
-{
-public:
-
-  local_data ( )
-    { push_back ( 1 ) ;
-      push_back ( fraction < exint > ( -1, 2 ) ) ;
-      push_back ( fraction < exint > ( 1, 6 ) ) ; }
-
-} ;
-
 assert ( n >= 0 ) ;
 
-static local_data data ;
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
+
+static vector < fraction < exint > >
+  data { fraction < exint > ( 1 ),
+         fraction < exint > ( -1, 2 ),
+         fraction < exint > ( 1, 6 ) } ;
 
 while ( data.size ( ) <= n )
+  {
   if ( ( data.size ( ) & 1 ) != 0 )
-    data.push_back ( 0 ) ;
-  else
     {
-    fraction < exint > s ;
-    exint f ( 1 ) ;
-
-    for ( sint i = 0 ; i < data.size ( ) ; ++ i )
-      {
-      s += f * data [ i ] ;
-      f *= data.size ( ) + 1 - i ;
-      f /= i + 1 ;
-      }
-
-    data.push_back ( - s / ( data.size ( ) + 1 ) ) ;
+    data.push_back ( 0 ) ;
+    continue ;
     }
+
+  fraction < exint > s ;
+  exint f ( 1 ) ;
+
+  for ( sint i = 0 ; i < data.size ( ) ; ++ i )
+    {
+    s += f * data [ i ] ;
+    f *= data.size ( ) + 1 - i ;
+    f /= i + 1 ;
+    }
+
+  data.push_back ( - s / ( data.size ( ) + 1 ) ) ;
+  }
 
 return data [ n ] ;
 }
@@ -106,6 +115,13 @@ fraction < exint > gamma_asymptotic_series_coefficient ( sint n )
 
 {
 assert ( n >= 0 ) ;
+
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
 
 static vector < fraction < exint > > data ( 2, 1 ) ;
 
@@ -144,6 +160,13 @@ fraction < exint > gamma_continued_fraction_coefficient ( sint n )
 {
 assert ( n >= 0 ) ;
 
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
+
 static quotient_difference_evaluator < fraction < exint > > qde ;
 
 while ( qde.data ( ).size ( ) <= n )
@@ -171,6 +194,13 @@ fraction < exint > log_gamma_continued_fraction_coefficient ( sint n )
 
 {
 assert ( n >= 0 ) ;
+
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
 
 static quotient_difference_evaluator < fraction < exint > > qde ;
 
