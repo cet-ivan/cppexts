@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include "cmath.h"
 #include "cassert.h"
 #include "vector.h"
+#include "mutex.h"
 #include "utility.h"
 
 #include "cfe.h"
@@ -52,10 +53,6 @@ return a + log ( 1 - exp ( b - a ) ) ;
 
 
 
-// !!! some functions are not thread safe !!!
-
-
-
 // *** STATIC_CACHED_ARRAY ***
 
 
@@ -66,6 +63,13 @@ T static_cached_array ( sint n )
 
 {
 assert ( n >= 0 ) ;
+
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
 
 static vector < T > data ;
 
@@ -93,6 +97,13 @@ T stirling_number_of_1st_kind ( sint n, sint k )
 {
 assert ( n >= 0 ) ;
 assert ( k >= 0  &&  k <= n ) ;
+
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
 
 static vector < vector < T > > data ;
 
@@ -237,6 +248,13 @@ void gamma_fast_continued_fraction_coefficients ( sint n, T & a, T & b )
 
 {
 assert ( n >= 0 ) ;
+
+#ifdef __STDCPP_THREADS__
+
+static mutex mtx ;
+lock_guard < mutex > lck ( mtx ) ;
+
+#endif
 
 static vector < pair < T, T > > data ;
 
