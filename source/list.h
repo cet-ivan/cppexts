@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -30,18 +30,6 @@ using std :: swap ;
 
 
 
-// *** SEQUENCE_SIZE ***
-
-
-template < class T, class Allocator >
-inline size_t sequence_size ( const list < T, Allocator > & x )
-
-{
-return x.size ( ) ;
-}
-
-
-
 // *** CONCATENATION ***
 
 
@@ -67,11 +55,6 @@ public:
       return * this ; }
 
   template < class Sequence >
-  list_concatenator & operator + ( Sequence & s )
-    { l.insert ( l.end ( ), cbegin ( s ), cend ( s ) ) ;
-      return * this ; }
-
-  template < class Sequence >
   list_concatenator & operator + ( Sequence && s )
     { l.insert ( l.end ( ), make_move_iterator ( begin ( s ) ),
                             make_move_iterator ( end   ( s ) ) ) ;
@@ -91,8 +74,9 @@ inline list < T, Allocator >
   concatenate ( const list < T, Allocator > & l, Sequences && ... s )
 
 {
-return move ( (         list_concatenator < T, Allocator > ( l )
-                + ... + forward < Sequences > ( s ) ).l ) ;
+return  (         list_concatenator < T, Allocator > ( l )
+          + ... + forward < Sequences > ( s ) )
+       .l ;
 }
 
 
@@ -103,8 +87,9 @@ inline list < T, Allocator >
   concatenate ( list < T, Allocator > && l, Sequences && ... s )
 
 {
-return move ( (         list_concatenator < T, Allocator > ( move ( l ) )
-                + ... + forward < Sequences > ( s ) ).l ) ;
+return  (         list_concatenator < T, Allocator > ( move ( l ) )
+          + ... + forward < Sequences > ( s ) )
+       .l ;
 }
 
 
