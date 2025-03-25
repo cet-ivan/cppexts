@@ -12,6 +12,7 @@
 
 
 #include "utility.h"
+#include "type_traits.h"
 #include "vector.h"
 
 #include "numbase.h"
@@ -22,11 +23,14 @@
 
 
 template < class F, class T >
-decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) )
+remove_reference_t
+  < decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) ) >
   closed_romberg_integral ( F f, const T & a, const T & b )
 
 {
-typedef decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) )
+typedef remove_reference_t
+          < decltype ( declval < F > ( )
+                         ( declval < T > ( ) ) * declval < T > ( ) ) >
         result_type ;
 
 T h = b - a ;
@@ -72,11 +76,14 @@ for ( sint total_intervals = 1 ; ; total_intervals *= 2 )
 
 
 template < class F, class T >
-decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) )
+remove_reference_t
+  < decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) ) >
   open_romberg_integral ( F f, const T & a, const T & b )
 
 {
-typedef decltype ( declval < F > ( ) ( declval < T > ( ) ) * declval < T > ( ) )
+typedef remove_reference_t
+          < decltype ( declval < F > ( )
+                         ( declval < T > ( ) ) * declval < T > ( ) ) >
         result_type ;
 
 T h = b - a ;
