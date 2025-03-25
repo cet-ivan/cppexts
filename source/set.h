@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -28,30 +28,6 @@ using std :: operator <= ;
 using std :: operator >= ;
 
 using std :: swap ;
-
-
-
-// *** SEQUENCE_SIZE ***
-
-
-//
-
-template < class Key, class Compare, class Allocator >
-inline size_t sequence_size ( const set < Key, Compare, Allocator > & x )
-
-{
-return x.size ( ) ;
-}
-
-
-//
-
-template < class Key, class Compare, class Allocator >
-inline size_t sequence_size ( const multiset < Key, Compare, Allocator > & x )
-
-{
-return x.size ( ) ;
-}
 
 
 
