@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2023.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -26,9 +26,7 @@
 // *** SIMPLEX_RESULT ***
 
 
-enum simplex_result { simplex_result_ok,
-                      simplex_result_no_solution,
-                      simplex_result_unbounded } ;
+enum class simplex_result { ok, no_solution, unbounded } ;
 
 
 
@@ -43,22 +41,19 @@ simplex_result raw_simplex ( Tableau & tableau,
                              RowToColumn & row_to_column )
 
 {
-typedef typename
-  indexing_traits
-    < typename indexing_traits < Tableau > :: value_type > :: value_type
-  element ;
+typedef indexing_vt < indexing_vt < Tableau > > element ;
 
-size_t total_variables = sequence_size ( column_to_row ),
-       total_constraints = sequence_size ( row_to_column ) ;
+size_t total_variables = indexing_size ( column_to_row ),
+       total_constraints = indexing_size ( row_to_column ) ;
 
 #ifndef NDEBUG
 
 assert ( total_variables >= total_constraints ) ;
 
-assert ( sequence_size ( tableau ) == total_constraints + 1 ) ;
+assert ( indexing_size ( tableau ) == total_constraints + 1 ) ;
 
 for ( size_t i = 0 ; i < total_constraints + 1 ; ++ i )
-  assert ( sequence_size ( tableau [ i ] ) == total_variables + 1 ) ;
+  assert ( indexing_size ( tableau [ i ] ) == total_variables + 1 ) ;
 
 {
 vector < size_t > sorted_column_to_row ;
@@ -135,7 +130,7 @@ for ( ; ; )
         }
 
       if ( column_pivot_i == 0 )
-        return simplex_result_unbounded ;
+        return simplex_result :: unbounded ;
 
       element delta = - cj * min_ratio ;
 
@@ -149,7 +144,7 @@ for ( ; ; )
     }
 
   if ( pivot_i == 0 )
-    return simplex_result_ok ;
+    return simplex_result :: ok ;
 
   {
   element pivot = tableau [ pivot_i ] [ pivot_j ] ;
@@ -203,34 +198,29 @@ simplex_result
                   bool maximize = false )
 
 {
-typedef typename indexing_traits < ObjectiveFunctionVector > :: value_type
-  element ;
+typedef indexing_vt < ObjectiveFunctionVector > element ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits
-                      <    typename indexing_traits < EqConstraintMatrix >
-                        :: value_type >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < indexing_vt < EqConstraintMatrix > >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and eq_constraint_matrix" ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits < EqConstraintFreeVector >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < EqConstraintFreeVector >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and eq_constraint_free_vector" ) ;
 
-size_t total_variables = sequence_size ( objective_function_vector ),
-       total_constraints = sequence_size ( eq_constraint_matrix ) ;
+size_t total_variables = indexing_size ( objective_function_vector ),
+       total_constraints = indexing_size ( eq_constraint_matrix ) ;
 
 #ifndef NDEBUG
 
 for ( size_t i = 0 ; i < total_constraints ; ++ i )
-  assert ( sequence_size ( eq_constraint_matrix [ i ] ) == total_variables ) ;
+  assert ( indexing_size ( eq_constraint_matrix [ i ] ) == total_variables ) ;
 
-assert ( sequence_size ( eq_constraint_free_vector ) == total_constraints ) ;
+assert ( indexing_size ( eq_constraint_free_vector ) == total_constraints ) ;
 
-assert ( sequence_size ( result_vector ) == total_variables ) ;
+assert ( indexing_size ( result_vector ) == total_variables ) ;
 
 #endif
 
@@ -279,7 +269,7 @@ for ( size_t i = 1 ; i < total_constraints + 1 ; ++ i )
 raw_simplex ( tableau, column_to_row, row_to_column ) ;
 
 if ( tableau [ 0 ] [ 0 ] != 0 )
-  return simplex_result_no_solution ;
+  return simplex_result :: no_solution ;
 
 {
 const size_t *
@@ -408,8 +398,8 @@ while ( column_to_row.size ( ) > total_variables )
 simplex_result
   status = raw_simplex ( tableau, column_to_row, row_to_column ) ;
 
-if ( status == simplex_result_unbounded )
-  return simplex_result_unbounded ;
+if ( status == simplex_result :: unbounded )
+  return simplex_result :: unbounded ;
 
 for ( size_t j = 1 ; j < total_variables + 1 ; ++ j )
   {
@@ -420,7 +410,7 @@ for ( size_t j = 1 ; j < total_variables + 1 ; ++ j )
 element t = tableau [ 0 ] [ 0 ] ;
 result_value = maximize ? t : - t ;
 
-return simplex_result_ok ;
+return simplex_result :: ok ;
 }
 
 
@@ -451,80 +441,67 @@ simplex_result
                   bool maximize = false )
 
 {
-typedef typename indexing_traits < ObjectiveFunctionVector > :: value_type
-  element ;
+typedef indexing_vt < ObjectiveFunctionVector > element ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits
-                     <    typename indexing_traits < EqConstraintMatrix >
-                       :: value_type >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < indexing_vt < EqConstraintMatrix > >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and eq_constraint_matrix." ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits < EqConstraintFreeVector >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < EqConstraintFreeVector >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and eq_constraint_free_vector." ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits
-                     <    typename indexing_traits < LeqConstraintMatrix >
-                       :: value_type >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < indexing_vt < LeqConstraintMatrix > >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and leq_constraint_matrix." ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits < LeqConstraintFreeVector >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < LeqConstraintFreeVector >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and leq_constraint_free_vector." ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits
-                      <    typename indexing_traits < GeqConstraintMatrix >
-                        :: value_type >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < indexing_vt < GeqConstraintMatrix > >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and geq_constraint_matrix." ) ;
 
-static_assert
-  ( is_same_v < element,
-                   typename indexing_traits < GeqConstraintFreeVector >
-                :: value_type >,
-    "" ) ;
+static_assert ( is_same_v < indexing_vt < GeqConstraintFreeVector >,
+                            element >,
+                "Different element types of "
+                "objective_function_vector and geq_constraint_free_vector." ) ;
 
-size_t total_base_variables = sequence_size ( objective_function_vector ),
-       total_eq_constraints = sequence_size ( eq_constraint_matrix ),
-       total_leq_constraints = sequence_size ( leq_constraint_matrix ),
-       total_geq_constraints = sequence_size ( geq_constraint_matrix ) ;
+size_t total_base_variables = indexing_size ( objective_function_vector ),
+       total_eq_constraints = indexing_size ( eq_constraint_matrix ),
+       total_leq_constraints = indexing_size ( leq_constraint_matrix ),
+       total_geq_constraints = indexing_size ( geq_constraint_matrix ) ;
 
 #ifndef NDEBUG
 
 for ( size_t i = 0 ; i < total_eq_constraints ; ++ i )
-  assert (    sequence_size ( eq_constraint_matrix [ i ] )
+  assert (    indexing_size ( eq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    sequence_size ( eq_constraint_free_vector )
+assert (    indexing_size ( eq_constraint_free_vector )
          == total_eq_constraints ) ;
 
 for ( size_t i = 0 ; i < total_leq_constraints ; ++ i )
-  assert (    sequence_size ( leq_constraint_matrix [ i ] )
+  assert (    indexing_size ( leq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    sequence_size ( leq_constraint_free_vector )
+assert (    indexing_size ( leq_constraint_free_vector )
          == total_leq_constraints ) ;
 
 for ( size_t i = 0 ; i < total_geq_constraints ; ++ i )
-  assert (    sequence_size ( geq_constraint_matrix [ i ] )
+  assert (    indexing_size ( geq_constraint_matrix [ i ] )
            == total_base_variables ) ;
 
-assert (    sequence_size ( geq_constraint_free_vector )
+assert (    indexing_size ( geq_constraint_free_vector )
          == total_geq_constraints ) ;
 
-assert ( sequence_size ( result_vector ) == total_base_variables ) ;
+assert ( indexing_size ( result_vector ) == total_base_variables ) ;
 
 #endif
 
@@ -591,7 +568,7 @@ simplex_result
                            result_value,
                            maximize ) ;
 
-if ( status == simplex_result_ok )
+if ( status == simplex_result :: ok )
   for ( size_t j = 0 ; j < total_base_variables ; ++ j )
     result_vector [ j ] = extended_result_vector [ j ] ;
 

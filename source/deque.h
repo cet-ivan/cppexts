@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -48,12 +48,10 @@ public:
 } ;
 
 
-
-// *** SEQUENCE_SIZE ***
-
+//
 
 template < class T, class Allocator >
-inline size_t sequence_size ( const deque < T, Allocator > & x )
+inline size_t indexing_size ( const deque < T, Allocator > & x )
 
 {
 return x.size ( ) ;
@@ -165,11 +163,6 @@ public:
       return * this ; }
 
   template < class Sequence >
-  deque_concatenator & operator + ( Sequence & s )
-    { d.insert ( d.end ( ), cbegin ( s ), cend ( s ) ) ;
-      return * this ; }
-
-  template < class Sequence >
   deque_concatenator & operator + ( Sequence && s )
     { d.insert ( d.end ( ), make_move_iterator ( begin ( s ) ),
                             make_move_iterator ( end   ( s ) ) ) ;
@@ -185,8 +178,9 @@ inline deque < T, Allocator >
   concatenate ( const deque < T, Allocator > & d, Sequences && ... s )
 
 {
-return move ( (         deque_concatenator < T, Allocator > ( d )
-                + ... + forward < Sequences > ( s ) ).d ) ;
+return  (         deque_concatenator < T, Allocator > ( d )
+          + ... + forward < Sequences > ( s ) )
+       .d ;
 }
 
 
@@ -197,8 +191,9 @@ inline deque < T, Allocator >
   concatenate ( deque < T, Allocator > && d, Sequences && ... s )
 
 {
-return move ( (         deque_concatenator < T, Allocator > ( move ( d ) )
-                + ... + forward < Sequences > ( s ) ).d ) ;
+return  (         deque_concatenator < T, Allocator > ( move ( d ) )
+          + ... + forward < Sequences > ( s ) )
+       .d ;
 }
 
 

@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2022.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -28,19 +28,15 @@ template < class G >
 void invariant_factor_decomposition ( G && g )
 
 {
-typedef
-  typename    indexing_traits
-                < typename    indexing_traits < remove_reference_t < G > >
-                           :: value_type >
-           :: value_type
-  element ;
+typedef indexing_vt < indexing_vt < remove_reference_t < G > > >
+        element ;
 
-size_t m = sequence_size ( g ) ;
+size_t m = indexing_size ( g ) ;
 
 if ( m == 0 )
   return ;
 
-size_t n = sequence_size ( g [ 0 ] ) ;
+size_t n = indexing_size ( g [ 0 ] ) ;
 
 if ( n == 0 )
   return ;
@@ -48,7 +44,7 @@ if ( n == 0 )
 #ifndef NDEBUG
 
 for ( size_t i = 1 ; i < m ; ++ i )
-  assert ( sequence_size ( g [ i ] ) == n ) ;
+  assert ( indexing_size ( g [ i ] ) == n ) ;
 
 #endif
 
@@ -98,8 +94,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = k ; l < n ; ++ l )
           {
-          auto t1 = g [ k ] [ l ],
-               t2 = g [ i ] [ l ] ;
+          element t1 = g [ k ] [ l ],
+                  t2 = g [ i ] [ l ] ;
 
           g [ k ] [ l ] =   x * t1 + y * t2 ;
           g [ i ] [ l ] = - u * t1 + v * t2 ;
@@ -125,8 +121,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = k ; l < m ; ++ l )
         {
-        auto t1 = g [ l ] [ k ],
-             t2 = g [ l ] [ j ] ;
+        element t1 = g [ l ] [ k ],
+                t2 = g [ l ] [ j ] ;
 
         g [ l ] [ k ] =   x * t1 + y * t2 ;
         g [ l ] [ j ] = - u * t1 + v * t2 ;
@@ -141,7 +137,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
         {
         if ( g [ k ] [ j ] != 0 )
           {
-          auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+          element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
           for ( size_t l = k ; l < m ; ++ l )
             g [ l ] [ j ] -= r * g [ l ] [ k ] ;
@@ -157,7 +153,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t i = k + 1 ; i < m ; ++ i )
     if ( g [ i ] [ k ] != 0 )
       {
-      auto r = g [ i ] [ k ] / g [ k ] [ k ] ;
+      element r = g [ i ] [ k ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < n ; ++ l )
         g [ i ] [ l ] -= r * g [ k ] [ l ] ;
@@ -166,7 +162,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t j = k + 1 ; j < n ; ++ j )
     if ( g [ k ] [ j ] != 0 )
       {
-      auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+      element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < m ; ++ l )
         g [ l ] [ j ] -= r * g [ l ] [ k ] ;
@@ -187,19 +183,25 @@ template < class A, class G, class B >
 void invariant_factor_decomposition ( A && a, G && g, B && b )
 
 {
-typedef
-  typename    indexing_traits
-                < typename    indexing_traits < remove_reference_t < G > >
-                           :: value_type >
-           :: value_type
-  element ;
+typedef indexing_vt < indexing_vt < remove_reference_t < G > > >
+        element ;
 
-size_t m = sequence_size ( g ) ;
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < A > > >,
+                element >,
+    "Different element types of g and a." ) ;
+
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < B > > >,
+                element >,
+    "Different element types of g and b." ) ;
+
+size_t m = indexing_size ( g ) ;
 
 if ( m == 0 )
   return ;
 
-size_t n = sequence_size ( g [ 0 ] ) ;
+size_t n = indexing_size ( g [ 0 ] ) ;
 
 if ( n == 0 )
   return ;
@@ -207,33 +209,35 @@ if ( n == 0 )
 #ifndef NDEBUG
 
 for ( size_t i = 1 ; i < m ; ++ i )
-  assert ( sequence_size ( g [ i ] ) == n ) ;
+  assert ( indexing_size ( g [ i ] ) == n ) ;
 
 #endif
 
-assert ( sequence_size ( a ) == m ) ;
+assert ( indexing_size ( a ) == m ) ;
+
+#ifndef NDEBUG
 
 for ( size_t i = 0 ; i < m ; ++ i )
-  {
-  assert ( sequence_size ( a [ i ] ) == m ) ;
+  assert ( indexing_size ( a [ i ] ) == m ) ;
 
-  for ( size_t j = 0 ; j < m ; ++ j )
-    a [ i ] [ j ] = 0 ;
+#endif
 
-  a [ i ] [ i ] = 1 ;
-  }
+assert ( indexing_size ( b ) == n ) ;
 
-assert ( sequence_size ( b ) == n ) ;
+#ifndef NDEBUG
 
 for ( size_t i = 0 ; i < n ; ++ i )
-  {
-  assert ( sequence_size ( b [ i ] ) == n ) ;
+  assert ( indexing_size ( b [ i ] ) == n ) ;
 
+#endif
+
+for ( size_t i = 0 ; i < m ; ++ i )
+  for ( size_t j = 0 ; j < m ; ++ j )
+    a [ i ] [ j ] = j == i ? 1 : 0 ;
+
+for ( size_t i = 0 ; i < n ; ++ i )
   for ( size_t j = 0 ; j < n ; ++ j )
-    b [ i ] [ j ] = 0 ;
-
-  b [ i ] [ i ] = 1 ;
-  }
+    b [ i ] [ j ] = j == i ? 1 : 0 ;
 
 size_t d = min ( m, n ) ;
 
@@ -291,8 +295,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = k ; l < n ; ++ l )
           {
-          auto t1 = g [ k ] [ l ],
-               t2 = g [ i ] [ l ] ;
+          element t1 = g [ k ] [ l ],
+                  t2 = g [ i ] [ l ] ;
 
           g [ k ] [ l ] =   x * t1 + y * t2 ;
           g [ i ] [ l ] = - u * t1 + v * t2 ;
@@ -300,8 +304,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = 0 ; l < m ; ++ l )
           {
-          auto t1 = a [ l ] [ k ],
-               t2 = a [ l ] [ i ] ;
+          element t1 = a [ l ] [ k ],
+                  t2 = a [ l ] [ i ] ;
 
           a [ l ] [ k ] =   v * t1 + u * t2 ;
           a [ l ] [ i ] = - y * t1 + x * t2 ;
@@ -327,8 +331,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = k ; l < m ; ++ l )
         {
-        auto t1 = g [ l ] [ k ],
-             t2 = g [ l ] [ j ] ;
+        element t1 = g [ l ] [ k ],
+                t2 = g [ l ] [ j ] ;
 
         g [ l ] [ k ] =   x * t1 + y * t2 ;
         g [ l ] [ j ] = - u * t1 + v * t2 ;
@@ -336,8 +340,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = 0 ; l < n ; ++ l )
         {
-        auto t1 = b [ k ] [ l ],
-             t2 = b [ j ] [ l ] ;
+        element t1 = b [ k ] [ l ],
+                t2 = b [ j ] [ l ] ;
 
         b [ k ] [ l ] =   v * t1 + u * t2 ;
         b [ j ] [ l ] = - y * t1 + x * t2 ;
@@ -352,7 +356,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
         {
         if ( g [ k ] [ j ] != 0 )
           {
-          auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+          element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
           for ( size_t l = k ; l < m ; ++ l )
             g [ l ] [ j ] -= r * g [ l ] [ k ] ;
@@ -374,7 +378,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t i = k + 1 ; i < m ; ++ i )
     if ( g [ i ] [ k ] != 0 )
       {
-      auto r = g [ i ] [ k ] / g [ k ] [ k ] ;
+      element r = g [ i ] [ k ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < n ; ++ l )
         g [ i ] [ l ] -= r * g [ k ] [ l ] ;
@@ -386,7 +390,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t j = k + 1 ; j < n ; ++ j )
     if ( g [ k ] [ j ] != 0 )
       {
-      auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+      element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < m ; ++ l )
         g [ l ] [ j ] -= r * g [ l ] [ k ] ;
@@ -414,19 +418,35 @@ void invariant_factor_decomposition
        ( A && a, AInv && a_inv, G && g, B && b, BInv && b_inv )
 
 {
-typedef
-  typename    indexing_traits
-                < typename    indexing_traits < remove_reference_t < G > >
-                           :: value_type >
-           :: value_type
-  element ;
+typedef indexing_vt < indexing_vt < remove_reference_t < G > > >
+        element ;
 
-size_t m = sequence_size ( g ) ;
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < A > > >,
+                element >,
+    "Different element types of g and a." ) ;
+
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < AInv > > >,
+                element >,
+    "Different element types of g and a_inv." ) ;
+
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < B > > >,
+                element >,
+    "Different element types of g and b." ) ;
+
+static_assert
+  ( is_same_v < indexing_vt < indexing_vt < remove_reference_t < BInv > > >,
+                element >,
+    "Different element types of g and b_inv." ) ;
+
+size_t m = indexing_size ( g ) ;
 
 if ( m == 0 )
   return ;
 
-size_t n = sequence_size ( g [ 0 ] ) ;
+size_t n = indexing_size ( g [ 0 ] ) ;
 
 if ( n == 0 )
   return ;
@@ -434,57 +454,53 @@ if ( n == 0 )
 #ifndef NDEBUG
 
 for ( size_t i = 1 ; i < m ; ++ i )
-  assert ( sequence_size ( g [ i ] ) == n ) ;
+  assert ( indexing_size ( g [ i ] ) == n ) ;
 
 #endif
 
-assert ( sequence_size ( a ) == m ) ;
+assert ( indexing_size ( a ) == m ) ;
+
+#ifndef NDEBUG
 
 for ( size_t i = 0 ; i < m ; ++ i )
-  {
-  assert ( sequence_size ( a [ i ] ) == m ) ;
+  assert ( indexing_size ( a [ i ] ) == m ) ;
 
-  for ( size_t j = 0 ; j < m ; ++ j )
-    a [ i ] [ j ] = 0 ;
+#endif
 
-  a [ i ] [ i ] = 1 ;
-  }
+assert ( indexing_size ( a_inv ) == m ) ;
 
-assert ( sequence_size ( a_inv ) == m ) ;
+#ifndef NDEBUG
 
 for ( size_t i = 0 ; i < m ; ++ i )
-  {
-  assert ( sequence_size ( a_inv [ i ] ) == m ) ;
+  assert ( indexing_size ( a_inv [ i ] ) == m ) ;
 
+#endif
+
+assert ( indexing_size ( b ) == n ) ;
+
+#ifndef NDEBUG
+
+for ( size_t i = 0 ; i < n ; ++ i )
+  assert ( indexing_size ( b [ i ] ) == n ) ;
+
+#endif
+
+assert ( indexing_size ( b_inv ) == n ) ;
+
+#ifndef NDEBUG
+
+for ( size_t i = 0 ; i < n ; ++ i )
+  assert ( indexing_size ( b_inv [ i ] ) == n ) ;
+
+#endif
+
+for ( size_t i = 0 ; i < m ; ++ i )
   for ( size_t j = 0 ; j < m ; ++ j )
-    a_inv [ i ] [ j ] = 0 ;
-
-  a_inv [ i ] [ i ] = 1 ;
-  }
-
-assert ( sequence_size ( b ) == n ) ;
+    a_inv [ i ] [ j ] = a [ i ] [ j ] = j == i ? 1 : 0 ;
 
 for ( size_t i = 0 ; i < n ; ++ i )
-  {
-  assert ( sequence_size ( b [ i ] ) == n ) ;
-
   for ( size_t j = 0 ; j < n ; ++ j )
-    b [ i ] [ j ] = 0 ;
-
-  b [ i ] [ i ] = 1 ;
-  }
-
-assert ( sequence_size ( b_inv ) == n ) ;
-
-for ( size_t i = 0 ; i < n ; ++ i )
-  {
-  assert ( sequence_size ( b_inv [ i ] ) == n ) ;
-
-  for ( size_t j = 0 ; j < n ; ++ j )
-    b_inv [ i ] [ j ] = 0 ;
-
-  b_inv [ i ] [ i ] = 1 ;
-  }
+    b_inv [ i ] [ j ] = b [ i ] [ j ] = j == i ? 1 : 0 ;
 
 size_t d = min ( m, n ) ;
 
@@ -548,8 +564,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = k ; l < n ; ++ l )
           {
-          auto t1 = g [ k ] [ l ],
-               t2 = g [ i ] [ l ] ;
+          element t1 = g [ k ] [ l ],
+                  t2 = g [ i ] [ l ] ;
 
           g [ k ] [ l ] =   x * t1 + y * t2 ;
           g [ i ] [ l ] = - u * t1 + v * t2 ;
@@ -557,8 +573,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = 0 ; l < m ; ++ l )
           {
-          auto t1 = a [ l ] [ k ],
-               t2 = a [ l ] [ i ] ;
+          element t1 = a [ l ] [ k ],
+                  t2 = a [ l ] [ i ] ;
 
           a [ l ] [ k ] =   v * t1 + u * t2 ;
           a [ l ] [ i ] = - y * t1 + x * t2 ;
@@ -566,8 +582,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
         for ( size_t l = 0 ; l < m ; ++ l )
           {
-          auto t1 = a_inv [ k ] [ l ],
-               t2 = a_inv [ i ] [ l ] ;
+          element t1 = a_inv [ k ] [ l ],
+                  t2 = a_inv [ i ] [ l ] ;
 
           a_inv [ k ] [ l ] =   x * t1 + y * t2 ;
           a_inv [ i ] [ l ] = - u * t1 + v * t2 ;
@@ -593,8 +609,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = k ; l < m ; ++ l )
         {
-        auto t1 = g [ l ] [ k ],
-             t2 = g [ l ] [ j ] ;
+        element t1 = g [ l ] [ k ],
+                t2 = g [ l ] [ j ] ;
 
         g [ l ] [ k ] =   x * t1 + y * t2 ;
         g [ l ] [ j ] = - u * t1 + v * t2 ;
@@ -602,8 +618,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = 0 ; l < n ; ++ l )
         {
-        auto t1 = b [ k ] [ l ],
-             t2 = b [ j ] [ l ] ;
+        element t1 = b [ k ] [ l ],
+                t2 = b [ j ] [ l ] ;
 
         b [ k ] [ l ] =   v * t1 + u * t2 ;
         b [ j ] [ l ] = - y * t1 + x * t2 ;
@@ -611,8 +627,8 @@ for ( size_t k = 0 ; k < d ; ++ k )
 
       for ( size_t l = 0 ; l < n ; ++ l )
         {
-        auto t1 = b_inv [ l ] [ k ],
-             t2 = b_inv [ l ] [ j ] ;
+        element t1 = b_inv [ l ] [ k ],
+                t2 = b_inv [ l ] [ j ] ;
 
         b_inv [ l ] [ k ] =   x * t1 + y * t2 ;
         b_inv [ l ] [ j ] = - u * t1 + v * t2 ;
@@ -627,7 +643,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
         {
         if ( g [ k ] [ j ] != 0 )
           {
-          auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+          element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
           for ( size_t l = k ; l < m ; ++ l )
             g [ l ] [ j ] -= r * g [ l ] [ k ] ;
@@ -655,7 +671,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t i = k + 1 ; i < m ; ++ i )
     if ( g [ i ] [ k ] != 0 )
       {
-      auto r = g [ i ] [ k ] / g [ k ] [ k ] ;
+      element r = g [ i ] [ k ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < n ; ++ l )
         g [ i ] [ l ] -= r * g [ k ] [ l ] ;
@@ -670,7 +686,7 @@ for ( size_t k = 0 ; k < d ; ++ k )
   for ( size_t j = k + 1 ; j < n ; ++ j )
     if ( g [ k ] [ j ] != 0 )
       {
-      auto r = g [ k ] [ j ] / g [ k ] [ k ] ;
+      element r = g [ k ] [ j ] / g [ k ] [ k ] ;
 
       for ( size_t l = k ; l < m ; ++ l )
         g [ l ] [ j ] -= r * g [ l ] [ k ] ;
