@@ -1,4 +1,4 @@
-// Copyright Ivan Stanojevic 2023.
+// Copyright Ivan Stanojevic 2025.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // https://www.boost.org/LICENSE_1_0.txt)
@@ -563,7 +563,9 @@ template < class T, size_t N >
 inline auto l1_norm ( const fs_vector < T, N > & a )
 
 {
-typedef decltype ( l1_norm ( declval < T > ( ) ) ) result_type ;
+typedef remove_reference_t
+          < decltype ( l1_norm ( declval < T > ( ) ) ) >
+        result_type ;
 
 return accumulate ( a.begin ( ), a.end ( ),
                     result_type ( 0 ),
@@ -579,7 +581,8 @@ inline auto l1_distance ( const fs_vector < T, N > & a,
                           const fs_vector < T, N > & b )
 
 {
-typedef decltype ( l1_distance ( declval < T > ( ), declval < T > ( ) ) )
+typedef remove_reference_t
+          < decltype ( l1_distance ( declval < T > ( ), declval < T > ( ) ) ) >
         result_type ;
 
 return inner_product ( a.begin ( ), a.end ( ),
@@ -597,7 +600,9 @@ template < class T, size_t N >
 inline auto sqr_l2_norm ( const fs_vector < T, N > & a )
 
 {
-typedef decltype ( sqr_l2_norm ( declval < T > ( ) ) ) result_type ;
+typedef remove_reference_t
+          < decltype ( sqr_l2_norm ( declval < T > ( ) ) ) >
+        result_type ;
 
 return accumulate ( a.begin ( ), a.end ( ),
                     result_type ( 0 ),
@@ -613,7 +618,9 @@ inline auto sqr_l2_distance ( const fs_vector < T, N > & a,
                               const fs_vector < T, N > & b )
 
 {
-typedef decltype ( sqr_l2_distance ( declval < T > ( ), declval < T > ( ) ) )
+typedef remove_reference_t
+          < decltype ( sqr_l2_distance ( declval < T > ( ),
+                                         declval < T > ( ) ) ) >
         result_type ;
 
 return inner_product ( a.begin ( ), a.end ( ),
@@ -652,7 +659,9 @@ template < class T, size_t N >
 inline auto linf_norm ( const fs_vector < T, N > & a )
 
 {
-typedef decltype ( linf_norm ( declval < T > ( ) ) ) result_type ;
+typedef remove_reference_t
+          < decltype ( linf_norm ( declval < T > ( ) ) ) >
+        result_type ;
 
 return accumulate ( a.begin ( ), a.end ( ),
                     result_type ( 0 ),
@@ -668,7 +677,9 @@ inline auto linf_distance ( const fs_vector < T, N > & a,
                             const fs_vector < T, N > & b )
 
 {
-typedef decltype ( linf_distance ( declval < T > ( ), declval < T > ( ) ) )
+typedef remove_reference_t
+          < decltype ( linf_distance ( declval < T > ( ),
+                                       declval < T > ( ) ) ) >
         result_type ;
 
 return inner_product ( a.begin ( ), a.end ( ),
@@ -697,7 +708,7 @@ template < class T, size_t N >
 inline auto length ( const fs_vector < T, N > & a )
 
 {
-return sqrt ( norm ( a ) ) ;
+return l2_norm ( a ) ;
 }
 
 
@@ -784,12 +795,10 @@ public:
 } ;
 
 
-
-// *** FS_VECTOR SEQUENCE_SIZE ***
-
+//
 
 template < class T, size_t N >
-constexpr size_t sequence_size ( const fs_vector < T, N > & )
+constexpr size_t indexing_size ( const fs_vector < T, N > & )
 
 {
 return N ;
@@ -1182,12 +1191,10 @@ public:
 } ;
 
 
-
-// *** FS_MATRIX SEQUENCE_SIZE ***
-
+//
 
 template < class T, size_t N1, size_t N2 >
-constexpr size_t sequence_size ( const fs_matrix < T, N1, N2 > & )
+constexpr size_t indexing_size ( const fs_matrix < T, N1, N2 > & )
 
 {
 return N1 ;
@@ -1222,6 +1229,9 @@ public:
 
   typedef :: reverse_iterator < iterator > reverse_iterator ;
   typedef :: reverse_iterator < const_iterator > const_reverse_iterator ;
+
+  typedef T ( & row_reference ) [ N ] ;
+  typedef const T ( & const_row_reference ) [ N ] ;
 
 private:
 
@@ -1316,13 +1326,15 @@ public:
                 ( "fs_lower_triangular_matrix :: at, index2 out of range" ) ;
       return elements [ high_index_offset ( n1 ) + n2 ] ; }
 
-  pointer operator [ ] ( size_t n1 ) noexcept
+  row_reference operator [ ] ( size_t n1 ) noexcept
     { assert ( n1 < N ) ;
-      return elements + high_index_offset ( n1 ) ; }
+      return * reinterpret_cast < T ( * ) [ N ] >
+                 ( elements + high_index_offset ( n1 ) ) ; }
 
-  const_pointer operator [ ] ( size_t n1 ) const noexcept
+  const_row_reference operator [ ] ( size_t n1 ) const noexcept
     { assert ( n1 < N ) ;
-      return elements + high_index_offset ( n1 ) ; }
+      return * reinterpret_cast < const T ( * ) [ N ] >
+                 ( elements + high_index_offset ( n1 ) ) ; }
 
   reference operator ( ) ( size_t n1, size_t n2 ) noexcept
     { return access ( n1, n2 ) ; }
@@ -1669,17 +1681,15 @@ class indexing_traits < fs_lower_triangular_matrix < T, N > >
 public:
 
   typedef size_t index_type ;
-  typedef T * value_type ;
+  typedef T value_type [ N ] ;
 
 } ;
 
 
-
-// *** FS_LOWER_TRIANGULAR_MATRIX SEQUENCE_SIZE ***
-
+//
 
 template < class T, size_t N >
-constexpr size_t sequence_size ( const fs_lower_triangular_matrix < T, N > & )
+constexpr size_t indexing_size ( const fs_lower_triangular_matrix < T, N > & )
 
 {
 return N ;
@@ -1714,6 +1724,9 @@ public:
 
   typedef :: reverse_iterator < iterator > reverse_iterator ;
   typedef :: reverse_iterator < const_iterator > const_reverse_iterator ;
+
+  typedef T ( & row_reference ) [ N ] ;
+  typedef const T ( & const_row_reference ) [ N ] ;
 
 private:
 
@@ -1808,13 +1821,15 @@ public:
                 ( "fs_upper_triangular_matrix :: at, index2 out of range" ) ;
       return elements [ high_index_offset ( n1 ) + n2 ] ; }
 
-  pointer operator [ ] ( size_t n1 ) noexcept
+  row_reference operator [ ] ( size_t n1 ) noexcept
     { assert ( n1 < N ) ;
-      return elements + high_index_offset ( n1 ) ; }
+      return * reinterpret_cast < T ( * ) [ N ] >
+                 ( elements + high_index_offset ( n1 ) ) ; }
 
-  const_pointer operator [ ] ( size_t n1 ) const noexcept
+  const_row_reference operator [ ] ( size_t n1 ) const noexcept
     { assert ( n1 < N ) ;
-      return elements + high_index_offset ( n1 ) ; }
+      return * reinterpret_cast < const T ( * ) [ N ] >
+                 ( elements + high_index_offset ( n1 ) ) ; }
 
   reference operator ( ) ( size_t n1, size_t n2 ) noexcept
     { return access ( n1, n2 ) ; }
@@ -2161,17 +2176,16 @@ class indexing_traits < fs_upper_triangular_matrix < T, N > >
 public:
 
   typedef size_t index_type ;
-  typedef T * value_type ;
+  typedef T value_type [ N ] ;
 
 } ;
 
 
-
-// *** FS_UPPER_TRIANGULAR_MATRIX SEQUENCE_SIZE ***
+//
 
 
 template < class T, size_t N >
-constexpr size_t sequence_size ( const fs_upper_triangular_matrix < T, N > & )
+constexpr size_t indexing_size ( const fs_upper_triangular_matrix < T, N > & )
 
 {
 return N ;
